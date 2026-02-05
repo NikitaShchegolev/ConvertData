@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ConvertData": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
