@@ -14,8 +14,6 @@ namespace ConvertData.Infrastructure
     /// </summary>
     internal sealed class XlsRowReader : IRowReader
     {
-        private const int DataRowCount = 15;
-
         public List<Row> Read(string path)
         {
             var lines = File.ReadAllLines(path, Encoding.UTF8)
@@ -25,18 +23,20 @@ namespace ConvertData.Infrastructure
             if (lines.Count == 0)
                 return new List<Row>();
 
-            var rows = new List<Row>(capacity: DataRowCount);
+            var rows = new List<Row>();
 
-            int dataLinesCount = lines.Count - 1;
-            int take = dataLinesCount > 0 ? System.Math.Min(DataRowCount, dataLinesCount) : 0;
-
-            for (int i = 0; i < take; i++)
+            // ѕерва€ строка Ч заголовок, дальше данные.
+            for (int i = 1; i < lines.Count; i++)
             {
-                var parts = SplitByTab(lines[i + 1]);
+                var parts = SplitByTab(lines[i]);
 
                 string name = Get(parts, 0, "");
                 string code = Get(parts, 1, "");
                 string profile = Get(parts, 2, "");
+
+                // ”словие: в выход должны попадать только заполненные строки (по CONNECTION_CODE).
+                if (string.IsNullOrWhiteSpace(code))
+                    continue;
 
                 string nt = Get(parts, 3, "0");
                 string nc = Get(parts, 4, "0");
@@ -44,11 +44,9 @@ namespace ConvertData.Infrastructure
                 string qo = Get(parts, 6, "0");
                 string q = Get(parts, 7, "0");
                 string t = Get(parts, 8, "0");
-
                 string m = Get(parts, 9, "0");
                 string mneg = Get(parts, 10, "0");
                 string mo = Get(parts, 11, "0");
-
                 string alpha = Get(parts, 12, "0");
                 string beta = Get(parts, 13, "0");
                 string gamma = Get(parts, 14, "0");
@@ -58,9 +56,6 @@ namespace ConvertData.Infrastructure
 
                 rows.Add(Map15(name, code, profile, nt, nc, n, qo, q, t, m, mneg, mo, alpha, beta, gamma, delta, epsilon, lambda));
             }
-
-            while (rows.Count < DataRowCount)
-                rows.Add(new Row());
 
             return rows;
         }

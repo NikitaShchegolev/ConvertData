@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,29 +10,27 @@ using OfficeOpenXml;
 namespace ConvertData.Infrastructure
 {
     /// <summary>
-    /// Reader для Excel-файлов.
+    /// Reader РґР»СЏ Excel-С„Р°Р№Р»РѕРІ.
     ///
-    /// Поддержка:
-    /// - `.xlsx` (zip) читается напрямую через EPPlus;
-    /// - бинарный `.xls` (OLE) при необходимости конвертируется в временный `.xlsx` через установленный Microsoft Excel (COM).
+    /// РџРѕРґРґРµСЂР¶РєР°:
+    /// - `.xlsx` (zip) С‡РёС‚Р°РµС‚СЃСЏ РЅР°РїСЂСЏРјСѓСЋ С‡РµСЂРµР· EPPlus;
+    /// - Р±РёРЅР°СЂРЅС‹Р№ `.xls` (OLE) РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚СЃСЏ РІ РІСЂРµРјРµРЅРЅС‹Р№ `.xlsx` С‡РµСЂРµР· СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ Microsoft Excel (COM).
     /// </summary>
     internal sealed class EpplusRowReader : IRowReader
     {
-        private const int DataRowCount = 15;
-
         /// <summary>
-        /// Считывает Excel-файл и возвращает строки в виде доменных объектов.
+        /// РЎС‡РёС‚С‹РІР°РµС‚ Excel-С„Р°Р№Р» Рё РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєРё РІ РІРёРґРµ РґРѕРјРµРЅРЅС‹С… РѕР±СЉРµРєС‚РѕРІ.
         /// </summary>
-        /// <param name="path">Путь к Excel файлу.</param>
+        /// <param name="path">РџСѓС‚СЊ Рє Excel С„Р°Р№Р»Сѓ.</param>
         public List<Row> Read(string path)
         {
             return ReadXlsxOrXlsViaExcelInterop(path);
         }
 
         /// <summary>
-        /// Определяет формат Excel по сигнатуре файла.
-        /// Если это `.xlsx` — читает напрямую.
-        /// Если это бинарный `.xls` — конвертирует во временный `.xlsx` через Excel и читает.
+        /// РћРїСЂРµРґРµР»СЏРµС‚ С„РѕСЂРјР°С‚ Excel РїРѕ СЃРёРіРЅР°С‚СѓСЂРµ С„Р°Р№Р»Р°.
+        /// Р•СЃР»Рё СЌС‚Рѕ `.xlsx` вЂ” С‡РёС‚Р°РµС‚ РЅР°РїСЂСЏРјСѓСЋ.
+        /// Р•СЃР»Рё СЌС‚Рѕ Р±РёРЅР°СЂРЅС‹Р№ `.xls` вЂ” РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РІРѕ РІСЂРµРјРµРЅРЅС‹Р№ `.xlsx` С‡РµСЂРµР· Excel Рё С‡РёС‚Р°РµС‚.
         /// </summary>
         private static List<Row> ReadXlsxOrXlsViaExcelInterop(string path)
         {
@@ -71,8 +69,8 @@ namespace ConvertData.Infrastructure
         }
 
         /// <summary>
-        /// Читает `.xlsx` через EPPlus: ищет первую страницу, определяет колонки по заголовкам,
-        /// затем мапит строки на `Row`.
+        /// Р§РёС‚Р°РµС‚ `.xlsx` С‡РµСЂРµР· EPPlus: РёС‰РµС‚ РїРµСЂРІСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ, РѕРїСЂРµРґРµР»СЏРµС‚ РєРѕР»РѕРЅРєРё РїРѕ Р·Р°РіРѕР»РѕРІРєР°Рј,
+        /// Р·Р°С‚РµРј РјР°РїРёС‚ СЃС‚СЂРѕРєРё РЅР° `Row`.
         /// </summary>
         private static List<Row> ReadXlsxWithEpplus(string path)
         {
@@ -93,7 +91,6 @@ namespace ConvertData.Infrastructure
             int idxName = IndexOfHeader(header, "Name");
             int idxCode = IndexOfHeader(header, "CONNECTION_CODE");
             int idxProfile = IndexOfHeader(header, "Profile");
-
             int idxNt = IndexOfHeader(header, "Nt");
             int idxQ = IndexOfHeader(header, "Q");
             int idxQo = IndexOfHeader(header, "Qo");
@@ -104,21 +101,21 @@ namespace ConvertData.Infrastructure
             int idxMneg = IndexOfHeader(header, "Mneg");
             int idxMo = IndexOfHeader(header, "Mo");
 
-            int idxAlpha = IndexOfHeader(header, "?");
+            int idxAlpha = IndexOfHeader(header, "О±");
             if (idxAlpha < 0) idxAlpha = IndexOfHeader(header, "Alpha");
-            int idxBeta = IndexOfHeader(header, "?");
+            int idxBeta = IndexOfHeader(header, "ОІ");
             if (idxBeta < 0) idxBeta = IndexOfHeader(header, "Beta");
-            int idxGamma = IndexOfHeader(header, "?");
+            int idxGamma = IndexOfHeader(header, "Оі");
             if (idxGamma < 0) idxGamma = IndexOfHeader(header, "Gamma");
-            int idxDelta = IndexOfHeader(header, "?");
+            int idxDelta = IndexOfHeader(header, "Оґ");
             if (idxDelta < 0) idxDelta = IndexOfHeader(header, "Delta");
-            int idxEpsilon = IndexOfHeader(header, "?");
+            int idxEpsilon = IndexOfHeader(header, "Оµ");
             if (idxEpsilon < 0) idxEpsilon = IndexOfHeader(header, "Epsilon");
-            int idxLambda = IndexOfHeader(header, "?");
+            int idxLambda = IndexOfHeader(header, "О»");
             if (idxLambda < 0) idxLambda = IndexOfHeader(header, "Lambda");
 
-            // Fallback: иногда греческие буквы теряются и приходят как "?".
-            // В этом случае подхватываем 6 колонок после Mo.
+            // Fallback: РёРЅРѕРіРґР° РіСЂРµС‡РµСЃРєРёРµ Р±СѓРєРІС‹ С‚РµСЂСЏСЋС‚СЃСЏ Рё РїСЂРёС…РѕРґСЏС‚ РєР°Рє "?".
+            // Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РїРѕРґС…РІР°С‚С‹РІР°РµРј 6 РєРѕР»РѕРЅРѕРє РїРѕСЃР»Рµ Mo.
             if (idxMo >= 0 && (idxAlpha < 0 || idxBeta < 0 || idxGamma < 0 || idxDelta < 0 || idxEpsilon < 0 || idxLambda < 0))
             {
                 var qMarks = header
@@ -171,15 +168,16 @@ namespace ConvertData.Infrastructure
             int? colEpsilon = idxEpsilon >= 0 ? startCol + idxEpsilon : null;
             int? colLambda = idxLambda >= 0 ? startCol + idxLambda : null;
 
-            var list = new List<Row>(capacity: DataRowCount);
+            var list = new List<Row>();
 
             int firstDataRow = startRow + 1;
-            int lastDataRowInSheet = Math.Min(endRow, firstDataRow + DataRowCount - 1);
-
-            for (int r = firstDataRow; r <= lastDataRowInSheet; r++)
+            for (int r = firstDataRow; r <= endRow; r++)
             {
-                string name = (ws.Cells[r, colName].Text ?? "").Trim();
                 string code = (ws.Cells[r, colCode].Text ?? "").Trim();
+                if (string.IsNullOrWhiteSpace(code))
+                    continue;
+
+                string name = (ws.Cells[r, colName].Text ?? "").Trim();
                 string profile = (ws.Cells[r, colProfile].Text ?? "").Trim();
 
                 string ntStr = GetCell(ws, r, colNt);
@@ -200,9 +198,6 @@ namespace ConvertData.Infrastructure
 
                 list.Add(Map15(name, code, profile, ntStr, qStr, qoStr, tStr, ncStr, nStr, mStr, mnegStr, moStr, alphaStr, betaStr, gammaStr, deltaStr, epsilonStr, lambdaStr));
             }
-
-            while (list.Count < DataRowCount)
-                list.Add(new Row());
 
             return list;
         }
@@ -286,8 +281,8 @@ namespace ConvertData.Infrastructure
         }
 
         /// <summary>
-        /// Конвертирует бинарный `.xls` в `.xlsx` через установленный Microsoft Excel (COM automation).
-        /// Нужен установленный Excel и Windows.
+        /// РљРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ Р±РёРЅР°СЂРЅС‹Р№ `.xls` РІ `.xlsx` С‡РµСЂРµР· СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ Microsoft Excel (COM automation).
+        /// РќСѓР¶РµРЅ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ Excel Рё Windows.
         /// </summary>
         private static void ConvertXlsToXlsxViaExcel(string xlsPath, string xlsxPath)
         {
@@ -352,7 +347,7 @@ namespace ConvertData.Infrastructure
         }
 
         /// <summary>
-        /// Парсит целое число из строки (InvariantCulture / ru-RU), иначе возвращает 0.
+        /// РџР°СЂСЃРёС‚ С†РµР»РѕРµ С‡РёСЃР»Рѕ РёР· СЃС‚СЂРѕРєРё (InvariantCulture / ru-RU), РёРЅР°С‡Рµ РІРѕР·РІСЂР°С‰Р°РµС‚ 0.
         /// </summary>
         private static int ParseInt(string s)
         {
@@ -366,7 +361,7 @@ namespace ConvertData.Infrastructure
         }
 
         /// <summary>
-        /// Находит индекс колонки в строке заголовков по имени (без учёта регистра).
+        /// РќР°С…РѕРґРёС‚ РёРЅРґРµРєСЃ РєРѕР»РѕРЅРєРё РІ СЃС‚СЂРѕРєРµ Р·Р°РіРѕР»РѕРІРєРѕРІ РїРѕ РёРјРµРЅРё (Р±РµР· СѓС‡С‘С‚Р° СЂРµРіРёСЃС‚СЂР°).
         /// </summary>
         private static int IndexOfHeader(List<string> header, string name)
         {
@@ -385,7 +380,7 @@ namespace ConvertData.Infrastructure
 
             var t = h.Trim();
 
-            // Иногда встречаются похожие символы/варианты.
+            // РРЅРѕРіРґР° РІСЃС‚СЂРµС‡Р°СЋС‚СЃСЏ РїРѕС…РѕР¶РёРµ СЃРёРјРІРѕР»С‹/РІР°СЂРёР°РЅС‚С‹.
             if (string.Equals(t, "a", StringComparison.OrdinalIgnoreCase)) return "?";
             if (string.Equals(t, "b", StringComparison.OrdinalIgnoreCase)) return "?";
             if (string.Equals(t, "g", StringComparison.OrdinalIgnoreCase)) return "?";
