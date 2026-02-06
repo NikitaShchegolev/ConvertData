@@ -1,107 +1,310 @@
 using System;
-using System.Globalization;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using ConvertData.Domain;
 using ConvertData.Infrastructure;
 
 namespace ConvertData.Application
 {
-    /// <summary>
-    /// Сценарий (use-case) приложения: конвертация входных Excel/табличных файлов в JSON.
-    ///
-    /// Ответственность класса:
-    /// - настроить окружение (кодировки, лицензия EPPlus);
-    /// - определить папки ввода/вывода относительно каталога проекта;
-    /// - найти входные файлы (или взять из аргументов);
-    /// - для каждого входного файла выбрать подходящий reader и сохранить JSON.
-    /// </summary>
     internal sealed class ConvertApp
     {
-        private readonly IRowWriter _writer;
-        private readonly IRowReaderFactory _readerFactory;
-        private readonly IPathResolver _pathResolver;
-        private readonly ILicenseConfigurator _licenseConfigurator;
+        private readonly IRowWriter _writer = new JsonRowWriter();
+        private readonly IRowReaderFactory _readerFactory = new RowReaderFactory();
+        private readonly IPathResolver _pathResolver = new PathResolver();
+        private readonly ILicenseConfigurator _licenseConfigurator = new EpplusLicenseConfigurator();
 
-        /// <summary>
-        /// Создаёт экземпляр приложения с конкретными инфраструктурными реализациями.
-        /// </summary>
-        public ConvertApp()
-        {
-            _writer = new JsonRowWriter();
-            _readerFactory = new RowReaderFactory();
-            _pathResolver = new PathResolver();
-            _licenseConfigurator = new EpplusLicenseConfigurator();
-        }
-
-        /// <summary>
-        /// Основной запуск сценария конвертации.
-        /// </summary>
-        /// <param name="args">
-        /// Аргументы командной строки.
-        /// Если указаны — каждый аргумент считается путём к входному файлу и обрабатывается.
-        /// Если не указаны — обрабатываются все поддерживаемые файлы из `EXCEL`.
-        /// </param>
         public void Run(string[] args)
         {
-            // Нужен для поддержки legacy-кодировок (например Windows-1251) на .NET.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            // Настройка лицензии библиотеки EPPlus.
             _licenseConfigurator.Configure();
 
-            // Определяем папку проекта и папки ввода/вывода.
             var projectDir = _pathResolver.GetProjectDir(AppDomain.CurrentDomain.BaseDirectory) ?? AppDomain.CurrentDomain.BaseDirectory;
             var excelDir = Path.Combine(projectDir, "EXCEL");
+            var excelProfileDir = Path.Combine(projectDir, "EXCEL_Profile");
             var jsonOutDir = Path.Combine(projectDir, "JSON_OUT");
             Directory.CreateDirectory(jsonOutDir);
 
-            foreach (var f in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly))
-            {
-                try { File.Delete(f); } catch { }
-            }
+            var mode = GetMode(args);
 
-            // Если переданы аргументы — обрабатываем только их.
-            if (args.Length > 0)
+            if (mode == RunMode.All || mode == RunMode.CreateJson)
             {
-                foreach (var input in args)
+                ClearJsonOut(jsonOutDir);
+
+                foreach (var input in GetInputFiles(GetInputArgsForCreateJson(args), excelDir))
                     ConvertOne(input, jsonOutDir);
 
-                return;
+                if (mode == RunMode.All)
+                {
+                    Console.WriteLine();
+                    if (!AskYesNo("Этап 1 завершён (создание JSON). Продолжить к этапу 2 (добавление из справочника)? [y/n]: "))
+                        return;
+                }
             }
 
-            // Иначе обрабатываем всё из папки EXCEL.
+            if (mode == RunMode.All || mode == RunMode.ApplyProfiles)
+            {
+                ApplyProfilesToJson(jsonOutDir, excelProfileDir);
+            }
+        }
+
+        private enum RunMode
+        {
+            All,
+            CreateJson,
+            ApplyProfiles
+        }
+
+        private static RunMode GetMode(string[] args)
+        {
+            if (args.Length == 0)
+                return RunMode.All;
+
+            if (args.Length >= 1 && string.Equals(args[0], "1", StringComparison.OrdinalIgnoreCase))
+                return RunMode.CreateJson;
+
+            if (args.Length >= 1 && string.Equals(args[0], "2", StringComparison.OrdinalIgnoreCase))
+                return RunMode.ApplyProfiles;
+
+            return RunMode.All;
+        }
+
+        private static string[] GetInputArgsForCreateJson(string[] args)
+        {
+            if (args.Length == 0)
+                return args;
+
+            if (string.Equals(args[0], "1", StringComparison.OrdinalIgnoreCase))
+                return args.Skip(1).ToArray();
+
+            return args;
+        }
+
+        private static bool AskYesNo(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                var s = (Console.ReadLine() ?? string.Empty).Trim();
+
+                if (s.Length == 0)
+                    continue;
+
+                if (string.Equals(s, "y", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "yes", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "д", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "да", StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                if (string.Equals(s, "n", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "no", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "н", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "нет", StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+        }
+
+        private static void ClearJsonOut(string jsonOutDir)
+        {
+            foreach (var f in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly))
+            {
+                try { File.Delete(f); }
+                catch { }
+            }
+        }
+
+        private static IEnumerable<string> GetInputFiles(string[] args, string excelDir)
+        {
+            if (args.Length > 0)
+            {
+                return args.Where(p => !string.Equals(Path.GetFileName(p), "Profile.xls", StringComparison.OrdinalIgnoreCase));
+            }
+
             if (!Directory.Exists(excelDir))
                 throw new DirectoryNotFoundException("Input folder not found: " + excelDir);
 
-            var inputFiles = Directory.EnumerateFiles(excelDir)
+            return Directory.EnumerateFiles(excelDir)
                 .Where(PathResolver.HasExcelExtension)
-                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            foreach (var input in inputFiles)
-                ConvertOne(input, jsonOutDir);
+                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase);
         }
 
-        /// <summary>
-        /// Конвертирует один входной файл в JSON.
-        /// </summary>
-        /// <param name="inputPath">Путь к входному файлу.</param>
-        /// <param name="jsonOutDir">Папка, куда сохраняется итоговый JSON.</param>
         private void ConvertOne(string inputPath, string jsonOutDir)
         {
             if (!File.Exists(inputPath))
                 return;
 
-            // Подбираем нужный reader (например TSV или Excel).
-            var reader = _readerFactory.Create(inputPath);
-            var rows = reader.Read(inputPath);
+            var rows = _readerFactory.Create(inputPath).Read(inputPath);
 
-            // Пишем JSON с таким же базовым именем файла.
             var outPath = Path.Combine(jsonOutDir, Path.GetFileNameWithoutExtension(inputPath) + ".json");
             _writer.Write(rows, outPath);
             Console.WriteLine("Written: " + outPath);
+        }
+
+        private void ApplyProfilesToJson(string jsonOutDir, string excelProfileDir)
+        {
+            var profileLookup = BuildProfileLookup(excelProfileDir);
+            if (profileLookup.Count == 0)
+            {
+                Console.WriteLine("Profile lookup is empty: EXCEL_Profile/Profile.xls was not parsed.");
+                return;
+            }
+
+            SelfCheckProfile(profileLookup);
+
+            foreach (var jsonPath in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly)
+                         .OrderBy(f => f, StringComparer.OrdinalIgnoreCase))
+            {
+                PatchJsonFile(jsonPath, profileLookup);
+            }
+        }
+
+        private static void SelfCheckProfile(Dictionary<string, (double H, double B, double s, double t)> profileLookup)
+        {
+            var key = NormalizeProfileKey("10Б1");
+            if (TryResolveProfile(profileLookup, key, out var g))
+            {
+                Console.WriteLine($"Self-check Profile=10Б1 => H={g.H}, B={g.B}, s={g.s}, t={g.t}");
+                return;
+            }
+
+            Console.WriteLine("Self-check Profile=10Б1 => NOT FOUND in Profile.xls");
+
+            var digits = new string(key.Where(char.IsDigit).ToArray());
+            var sample = profileLookup.Keys
+                .Where(k => !string.IsNullOrWhiteSpace(digits) && k.Contains(digits, StringComparison.OrdinalIgnoreCase))
+                .Take(10)
+                .ToList();
+
+            if (sample.Count > 0)
+                Console.WriteLine("Closest keys containing digits '" + digits + "': " + string.Join(", ", sample));
+        }
+
+        private static void PatchJsonFile(string jsonPath, Dictionary<string, (double H, double B, double s, double t)> profileLookup)
+        {
+            if (!TryReadJsonArray(jsonPath, out var root, out var arr))
+                return;
+
+            var patched = 0;
+
+            foreach (var item in arr)
+            {
+                if (item is not JsonObject obj)
+                    continue;
+
+                var key = NormalizeProfileKey(obj["Profile"]?.GetValue<string>());
+                if (string.IsNullOrWhiteSpace(key) || !TryResolveProfile(profileLookup, key, out var g))
+                    continue;
+
+                obj["H"] = g.H;
+                obj["B"] = g.B;
+                obj["s"] = g.s;
+                obj["t"] = g.t;
+                patched++;
+            }
+
+            if (patched == 0)
+                return;
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
+            File.WriteAllText(jsonPath, root!.ToJsonString(options), Encoding.UTF8);
+        }
+
+        private static bool TryReadJsonArray(string jsonPath, out JsonNode? root, out JsonArray arr)
+        {
+            root = null;
+            arr = null!;
+
+            try
+            {
+                root = JsonNode.Parse(File.ReadAllText(jsonPath, Encoding.UTF8));
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (root is not JsonArray a)
+                return false;
+
+            arr = a;
+            return true;
+        }
+
+        private Dictionary<string, (double H, double B, double s, double t)> BuildProfileLookup(string excelProfileDir)
+        {
+            var profilePath = Path.Combine(excelProfileDir, "Profile.xls");
+            if (!File.Exists(profilePath))
+                return new(StringComparer.OrdinalIgnoreCase);
+
+            try
+            {
+                var rows = _readerFactory.Create(profilePath).Read(profilePath);
+
+                var dict = new Dictionary<string, (double H, double B, double s, double t)>(StringComparer.OrdinalIgnoreCase);
+                foreach (var r in rows)
+                {
+                    var key = NormalizeProfileKey(r.Profile);
+                    if (!string.IsNullOrWhiteSpace(key))
+                        dict[key] = (r.H, r.B, r.s, r.t);
+                }
+
+                Console.WriteLine($"Loaded profiles: {dict.Count} from {profilePath}");
+                return dict;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to read profile excel: " + profilePath);
+                Console.WriteLine(ex);
+                return new(StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        private static string NormalizeProfileKey(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return "";
+
+            return new string(s
+                .Trim()
+                .Replace('\u00A0', ' ')
+                .Where(ch => !char.IsWhiteSpace(ch))
+                .ToArray());
+        }
+
+        private static bool TryResolveProfile(
+            Dictionary<string, (double H, double B, double s, double t)> profileLookup,
+            string normalizedProfile,
+            out (double H, double B, double s, double t) geometry)
+        {
+            if (profileLookup.TryGetValue(normalizedProfile, out geometry))
+                return true;
+
+            var digits = new string(normalizedProfile.Where(char.IsDigit).ToArray());
+            if (!string.IsNullOrWhiteSpace(digits) && profileLookup.TryGetValue(digits, out geometry))
+                return true;
+
+            if (!string.IsNullOrWhiteSpace(digits))
+            {
+                foreach (var kv in profileLookup)
+                {
+                    if (kv.Key.StartsWith(digits, StringComparison.OrdinalIgnoreCase))
+                    {
+                        geometry = kv.Value;
+                        return true;
+                    }
+                }
+            }
+
+            geometry = default;
+            return false;
         }
     }
 }

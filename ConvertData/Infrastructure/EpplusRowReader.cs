@@ -84,13 +84,22 @@ namespace ConvertData.Infrastructure
             int startCol = ws.Dimension.Start.Column;
             int endCol = ws.Dimension.End.Column;
 
+            // Ищем строку заголовка (иногда первая строка может быть пустой/с названием таблицы)
+            int headerRow = FindHeaderRow(ws, startRow, Math.Min(endRow, startRow + 30), startCol, endCol);
+
             var header = new List<string>();
             for (int c = startCol; c <= endCol; c++)
-                header.Add(NormalizeHeader((ws.Cells[startRow, c].Text ?? "").Trim()));
+                header.Add(NormalizeHeader((ws.Cells[headerRow, c].Text ?? "").Trim()));
+
+            int idxH = IndexOfHeaderAny(header, new[] { "H", "Н" });
+            int idxB = IndexOfHeaderAny(header, new[] { "B", "В" });
+            int idxs = IndexOfHeaderAny(header, new[] { "s", "S" });
+            int idxt = IndexOfHeaderAny(header, new[] { "t", "T" });
 
             int idxName = IndexOfHeader(header, "Name");
-            int idxCode = IndexOfHeader(header, "CONNECTION_CODE");
-            int idxProfile = IndexOfHeader(header, "Profile");
+            int idxCode = IndexOfHeaderAny(header, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" });
+            int idxProfile = IndexOfHeaderAny(header, new[] { "Profile", "Профиль" });
+
             int idxNt = IndexOfHeader(header, "Nt");
             int idxQ = IndexOfHeader(header, "Q");
             int idxQo = IndexOfHeader(header, "Qo");
@@ -145,11 +154,46 @@ namespace ConvertData.Infrastructure
                 }
             }
 
-            if (idxName < 0 || idxCode < 0 || idxProfile < 0)
-                throw new InvalidDataException("Cannot find required headers in first row of worksheet");
+            // Поддержка двух форматов:
+            // 1) Основные таблицы: обязательны Name/CONNECTION_CODE/Profile
+            // 2) Справочник профилей: достаточно Profile + H/B/s/t
+            bool isMainTable = idxName >= 0 && idxCode >= 0 && idxProfile >= 0;
+            bool isProfileTable = idxProfile >= 0 && idxH >= 0 && idxB >= 0 && idxs >= 0 && idxt >= 0;
 
-            int colName = startCol + idxName;
-            int colCode = startCol + idxCode;
+            if (!isMainTable && !isProfileTable)
+            {
+                // Fallback для справочника: заголовки могут отсутствовать или быть нераспознаны.
+                // 1) Если есть колонка Profile, считаем что следующие 4 колонки — H,B,s,t.
+                if (idxProfile >= 0)
+                {
+                    if (idxH < 0) idxH = idxProfile + 1;
+                    if (idxB < 0) idxB = idxProfile + 2;
+                    if (idxs < 0) idxs = idxProfile + 3;
+                    if (idxt < 0) idxt = idxProfile + 4;
+                    isProfileTable = idxProfile >= 0 && idxH < header.Count && idxB < header.Count && idxs < header.Count && idxt < header.Count;
+                }
+                else
+                {
+                    // 2) Если даже Profile не нашли — берём первые 5 колонок.
+                    idxProfile = 0;
+                    idxH = 1;
+                    idxB = 2;
+                    idxs = 3;
+                    idxt = 4;
+                    isProfileTable = header.Count >= 5;
+                }
+
+                if (!isProfileTable)
+                    throw new InvalidDataException("Cannot find required headers in worksheet");
+            }
+
+            int? colH = idxH >= 0 ? startCol + idxH : null;
+            int? colB = idxB >= 0 ? startCol + idxB : null;
+            int? cols = idxs >= 0 ? startCol + idxs : null;
+            int? colt = idxt >= 0 ? startCol + idxt : null;
+
+            int? colName = idxName >= 0 ? startCol + idxName : null;
+            int? colCode = idxCode >= 0 ? startCol + idxCode : null;
             int colProfile = startCol + idxProfile;
 
             int? colNt = idxNt >= 0 ? startCol + idxNt : null;
@@ -169,34 +213,63 @@ namespace ConvertData.Infrastructure
             int? colLambda = idxLambda >= 0 ? startCol + idxLambda : null;
 
             var list = new List<Row>();
+            int firstDataRow = headerRow + 1;
 
-            int firstDataRow = startRow + 1;
             for (int r = firstDataRow; r <= endRow; r++)
             {
-                string code = (ws.Cells[r, colCode].Text ?? "").Trim();
-                if (string.IsNullOrWhiteSpace(code))
-                    continue;
+                if (isMainTable)
+                {
+                    string code = (ws.Cells[r, colCode!.Value].Text ?? "").Trim();
+                    if (string.IsNullOrWhiteSpace(code))
+                        continue;
 
-                string name = (ws.Cells[r, colName].Text ?? "").Trim();
-                string profile = (ws.Cells[r, colProfile].Text ?? "").Trim();
+                    string name = (ws.Cells[r, colName!.Value].Text ?? "").Trim();
+                    string profile = (ws.Cells[r, colProfile].Text ?? "").Trim();
 
-                string ntStr = GetCell(ws, r, colNt);
-                string qStr = GetCell(ws, r, colQ);
-                string qoStr = GetCell(ws, r, colQo);
-                string tStr = GetCell(ws, r, colT);
-                string ncStr = GetCell(ws, r, colNc);
-                string nStr = GetCell(ws, r, colN);
-                string mStr = GetCell(ws, r, colM);
-                string mnegStr = GetCell(ws, r, colMneg);
-                string moStr = GetCell(ws, r, colMo);
-                string alphaStr = GetCell(ws, r, colAlpha);
-                string betaStr = GetCell(ws, r, colBeta);
-                string gammaStr = GetCell(ws, r, colGamma);
-                string deltaStr = GetCell(ws, r, colDelta);
-                string epsilonStr = GetCell(ws, r, colEpsilon);
-                string lambdaStr = GetCell(ws, r, colLambda);
+                    string hStr = GetCell(ws, r, colH);
+                    string bStr = GetCell(ws, r, colB);
+                    string sStr = GetCell(ws, r, cols);
+                    string tgeomStr = GetCell(ws, r, colt);
 
-                list.Add(Map15(name, code, profile, ntStr, qStr, qoStr, tStr, ncStr, nStr, mStr, mnegStr, moStr, alphaStr, betaStr, gammaStr, deltaStr, epsilonStr, lambdaStr));
+                    string ntStr = GetCell(ws, r, colNt);
+                    string qStr = GetCell(ws, r, colQ);
+                    string qoStr = GetCell(ws, r, colQo);
+                    string tStr = GetCell(ws, r, colT);
+                    string ncStr = GetCell(ws, r, colNc);
+                    string nStr = GetCell(ws, r, colN);
+                    string mStr = GetCell(ws, r, colM);
+                    string mnegStr = GetCell(ws, r, colMneg);
+                    string moStr = GetCell(ws, r, colMo);
+                    string alphaStr = GetCell(ws, r, colAlpha);
+                    string betaStr = GetCell(ws, r, colBeta);
+                    string gammaStr = GetCell(ws, r, colGamma);
+                    string deltaStr = GetCell(ws, r, colDelta);
+                    string epsilonStr = GetCell(ws, r, colEpsilon);
+                    string lambdaStr = GetCell(ws, r, colLambda);
+
+                    list.Add(Map19(name, code, profile, hStr, bStr, sStr, tgeomStr, ntStr, qStr, qoStr, tStr, ncStr, nStr, mStr, mnegStr, moStr, alphaStr, betaStr, gammaStr, deltaStr, epsilonStr, lambdaStr));
+                }
+                else
+                {
+                    // Справочник Profile.xls: Profile/H/B/s/t
+                    string profile = (ws.Cells[r, colProfile].Text ?? "").Trim();
+                    if (string.IsNullOrWhiteSpace(profile))
+                        continue;
+
+                    string hStr = GetCell(ws, r, colH);
+                    string bStr = GetCell(ws, r, colB);
+                    string sStr = GetCell(ws, r, cols);
+                    string tStr = GetCell(ws, r, colt);
+
+                    list.Add(new Row
+                    {
+                        Profile = profile,
+                        H = ParseDouble(hStr),
+                        B = ParseDouble(bStr),
+                        s = ParseDouble(sStr),
+                        t = ParseDouble(tStr)
+                    });
+                }
             }
 
             return list;
@@ -209,10 +282,14 @@ namespace ConvertData.Infrastructure
             return (ws.Cells[row, col.Value].Text ?? "").Trim();
         }
 
-        private static Row Map15(
+        private static Row Map19(
             string name,
             string code,
             string profile,
+            string h,
+            string b,
+            string s,
+            string tGeom,
             string nt,
             string q,
             string qo,
@@ -229,6 +306,11 @@ namespace ConvertData.Infrastructure
             string epsilon,
             string lambda)
         {
+            var hDouble = ParseDouble(h);
+            var bDouble = ParseDouble(b);
+            var sDouble = ParseDouble(s);
+            var tGeomDouble = ParseDouble(tGeom);
+
             var ntInt = ParseInt(nt);
             var qInt = ParseInt(q);
             var qoInt = ParseInt(qo);
@@ -251,6 +333,10 @@ namespace ConvertData.Infrastructure
                 Name = name,
                 CONNECTION_CODE = code,
                 Profile = profile,
+                H = hDouble,
+                B = bDouble,
+                s = sDouble,
+                t = tGeomDouble,
                 Nt = ntInt,
                 Nc = ncInt,
                 N = nInt,
@@ -371,6 +457,44 @@ namespace ConvertData.Infrastructure
                     return i;
             }
             return -1;
+        }
+
+        private static int IndexOfHeaderAny(List<string> header, IEnumerable<string> names)
+        {
+            foreach (var n in names)
+            {
+                int idx = IndexOfHeader(header, n);
+                if (idx >= 0)
+                    return idx;
+            }
+            return -1;
+        }
+
+        private static int FindHeaderRow(ExcelWorksheet ws, int fromRow, int toRow, int startCol, int endCol)
+        {
+            for (int r = fromRow; r <= toRow; r++)
+            {
+                var tokens = new List<string>();
+                for (int c = startCol; c <= endCol; c++)
+                    tokens.Add(NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
+
+                bool hasProfile = IndexOfHeaderAny(tokens, new[] { "Profile", "Профиль" }) >= 0;
+                bool hasH = IndexOfHeaderAny(tokens, new[] { "H", "Н" }) >= 0;
+                bool hasB = IndexOfHeaderAny(tokens, new[] { "B", "В" }) >= 0;
+                bool hass = IndexOfHeaderAny(tokens, new[] { "s", "S" }) >= 0;
+                bool hast = IndexOfHeaderAny(tokens, new[] { "t", "T" }) >= 0;
+
+                bool hasMain = IndexOfHeaderAny(tokens, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" }) >= 0
+                    && IndexOfHeader(tokens, "Name") >= 0
+                    && hasProfile;
+
+                bool hasProfileTable = hasProfile && hasH && hasB && hass && hast;
+
+                if (hasMain || hasProfileTable)
+                    return r;
+            }
+
+            return fromRow;
         }
 
         private static string NormalizeHeader(string h)

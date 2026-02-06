@@ -16,12 +16,51 @@ namespace ConvertData.Infrastructure
     {
         public List<Row> Read(string path)
         {
-            var lines = File.ReadAllLines(path, Encoding.UTF8)
+            var rawLines = ReadLinesBestEffort(path);
+
+            var lines = rawLines
                 .Where(l => !string.IsNullOrWhiteSpace(l))
                 .ToList();
 
             if (lines.Count == 0)
                 return new List<Row>();
+
+            // Если это справочник профилей (TSV) с заголовком: Profile\tH\tB\ts\tt
+            var headerParts = SplitByTab(lines[0]);
+            bool isProfileTsv = headerParts.Count >= 5
+                && string.Equals(NormalizeHeaderToken(headerParts[0]), "Profile", System.StringComparison.OrdinalIgnoreCase)
+                && string.Equals(NormalizeHeaderToken(headerParts[1]), "H", System.StringComparison.OrdinalIgnoreCase)
+                && string.Equals(NormalizeHeaderToken(headerParts[2]), "B", System.StringComparison.OrdinalIgnoreCase)
+                && string.Equals(NormalizeHeaderToken(headerParts[3]), "s", System.StringComparison.OrdinalIgnoreCase)
+                && string.Equals(NormalizeHeaderToken(headerParts[4]), "t", System.StringComparison.OrdinalIgnoreCase);
+
+            if (isProfileTsv)
+            {
+                var list = new List<Row>();
+                for (int i = 1; i < lines.Count; i++)
+                {
+                    var parts = SplitByTab(lines[i]);
+                    var profile = Get(parts, 0, "");
+                    if (string.IsNullOrWhiteSpace(profile))
+                        continue;
+
+                    var h = Get(parts, 1, "0");
+                    var b = Get(parts, 2, "0");
+                    var s = Get(parts, 3, "0");
+                    var t = Get(parts, 4, "0");
+
+                    list.Add(new Row
+                    {
+                        Profile = profile,
+                        H = ParseDouble(h),
+                        B = ParseDouble(b),
+                        s = ParseDouble(s),
+                        t = ParseDouble(t)
+                    });
+                }
+
+                return list;
+            }
 
             var rows = new List<Row>();
 
@@ -58,6 +97,62 @@ namespace ConvertData.Infrastructure
             }
 
             return rows;
+        }
+
+        private static IEnumerable<string> ReadLinesBestEffort(string path)
+        {
+            // Встречается, что "Profile.xls" — это CSV/TSV сохранённый в OEM866 или ANSI.
+            // Пробуем несколько кодировок и выбираем ту, где распознаётся заголовок Profile/H/B/s/t.
+            var encodings = new[]
+            {
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true),
+                Encoding.UTF8,
+                Encoding.GetEncoding(1251),
+                Encoding.GetEncoding(866)
+            };
+
+            foreach (var enc in encodings)
+            {
+                try
+                {
+                    var lines = File.ReadAllLines(path, enc);
+                    if (lines.Length == 0)
+                        continue;
+
+                    var headerParts = SplitByTab(lines[0]);
+                    bool isProfileTsv = headerParts.Count >= 5
+                        && string.Equals(NormalizeHeaderToken(headerParts[0]), "Profile", System.StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(NormalizeHeaderToken(headerParts[1]), "H", System.StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(NormalizeHeaderToken(headerParts[2]), "B", System.StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(NormalizeHeaderToken(headerParts[3]), "s", System.StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(NormalizeHeaderToken(headerParts[4]), "t", System.StringComparison.OrdinalIgnoreCase);
+
+                    if (isProfileTsv)
+                        return lines;
+
+                    // Если это НЕ справочник профилей, но файл читается без ошибок — тоже возвращаем.
+                    // (Дальше логика прочтёт как обычную TSV-таблицу из EXCEL.)
+                    return lines;
+                }
+                catch
+                {
+                    // пробуем следующую
+                }
+            }
+
+            // Последний шанс: как binary с UTF8 (как было раньше)
+            return File.ReadAllLines(path, Encoding.UTF8);
+        }
+
+        private static string NormalizeHeaderToken(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return string.Empty;
+
+            var t = s.Trim();
+            if (t.Length > 0 && t[0] == '\uFEFF')
+                t = t.TrimStart('\uFEFF');
+            return t;
         }
 
         private static string Get(List<string> parts, int index, string fallback)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -16,10 +17,16 @@ namespace ConvertData.Infrastructure
             for (int i = 0; i < rows.Count; i++)
             {
                 var r = rows[i];
+                var guid = Guid.NewGuid().ToString("D");
+
                 sb.AppendLine("  {");
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
-                sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
+                sb.AppendLine("    \"CONNECTION_CODE\": \"" + guid + "\",");
                 sb.AppendLine("    \"Profile\": \"" + JsonEscape(r.Profile) + "\",");
+                sb.AppendLine("    \"H\": " + r.H.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"B\": " + r.B.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"s\": " + r.s.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"t\": " + r.t.ToString(CultureInfo.InvariantCulture) + ",");
                 sb.AppendLine("    \"Nt\": " + r.Nt + ",");
                 sb.AppendLine("    \"Q\": " + r.Q + ",");
                 sb.AppendLine("    \"Qo\": " + r.Qo + ",");
