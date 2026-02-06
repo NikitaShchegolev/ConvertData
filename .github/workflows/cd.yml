@@ -1,0 +1,95 @@
+name: CD
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    name: Build and Upload (artifacts)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish (Release)
+        run: dotnet publish ./ConvertData/ConvertData.csproj -c Release -o artifacts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: convertdata-build
+          path: artifacts/
+
+  create-release-on-tag:
+    name: Release (create on tag + upload assets)
+    runs-on: ubuntu-latest
+    needs: build-and-upload
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: convertdata-build
+
+      - name: Zip artifacts
+        run: |
+          if [ -d convertdata-build ]; then
+            zip -r convertdata-build.zip convertdata-build >/dev/null || true
+          else
+            echo "convertdata-build directory not found"
+            exit 1
+          fi
+
+      - name: Create/Update GitHub Release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: convertdata-build.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-on-published:
+    name: Release (upload assets)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: convertdata-build
+
+      - name: Zip artifacts
+        run: |
+          if [ -d convertdata-build ]; then
+            zip -r convertdata-build.zip convertdata-build >/dev/null || true
+          else
+            echo "convertdata-build directory not found"
+            exit 0
+          fi
+
+      - name: Upload asset to existing GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: convertdata-build.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

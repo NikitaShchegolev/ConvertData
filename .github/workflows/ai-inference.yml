@@ -1,0 +1,213 @@
+name: AI Inference (GitHub Models)
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Prompt to send to the model"
+        required: true
+        default: "Say hello from GitHub Models"
+      model:
+        description: "Model id (GitHub Models)"
+        required: true
+        default: "openai/gpt-4o-mini"
+      timeoutSeconds:
+        description: "Timeout in seconds for TestAIModel run"
+        required: false
+        default: "60"
+  push:
+    branches: [ home, main, master ]
+  pull_request:
+    branches: [ home, main, master ]
+
+permissions:
+  contents: read
+  models: read
+
+concurrency:
+  group: ai-inference-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inference:
+    runs-on: ubuntu-latest
+
+    # Don't run on PRs from forks by default
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build prompt/model
+        id: vars
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+          PUSH_HEAD_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+
+          write_output_multiline() {
+            key="$1"
+            value="$2"
+            delimiter="__EOF__"
+            {
+              echo "${key}<<${delimiter}";
+              echo "${value}";
+              echo "${delimiter}";
+            } >> "$GITHUB_OUTPUT"
+          }
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            write_output_multiline "prompt" "${{ inputs.prompt }}"
+            echo "model=${{ inputs.model }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            title="$PR_TITLE"
+            changed_files=$(git diff --name-only "$PR_BASE_SHA".."$PR_HEAD_SHA" | sed '/^$/d' || true)
+          else
+            title="$PUSH_HEAD_MSG"
+            if [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+              changed_files=$(git diff --name-only "$PUSH_BEFORE".."$PUSH_AFTER" | sed '/^$/d' || true)
+            else
+              changed_files=$(git show --name-only --pretty="" "$PUSH_AFTER" | sed '/^$/d' || true)
+            fi
+          fi
+
+          file_count=$(printf "%s\n" "$changed_files" | sed '/^$/d' | wc -l | tr -d ' ' || true)
+          if [ -z "${file_count}" ]; then file_count=0; fi
+
+          max_files=200
+          if [ "$file_count" -gt "$max_files" ]; then
+            changed_files_limited=$(printf "%s\n" "$changed_files" | sed '/^$/d' | head -n "$max_files")
+            changed_files=$(printf "%s\n... and %s more\n" "$changed_files_limited" "$((file_count - max_files))")
+          fi
+
+          if [ -z "${changed_files}" ]; then
+            changed_files="(no files detected)"
+          fi
+
+          prompt=$(
+            printf '%s\n' \
+              'You are a CI assistant. Summarize what likely changed in this repository based on the commit/PR title and the file list (do not assume access to file contents). Provide:' \
+              '1) a 3-bullet summary of the change,' \
+              '2) potential risks (build, tests, breaking changes),' \
+              '3) what to verify in CI/CD (specific workflows/jobs to check),' \
+              '4) if documentation updates are needed.' \
+              '' \
+              'Title:' \
+              "$title" \
+              '' \
+              'Changed files:' \
+              "$changed_files"
+          )
+
+          write_output_multiline "prompt" "$prompt"
+          echo "model=openai/gpt-4o-mini" >> "$GITHUB_OUTPUT"
+
+      - name: Call GitHub Models (REST)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROMPT: ${{ steps.vars.outputs.prompt }}
+          MODEL: ${{ steps.vars.outputs.model }}
+        run: |
+          set -euo pipefail
+
+          payload=$(jq -n --arg model "$MODEL" --arg prompt "$PROMPT" '{
+            model: $model,
+            messages: [
+              { role: "user", content: $prompt }
+            ]
+          }')
+
+          echo "Request model: $MODEL"
+          echo "Request payload:"
+          echo "$payload" | jq .
+
+          echo "\nCalling GitHub Models..."
+
+          set +e
+          http_code=$(curl -sS -o response.json -w "%{http_code}" -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/json" \
+            https://models.github.ai/inference/chat/completions \
+            -d "$payload")
+          curl_exit=$?
+          set -e
+
+          if [ $curl_exit -ne 0 ]; then
+            echo "curl failed with exit code $curl_exit" >&2
+            exit $curl_exit
+          fi
+
+          echo "HTTP status: $http_code"
+
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "Request failed (HTTP $http_code). Response body:" >&2
+            cat response.json >&2
+            exit 1
+          fi
+
+          echo "\nResponse:"
+          jq -r '.choices[0].message.content // .error.message // .message // .' response.json
+
+  testaimodel:
+    name: Run TestAIModel (models.github.ai/inference)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Skip notice (not workflow_dispatch)
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          echo "Skipping TestAIModel: this job only runs on workflow_dispatch."
+
+      - name: Checkout
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            8.0.x
+
+      - name: Run
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          MODEL="${{ inputs.model }}"
+          PROMPT="${{ inputs.prompt }}"
+          TIMEOUT="${{ inputs.timeoutSeconds }}"
+
+          if [ -z "${MODEL}" ]; then MODEL="gpt-4o-mini"; fi
+          if [ -z "${PROMPT}" ]; then PROMPT="Say hello from GitHub Models"; fi
+          if [ -z "${TIMEOUT}" ]; then TIMEOUT="60"; fi
+
+          echo "Using MODEL=${MODEL}"
+          echo "Using TIMEOUT=${TIMEOUT}"
+
+          if [ -f ./TestAIModel/TestAIModel.csproj ]; then
+            dotnet run --project ./TestAIModel/TestAIModel.csproj -c Release -- \
+              --no-diagnostics \
+              --model "${MODEL}" \
+              --prompt "${PROMPT}" \
+              --timeout "${TIMEOUT}"
+          else
+            echo "TestAIModel project not found; skipping dotnet run."
+          fi
