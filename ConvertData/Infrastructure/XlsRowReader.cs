@@ -106,7 +106,6 @@ namespace ConvertData.Infrastructure
             int ntInt = ParseInt(nt);
             if (ntInt == 0 && !string.IsNullOrWhiteSpace(n))
                 ntInt = nInt;
-
             int ncInt = ParseInt(nc);
             if (ncInt == 0 && !string.IsNullOrWhiteSpace(n))
                 ncInt = nInt;
