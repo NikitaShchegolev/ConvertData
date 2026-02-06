@@ -57,6 +57,11 @@ namespace ConvertData.Application
             var jsonOutDir = Path.Combine(projectDir, "JSON_OUT");
             Directory.CreateDirectory(jsonOutDir);
 
+            foreach (var f in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly))
+            {
+                try { File.Delete(f); } catch { }
+            }
+
             // Если переданы аргументы — обрабатываем только их.
             if (args.Length > 0)
             {

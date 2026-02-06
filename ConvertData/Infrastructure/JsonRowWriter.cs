@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -7,17 +7,8 @@ using ConvertData.Domain;
 
 namespace ConvertData.Infrastructure
 {
-    /// <summary>
-    /// Writer, сохраняющий строки `Row` в JSON-файл.
-    /// Формат JSON сохранён в точности как в исходной реализации (ручная сборка строки).
-    /// </summary>
     internal sealed class JsonRowWriter : IRowWriter
     {
-        /// <summary>
-        /// Записывает список строк в файл `outputPath` в формате JSON.
-        /// </summary>
-        /// <param name="rows">Данные для сохранения.</param>
-        /// <param name="outputPath">Путь выходного файла.</param>
         public void Write(List<Row> rows, string outputPath)
         {
             var sb = new StringBuilder();
@@ -30,34 +21,35 @@ namespace ConvertData.Infrastructure
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
                 sb.AppendLine("    \"Profile\": \"" + JsonEscape(r.Profile) + "\",");
                 sb.AppendLine("    \"Nt\": " + r.Nt + ",");
+                sb.AppendLine("    \"Q\": " + r.Q + ",");
+                sb.AppendLine("    \"Qo\": " + r.Qo + ",");
+                sb.AppendLine("    \"T\": " + r.T + ",");
                 sb.AppendLine("    \"Nc\": " + r.Nc + ",");
                 sb.AppendLine("    \"N\": " + r.N + ",");
-                sb.AppendLine("    \"Qo\": " + r.Qo + ",");
-                sb.AppendLine("    \"Q\": " + r.Q + ",");
-                sb.AppendLine("    \"T\": " + r.T + ",");
                 sb.AppendLine("    \"M\": " + r.M + ",");
-                sb.AppendLine("    \"Mneg\": " + r.Mneg.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"Mo\": " + r.Mo.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"?\": " + r.Alpha.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"?\": " + r.Beta.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"?\": " + r.Gamma.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"?\": " + r.Delta.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"?\": " + r.Epsilon.ToString("0.0", CultureInfo.InvariantCulture) + ",");
-                sb.AppendLine("    \"?\": " + r.Lambda.ToString("0.0", CultureInfo.InvariantCulture));
+                sb.AppendLine("    \"Mneg\": " + r.Mneg.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"Mo\": " + r.Mo.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"О±\": " + r.Alpha.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"ОІ\": " + r.Beta.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"Оі\": " + r.Gamma.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"Оґ\": " + r.Delta.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"Оµ\": " + r.Epsilon.ToString(CultureInfo.InvariantCulture) + ",");
+                sb.AppendLine("    \"О»\": " + r.Lambda.ToString(CultureInfo.InvariantCulture));
                 sb.Append("  }");
                 if (i != rows.Count - 1) sb.Append(",");
                 sb.AppendLine();
             }
             sb.AppendLine("]");
 
+            // РЇРІРЅРѕ СЃРѕС…СЂР°РЅСЏРµРј UTF-8 Р±РµР· BOM.
             File.WriteAllText(outputPath, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
 
         /// <summary>
-        /// Экранирует строку для безопасной вставки в JSON.
+        /// Р­РєСЂР°РЅРёСЂСѓРµС‚ СЃС‚СЂРѕРєСѓ РґР»СЏ Р±РµР·РѕРїР°СЃРЅРѕР№ РІСЃС‚Р°РІРєРё РІ JSON.
         /// </summary>
-        /// <param name="s">Исходная строка.</param>
-        /// <returns>Экранированная строка.</returns>
+        /// <param name="s">РСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°.</param>
+        /// <returns>Р­РєСЂР°РЅРёСЂРѕРІР°РЅРЅР°СЏ СЃС‚СЂРѕРєР°.</returns>
         private static string JsonEscape(string s)
         {
             if (s == null) return "";

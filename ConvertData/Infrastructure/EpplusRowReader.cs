@@ -18,6 +18,8 @@ namespace ConvertData.Infrastructure
     /// </summary>
     internal sealed class EpplusRowReader : IRowReader
     {
+        private const int DataRowCount = 15;
+
         /// <summary>
         /// Считывает Excel-файл и возвращает строки в виде доменных объектов.
         /// </summary>
@@ -86,45 +88,201 @@ namespace ConvertData.Infrastructure
 
             var header = new List<string>();
             for (int c = startCol; c <= endCol; c++)
-                header.Add((ws.Cells[startRow, c].Text ?? "").Trim());
+                header.Add(NormalizeHeader((ws.Cells[startRow, c].Text ?? "").Trim()));
 
             int idxName = IndexOfHeader(header, "Name");
             int idxCode = IndexOfHeader(header, "CONNECTION_CODE");
             int idxProfile = IndexOfHeader(header, "Profile");
-            int idxN = IndexOfHeader(header, "N");
+
+            int idxNt = IndexOfHeader(header, "Nt");
             int idxQ = IndexOfHeader(header, "Q");
             int idxQo = IndexOfHeader(header, "Qo");
             int idxT = IndexOfHeader(header, "T");
+            int idxNc = IndexOfHeader(header, "Nc");
+            int idxN = IndexOfHeader(header, "N");
+            int idxM = IndexOfHeader(header, "M");
+            int idxMneg = IndexOfHeader(header, "Mneg");
+            int idxMo = IndexOfHeader(header, "Mo");
 
-            if (idxName < 0 || idxCode < 0 || idxProfile < 0 || idxN < 0 || idxQ < 0 || idxQo < 0 || idxT < 0)
+            int idxAlpha = IndexOfHeader(header, "?");
+            if (idxAlpha < 0) idxAlpha = IndexOfHeader(header, "Alpha");
+            int idxBeta = IndexOfHeader(header, "?");
+            if (idxBeta < 0) idxBeta = IndexOfHeader(header, "Beta");
+            int idxGamma = IndexOfHeader(header, "?");
+            if (idxGamma < 0) idxGamma = IndexOfHeader(header, "Gamma");
+            int idxDelta = IndexOfHeader(header, "?");
+            if (idxDelta < 0) idxDelta = IndexOfHeader(header, "Delta");
+            int idxEpsilon = IndexOfHeader(header, "?");
+            if (idxEpsilon < 0) idxEpsilon = IndexOfHeader(header, "Epsilon");
+            int idxLambda = IndexOfHeader(header, "?");
+            if (idxLambda < 0) idxLambda = IndexOfHeader(header, "Lambda");
+
+            // Fallback: иногда греческие буквы теряются и приходят как "?".
+            // В этом случае подхватываем 6 колонок после Mo.
+            if (idxMo >= 0 && (idxAlpha < 0 || idxBeta < 0 || idxGamma < 0 || idxDelta < 0 || idxEpsilon < 0 || idxLambda < 0))
+            {
+                var qMarks = header
+                    .Select((h, i) => new { h, i })
+                    .Where(x => x.h == "?")
+                    .Select(x => x.i)
+                    .ToList();
+
+                int baseIdx = idxMo + 1;
+                if (baseIdx < header.Count && header.Count - baseIdx >= 6)
+                {
+                    if (idxAlpha < 0) idxAlpha = baseIdx + 0;
+                    if (idxBeta < 0) idxBeta = baseIdx + 1;
+                    if (idxGamma < 0) idxGamma = baseIdx + 2;
+                    if (idxDelta < 0) idxDelta = baseIdx + 3;
+                    if (idxEpsilon < 0) idxEpsilon = baseIdx + 4;
+                    if (idxLambda < 0) idxLambda = baseIdx + 5;
+                }
+                else if (qMarks.Count >= 6)
+                {
+                    if (idxAlpha < 0) idxAlpha = qMarks[0];
+                    if (idxBeta < 0) idxBeta = qMarks[1];
+                    if (idxGamma < 0) idxGamma = qMarks[2];
+                    if (idxDelta < 0) idxDelta = qMarks[3];
+                    if (idxEpsilon < 0) idxEpsilon = qMarks[4];
+                    if (idxLambda < 0) idxLambda = qMarks[5];
+                }
+            }
+
+            if (idxName < 0 || idxCode < 0 || idxProfile < 0)
                 throw new InvalidDataException("Cannot find required headers in first row of worksheet");
 
             int colName = startCol + idxName;
             int colCode = startCol + idxCode;
             int colProfile = startCol + idxProfile;
-            int colN = startCol + idxN;
-            int colQ = startCol + idxQ;
-            int colQo = startCol + idxQo;
-            int colT = startCol + idxT;
 
-            var list = new List<Row>();
-            for (int r = startRow + 1; r <= endRow; r++)
+            int? colNt = idxNt >= 0 ? startCol + idxNt : null;
+            int? colQ = idxQ >= 0 ? startCol + idxQ : null;
+            int? colQo = idxQo >= 0 ? startCol + idxQo : null;
+            int? colT = idxT >= 0 ? startCol + idxT : null;
+            int? colNc = idxNc >= 0 ? startCol + idxNc : null;
+            int? colN = idxN >= 0 ? startCol + idxN : null;
+            int? colM = idxM >= 0 ? startCol + idxM : null;
+            int? colMneg = idxMneg >= 0 ? startCol + idxMneg : null;
+            int? colMo = idxMo >= 0 ? startCol + idxMo : null;
+            int? colAlpha = idxAlpha >= 0 ? startCol + idxAlpha : null;
+            int? colBeta = idxBeta >= 0 ? startCol + idxBeta : null;
+            int? colGamma = idxGamma >= 0 ? startCol + idxGamma : null;
+            int? colDelta = idxDelta >= 0 ? startCol + idxDelta : null;
+            int? colEpsilon = idxEpsilon >= 0 ? startCol + idxEpsilon : null;
+            int? colLambda = idxLambda >= 0 ? startCol + idxLambda : null;
+
+            var list = new List<Row>(capacity: DataRowCount);
+
+            int firstDataRow = startRow + 1;
+            int lastDataRowInSheet = Math.Min(endRow, firstDataRow + DataRowCount - 1);
+
+            for (int r = firstDataRow; r <= lastDataRowInSheet; r++)
             {
                 string name = (ws.Cells[r, colName].Text ?? "").Trim();
                 string code = (ws.Cells[r, colCode].Text ?? "").Trim();
                 string profile = (ws.Cells[r, colProfile].Text ?? "").Trim();
-                string n = (ws.Cells[r, colN].Text ?? "").Trim();
-                string q = (ws.Cells[r, colQ].Text ?? "").Trim();
-                string qo = (ws.Cells[r, colQo].Text ?? "").Trim();
-                string t = (ws.Cells[r, colT].Text ?? "").Trim();
 
-                if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(code))
-                    continue;
+                string ntStr = GetCell(ws, r, colNt);
+                string qStr = GetCell(ws, r, colQ);
+                string qoStr = GetCell(ws, r, colQo);
+                string tStr = GetCell(ws, r, colT);
+                string ncStr = GetCell(ws, r, colNc);
+                string nStr = GetCell(ws, r, colN);
+                string mStr = GetCell(ws, r, colM);
+                string mnegStr = GetCell(ws, r, colMneg);
+                string moStr = GetCell(ws, r, colMo);
+                string alphaStr = GetCell(ws, r, colAlpha);
+                string betaStr = GetCell(ws, r, colBeta);
+                string gammaStr = GetCell(ws, r, colGamma);
+                string deltaStr = GetCell(ws, r, colDelta);
+                string epsilonStr = GetCell(ws, r, colEpsilon);
+                string lambdaStr = GetCell(ws, r, colLambda);
 
-                list.Add(MapBasic(name, code, profile, n, q, qo, t));
+                list.Add(Map15(name, code, profile, ntStr, qStr, qoStr, tStr, ncStr, nStr, mStr, mnegStr, moStr, alphaStr, betaStr, gammaStr, deltaStr, epsilonStr, lambdaStr));
             }
 
+            while (list.Count < DataRowCount)
+                list.Add(new Row());
+
             return list;
+        }
+
+        private static string GetCell(ExcelWorksheet ws, int row, int? col)
+        {
+            if (col == null)
+                return "";
+            return (ws.Cells[row, col.Value].Text ?? "").Trim();
+        }
+
+        private static Row Map15(
+            string name,
+            string code,
+            string profile,
+            string nt,
+            string q,
+            string qo,
+            string t,
+            string nc,
+            string n,
+            string m,
+            string mneg,
+            string mo,
+            string alpha,
+            string beta,
+            string gamma,
+            string delta,
+            string epsilon,
+            string lambda)
+        {
+            var ntInt = ParseInt(nt);
+            var qInt = ParseInt(q);
+            var qoInt = ParseInt(qo);
+            var tInt = ParseInt(t);
+            var ncInt = ParseInt(nc);
+            var nInt = ParseInt(n);
+            var mInt = ParseInt(m);
+
+            var mnegDouble = ParseDouble(mneg);
+            var moDouble = ParseDouble(mo);
+            var alphaDouble = ParseDouble(alpha);
+            var betaDouble = ParseDouble(beta);
+            var gammaDouble = ParseDouble(gamma);
+            var deltaDouble = ParseDouble(delta);
+            var epsilonDouble = ParseDouble(epsilon);
+            var lambdaDouble = ParseDouble(lambda);
+
+            return new Row
+            {
+                Name = name,
+                CONNECTION_CODE = code,
+                Profile = profile,
+                Nt = ntInt,
+                Nc = ncInt,
+                N = nInt,
+                Qo = qoInt,
+                Q = qInt,
+                T = tInt,
+                M = mInt,
+                Mneg = mnegDouble,
+                Mo = moDouble,
+                Alpha = alphaDouble,
+                Beta = betaDouble,
+                Gamma = gammaDouble,
+                Delta = deltaDouble,
+                Epsilon = epsilonDouble,
+                Lambda = lambdaDouble
+            };
+        }
+
+        private static double ParseDouble(string s)
+        {
+            if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var v))
+                return v;
+
+            if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, new CultureInfo("ru-RU"), out v))
+                return v;
+
+            return 0.0;
         }
 
         /// <summary>
@@ -194,39 +352,6 @@ namespace ConvertData.Infrastructure
         }
 
         /// <summary>
-        /// Преобразует набор строк в доменную модель `Row`.
-        /// </summary>
-        private static Row MapBasic(string name, string code, string profile, string n, string q, string qo, string t)
-        {
-            var nInt = ParseInt(n);
-            var qInt = ParseInt(q);
-            var qoInt = ParseInt(qo);
-            var tInt = ParseInt(t);
-
-            return new Row
-            {
-                Name = name,
-                CONNECTION_CODE = code,
-                Profile = profile,
-                Nt = nInt,
-                Nc = nInt,
-                N = nInt,
-                Qo = qoInt,
-                Q = qInt,
-                T = tInt,
-                M = 0,
-                Mneg = 0.0,
-                Mo = 0.0,
-                Alpha = 0.0,
-                Beta = 0.0,
-                Gamma = 0.0,
-                Delta = 0.0,
-                Epsilon = 0.0,
-                Lambda = 0.0
-            };
-        }
-
-        /// <summary>
         /// Парсит целое число из строки (InvariantCulture / ru-RU), иначе возвращает 0.
         /// </summary>
         private static int ParseInt(string s)
@@ -251,6 +376,24 @@ namespace ConvertData.Infrastructure
                     return i;
             }
             return -1;
+        }
+
+        private static string NormalizeHeader(string h)
+        {
+            if (string.IsNullOrWhiteSpace(h))
+                return string.Empty;
+
+            var t = h.Trim();
+
+            // Иногда встречаются похожие символы/варианты.
+            if (string.Equals(t, "a", StringComparison.OrdinalIgnoreCase)) return "?";
+            if (string.Equals(t, "b", StringComparison.OrdinalIgnoreCase)) return "?";
+            if (string.Equals(t, "g", StringComparison.OrdinalIgnoreCase)) return "?";
+            if (string.Equals(t, "d", StringComparison.OrdinalIgnoreCase)) return "?";
+            if (string.Equals(t, "e", StringComparison.OrdinalIgnoreCase)) return "?";
+            if (string.Equals(t, "l", StringComparison.OrdinalIgnoreCase)) return "?";
+
+            return t;
         }
     }
 }
