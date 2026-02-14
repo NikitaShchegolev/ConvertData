@@ -39,7 +39,7 @@ namespace ConvertData.Application
                 foreach (var input in GetInputFiles(GetInputArgsForCreateJson(args), excelDir))
                     ConvertOne(input, jsonOutDir);
 
-                Console.WriteLine("Этап 1 завершён.");
+                Console.WriteLine("Этап 1 завершён.");                
             }
 
             if (mode == RunMode.All || mode == RunMode.ApplyProfiles)
@@ -86,6 +86,30 @@ namespace ConvertData.Application
                 return args.Skip(1).ToArray();
 
             return args;
+        }
+
+        private static bool AskYesNo(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                var s = (Console.ReadLine() ?? string.Empty).Trim();
+
+                if (s.Length == 0)
+                    continue;
+
+                if (string.Equals(s, "y", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "yes", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "д", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "да", StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                if (string.Equals(s, "n", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "no", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "н", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(s, "нет", StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
         }
 
         private static void ClearJsonOut(string jsonOutDir)
