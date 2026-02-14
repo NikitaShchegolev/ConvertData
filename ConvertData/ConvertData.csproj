@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="JSON_OUT\" />
+    <Folder Include="JSON_All\" />
   </ItemGroup>
 
 </Project>

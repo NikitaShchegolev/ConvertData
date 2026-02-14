@@ -62,36 +62,43 @@ namespace ConvertData.Infrastructure
                 return list;
             }
 
+            // —троим индекс колонок по заголовкам первой строки.
+            var colIndex = new Dictionary<string, int>(System.StringComparer.OrdinalIgnoreCase);
+            for (int c = 0; c < headerParts.Count; c++)
+            {
+                var key = NormalizeHeaderToken(headerParts[c]);
+                if (!string.IsNullOrEmpty(key) && !colIndex.ContainsKey(key))
+                    colIndex[key] = c;
+            }
+
             var rows = new List<Row>();
 
-            // ѕерва€ строка Ч заголовок, дальше данные.
             for (int i = 1; i < lines.Count; i++)
             {
                 var parts = SplitByTab(lines[i]);
 
-                string name = Get(parts, 0, "");
-                string code = Get(parts, 1, "");
-                string profile = Get(parts, 2, "");
+                string name = GetByHeader(parts, colIndex, "Name", "");
+                string code = GetByHeader(parts, colIndex, "CONNECTION_CODE", "");
+                string profile = GetByHeader(parts, colIndex, "Profile", "");
 
-                // ”словие: в выход должны попадать только заполненные строки (по CONNECTION_CODE).
-                if (string.IsNullOrWhiteSpace(code))
+                if (string.IsNullOrWhiteSpace(code) && string.IsNullOrWhiteSpace(name))
                     continue;
 
-                string nt = Get(parts, 3, "0");
-                string nc = Get(parts, 4, "0");
-                string n = Get(parts, 5, "0");
-                string qo = Get(parts, 6, "0");
-                string q = Get(parts, 7, "0");
-                string t = Get(parts, 8, "0");
-                string m = Get(parts, 9, "0");
-                string mneg = Get(parts, 10, "0");
-                string mo = Get(parts, 11, "0");
-                string alpha = Get(parts, 12, "0");
-                string beta = Get(parts, 13, "0");
-                string gamma = Get(parts, 14, "0");
-                string delta = Get(parts, 15, "0");
-                string epsilon = Get(parts, 16, "0");
-                string lambda = Get(parts, 17, "0");
+                string n = GetByHeader(parts, colIndex, "N", "0");
+                string nt = GetByHeader(parts, colIndex, "Nt", n);
+                string nc = GetByHeader(parts, colIndex, "Nc", n);
+                string q = GetByHeader(parts, colIndex, "Q", "0");
+                string qo = GetByHeader(parts, colIndex, "Qo", "0");
+                string t = GetByHeader(parts, colIndex, "T", "0");
+                string m = GetByHeader(parts, colIndex, "M", "0");
+                string mneg = GetByHeader(parts, colIndex, "Mneg", "0");
+                string mo = GetByHeader(parts, colIndex, "Mo", "0");
+                string alpha = GetByHeader(parts, colIndex, "Alpha", "0");
+                string beta = GetByHeader(parts, colIndex, "Beta", "0");
+                string gamma = GetByHeader(parts, colIndex, "Gamma", "0");
+                string delta = GetByHeader(parts, colIndex, "Delta", "0");
+                string epsilon = GetByHeader(parts, colIndex, "Epsilon", "0");
+                string lambda = GetByHeader(parts, colIndex, "Lambda", "0");
 
                 rows.Add(Map15(name, code, profile, nt, nc, n, qo, q, t, m, mneg, mo, alpha, beta, gamma, delta, epsilon, lambda));
             }
@@ -162,6 +169,14 @@ namespace ConvertData.Infrastructure
 
             var v = parts[index];
             return string.IsNullOrWhiteSpace(v) ? fallback : v;
+        }
+
+        private static string GetByHeader(List<string> parts, Dictionary<string, int> colIndex, string header, string fallback)
+        {
+            if (!colIndex.TryGetValue(header, out var index))
+                return fallback;
+
+            return Get(parts, index, fallback);
         }
 
         private static List<string> SplitByTab(string line)

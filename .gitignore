@@ -24,9 +24,12 @@ Thumbs.db
 
 # Generated output (this tool)
 ConvertData/JSON_OUT/
+ConvertData/JSON_All/
 
 # Source Excel files (local input)
 ConvertData/EXCEL/
+*.xls
+Profile.xls
 
 # Temporary converted files (should normally be in %TEMP%, but ignore just in case)
 *_converted_*.xlsx

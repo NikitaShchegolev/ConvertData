@@ -26,29 +26,34 @@ namespace ConvertData.Application
             var excelDir = Path.Combine(projectDir, "EXCEL");
             var excelProfileDir = Path.Combine(projectDir, "EXCEL_Profile");
             var jsonOutDir = Path.Combine(projectDir, "JSON_OUT");
+            var jsonAllDir = Path.Combine(projectDir, "JSON_All");
             Directory.CreateDirectory(jsonOutDir);
 
             var mode = GetMode(args);
 
             if (mode == RunMode.All || mode == RunMode.CreateJson)
             {
+                Console.WriteLine("=== Этап 1: Создание JSON из Excel (без профилей) ===");
                 ClearJsonOut(jsonOutDir);
 
                 foreach (var input in GetInputFiles(GetInputArgsForCreateJson(args), excelDir))
                     ConvertOne(input, jsonOutDir);
 
-                if (mode == RunMode.All)
-                {
-                    Console.WriteLine();
-                    if (!AskYesNo("Этап 1 завершён (создание JSON). Продолжить к этапу 2 (добавление из справочника)? [y/n]: "))
-                        return;
-                }
+                Console.WriteLine("Этап 1 завершён.");
             }
 
             if (mode == RunMode.All || mode == RunMode.ApplyProfiles)
             {
+                Console.WriteLine();
+                Console.WriteLine("=== Этап 2: Применение справочника профилей (H, B, s, t) ===");
                 ApplyProfilesToJson(jsonOutDir, excelProfileDir);
+                Console.WriteLine("Этап 2 завершён.");
             }
+
+            Console.WriteLine();
+            Console.WriteLine("=== Этап 3: Объединение всех JSON в один файл ===");
+            new JsonMerger().MergeAll(jsonOutDir, jsonAllDir);
+            Console.WriteLine("Этап 3 завершён.");
         }
 
         private enum RunMode
@@ -81,30 +86,6 @@ namespace ConvertData.Application
                 return args.Skip(1).ToArray();
 
             return args;
-        }
-
-        private static bool AskYesNo(string prompt)
-        {
-            while (true)
-            {
-                Console.Write(prompt);
-                var s = (Console.ReadLine() ?? string.Empty).Trim();
-
-                if (s.Length == 0)
-                    continue;
-
-                if (string.Equals(s, "y", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "yes", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "д", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "да", StringComparison.OrdinalIgnoreCase))
-                    return true;
-
-                if (string.Equals(s, "n", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "no", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "н", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "нет", StringComparison.OrdinalIgnoreCase))
-                    return false;
-            }
         }
 
         private static void ClearJsonOut(string jsonOutDir)
