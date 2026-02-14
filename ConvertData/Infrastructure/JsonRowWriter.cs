@@ -21,7 +21,8 @@ namespace ConvertData.Infrastructure
 
                 sb.AppendLine("  {");
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
-                sb.AppendLine("    \"CONNECTION_CODE\": \"" + guid + "\",");
+                sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
+                sb.AppendLine("    \"CONNECTION_GUID\": \"" + guid + "\",");
                 sb.AppendLine("    \"Profile\": \"" + JsonEscape(r.Profile) + "\",");
                 sb.AppendLine("    \"H\": " + r.H.ToString(CultureInfo.InvariantCulture) + ",");
                 sb.AppendLine("    \"B\": " + r.B.ToString(CultureInfo.InvariantCulture) + ",");
