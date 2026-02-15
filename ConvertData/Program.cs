@@ -19,7 +19,7 @@ namespace ConvertData
         /// По умолчанию читает входные файлы из папки `EXCEL` проекта и пишет результаты в `JSON_OUT`.
         /// Если переданы аргументы командной строки — обрабатывает только указанные файлы.
         /// </summary>
-        /// <param name="нargs">Список путей к входным файлам (опционально).</param>
+        /// <param name="args">Список путей к входным файлам (опционально).</param>
         static void Main(string[] args)
         {
             new Application.ConvertApp().Run(args);
