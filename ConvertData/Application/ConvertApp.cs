@@ -103,6 +103,13 @@ namespace ConvertData.Application
             else
                 Console.WriteLine("  Проверка: дубликатов CONNECTION_CODE нет.");
             Console.WriteLine("Этап 8 завершён.");
+
+            Console.WriteLine();
+            Console.WriteLine("=== Этап 9: Создание NameConnections.json из all_NotDuplicate.json ===");
+            new NameConnectionsExporter().Export(
+                allNotDuplicateJsonPath,
+                Path.Combine(excelProfileOutDir, "NameConnections.json"));
+            Console.WriteLine("Этап 9 завершён.");
         }
 
         private static void ClearJsonOut(string jsonOutDir)
