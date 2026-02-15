@@ -22,6 +22,9 @@ Thumbs.db
 # Logs
 *.log
 
+# JSON data
+*.json
+
 # Generated output (this tool)
 ConvertData/JSON_OUT/
 ConvertData/JSON_All/
@@ -33,3 +36,6 @@ Profile.xls
 
 # Temporary converted files (should normally be in %TEMP%, but ignore just in case)
 *_converted_*.xlsx
+
+# Temp/backups
+*.tmp

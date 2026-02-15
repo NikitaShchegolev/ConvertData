@@ -27,6 +27,7 @@ namespace ConvertData.Application
             var excelProfileDir = Path.Combine(projectDir, "EXCEL_Profile");
             var jsonOutDir = Path.Combine(projectDir, "JSON_OUT");
             var jsonAllDir = Path.Combine(projectDir, "JSON_All");
+            var excelProfileOutDir = Path.Combine(projectDir, "EXCEL_Profile_OUT");
             Directory.CreateDirectory(jsonOutDir);
 
             var mode = GetMode(args);
@@ -54,6 +55,9 @@ namespace ConvertData.Application
             Console.WriteLine("=== Этап 3: Объединение всех JSON в один файл ===");
             new JsonMerger().MergeAll(jsonOutDir, jsonAllDir);
             Console.WriteLine("Этап 3 завершён.");
+
+            var allJsonPath = Path.Combine(jsonAllDir, "all.json");
+            new ProfileAndConnectionCodeExporter().Export(allJsonPath, excelProfileOutDir);
         }
 
         private enum RunMode
