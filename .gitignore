@@ -22,6 +22,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Text data
+*.txt
+
 # JSON data
 *.json
 
