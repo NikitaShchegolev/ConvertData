@@ -19,6 +19,10 @@ internal sealed class Row
     public int T { get; set; }
     public int M { get; set; }
 
+    public int variable { get; set; }
+    public int Sj { get; set; }
+    public int Sjo { get; set; }
+
     public double Mneg { get; set; }
     public double Mo { get; set; }
 

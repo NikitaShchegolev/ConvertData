@@ -16,6 +16,7 @@
   <ItemGroup>
     <Folder Include="JSON_OUT\" />
     <Folder Include="JSON_All\" />
+    <Folder Include="EXCEL_Profile_OUT\" />
   </ItemGroup>
 
 </Project>

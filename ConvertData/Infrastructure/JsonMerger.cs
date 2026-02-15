@@ -25,6 +25,7 @@ namespace ConvertData.Infrastructure
             var merged = new JsonArray();
 
             var files = Directory.EnumerateFiles(jsonDir, "*.json", SearchOption.TopDirectoryOnly)
+                .Where(f => !string.Equals(Path.GetFileName(f), "Profile.json", StringComparison.OrdinalIgnoreCase))
                 .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -37,11 +38,13 @@ namespace ConvertData.Infrastructure
 
                     if (node is JsonArray arr)
                     {
+                        int count = arr.Count;
                         foreach (var item in arr.ToList())
                         {
                             arr.Remove(item);
                             merged.Add(item);
                         }
+                        Console.WriteLine($"  + {Path.GetFileName(file)}: {count} records");
                     }
                 }
                 catch (Exception ex)

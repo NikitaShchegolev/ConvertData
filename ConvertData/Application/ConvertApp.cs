@@ -88,30 +88,6 @@ namespace ConvertData.Application
             return args;
         }
 
-        private static bool AskYesNo(string prompt)
-        {
-            while (true)
-            {
-                Console.Write(prompt);
-                var s = (Console.ReadLine() ?? string.Empty).Trim();
-
-                if (s.Length == 0)
-                    continue;
-
-                if (string.Equals(s, "y", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "yes", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "д", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "да", StringComparison.OrdinalIgnoreCase))
-                    return true;
-
-                if (string.Equals(s, "n", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "no", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "н", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s, "нет", StringComparison.OrdinalIgnoreCase))
-                    return false;
-            }
-        }
-
         private static void ClearJsonOut(string jsonOutDir)
         {
             foreach (var f in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly))
@@ -245,28 +221,42 @@ namespace ConvertData.Application
 
         private Dictionary<string, (double H, double B, double s, double t)> BuildProfileLookup(string excelProfileDir)
         {
-            var profilePath = Path.Combine(excelProfileDir, "Profile.xls");
+            var profilePath = Path.Combine(excelProfileDir, "Profile.json");
             if (!File.Exists(profilePath))
                 return new(StringComparer.OrdinalIgnoreCase);
 
             try
             {
-                var rows = _readerFactory.Create(profilePath).Read(profilePath);
+                var json = File.ReadAllText(profilePath, Encoding.UTF8);
+                var arr = JsonNode.Parse(json) as JsonArray;
+                if (arr is null)
+                    return new(StringComparer.OrdinalIgnoreCase);
 
                 var dict = new Dictionary<string, (double H, double B, double s, double t)>(StringComparer.OrdinalIgnoreCase);
-                foreach (var r in rows)
+                foreach (var item in arr)
                 {
-                    var key = NormalizeProfileKey(r.Profile);
-                    if (!string.IsNullOrWhiteSpace(key))
-                        dict[key] = (r.H, r.B, r.s, r.t);
+                    if (item is not JsonObject obj)
+                        continue;
+
+                    var profile = obj["Profile"]?.GetValue<string>();
+                    var key = NormalizeProfileKey(profile);
+                    if (string.IsNullOrWhiteSpace(key))
+                        continue;
+
+                    double h = obj["H"]?.GetValue<double>() ?? 0;
+                    double b = obj["B"]?.GetValue<double>() ?? 0;
+                    double s = obj["s"]?.GetValue<double>() ?? 0;
+                    double t = obj["t"]?.GetValue<double>() ?? 0;
+
+                    dict[key] = (h, b, s, t);
                 }
 
-                Console.WriteLine($"Loaded profiles: {dict.Count} from {profilePath}");
+                Console.WriteLine($"  Loaded profiles: {dict.Count} from {profilePath}");
                 return dict;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to read profile excel: " + profilePath);
+                Console.WriteLine("  Failed to read profile json: " + profilePath);
                 Console.WriteLine(ex);
                 return new(StringComparer.OrdinalIgnoreCase);
             }

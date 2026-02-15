@@ -91,6 +91,9 @@ namespace ConvertData.Infrastructure
                 string qo = GetByHeader(parts, colIndex, "Qo", "0");
                 string t = GetByHeader(parts, colIndex, "T", "0");
                 string m = GetByHeader(parts, colIndex, "M", "0");
+                string variable = GetByHeader(parts, colIndex, "variable", "0");
+                string sj = GetByHeader(parts, colIndex, "Sj", "0");
+                string sjo = GetByHeader(parts, colIndex, "Sjo", "0");
                 string mneg = GetByHeader(parts, colIndex, "Mneg", "0");
                 string mo = GetByHeader(parts, colIndex, "Mo", "0");
                 string alpha = GetByHeader(parts, colIndex, "Alpha", "0");
@@ -100,7 +103,7 @@ namespace ConvertData.Infrastructure
                 string epsilon = GetByHeader(parts, colIndex, "Epsilon", "0");
                 string lambda = GetByHeader(parts, colIndex, "Lambda", "0");
 
-                rows.Add(Map15(name, code, profile, nt, nc, n, qo, q, t, m, mneg, mo, alpha, beta, gamma, delta, epsilon, lambda));
+                rows.Add(Map15(name, code, profile, nt, nc, n, qo, q, t, m, variable, sj, sjo, mneg, mo, alpha, beta, gamma, delta, epsilon, lambda));
             }
 
             return rows;
@@ -197,6 +200,9 @@ namespace ConvertData.Infrastructure
             string q,
             string t,
             string m,
+            string variable,
+            string sj,
+            string sjo,
             string mneg,
             string mo,
             string alpha,
@@ -218,6 +224,9 @@ namespace ConvertData.Infrastructure
             int qInt = ParseInt(q);
             int tInt = ParseInt(t);
             int mInt = ParseInt(m);
+            int variableInt = ParseInt(variable);
+            int sjInt = ParseInt(sj);
+            int sjoInt = ParseInt(sjo);
             double mnegDouble = ParseDouble(mneg);
             double moDouble = ParseDouble(mo);
             double alphaDouble = ParseDouble(alpha);
@@ -239,6 +248,9 @@ namespace ConvertData.Infrastructure
                 Q = qInt,
                 T = tInt,
                 M = mInt,
+                variable = variableInt,
+                Sj = sjInt,
+                Sjo = sjoInt,
                 Mneg = mnegDouble,
                 Mo = moDouble,
                 Alpha = alphaDouble,

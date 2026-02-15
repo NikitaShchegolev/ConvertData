@@ -107,6 +107,9 @@ namespace ConvertData.Infrastructure
             int idxNc = IndexOfHeader(header, "Nc");
             int idxN = IndexOfHeader(header, "N");
             int idxM = IndexOfHeader(header, "M");
+            int idxVariable = IndexOfHeaderAny(header, new[] { "variable", "Variable" });
+            int idxSj = IndexOfHeader(header, "Sj");
+            int idxSjo = IndexOfHeader(header, "Sjo");
             int idxMneg = IndexOfHeader(header, "Mneg");
             int idxMo = IndexOfHeader(header, "Mo");
 
@@ -203,6 +206,9 @@ namespace ConvertData.Infrastructure
             int? colNc = idxNc >= 0 ? startCol + idxNc : null;
             int? colN = idxN >= 0 ? startCol + idxN : null;
             int? colM = idxM >= 0 ? startCol + idxM : null;
+            int? colVariable = idxVariable >= 0 ? startCol + idxVariable : null;
+            int? colSj = idxSj >= 0 ? startCol + idxSj : null;
+            int? colSjo = idxSjo >= 0 ? startCol + idxSjo : null;
             int? colMneg = idxMneg >= 0 ? startCol + idxMneg : null;
             int? colMo = idxMo >= 0 ? startCol + idxMo : null;
             int? colAlpha = idxAlpha >= 0 ? startCol + idxAlpha : null;
@@ -238,6 +244,9 @@ namespace ConvertData.Infrastructure
                     string ncStr = GetCell(ws, r, colNc);
                     string nStr = GetCell(ws, r, colN);
                     string mStr = GetCell(ws, r, colM);
+                    string variableStr = GetCell(ws, r, colVariable);
+                    string sjStr = GetCell(ws, r, colSj);
+                    string sjoStr = GetCell(ws, r, colSjo);
                     string mnegStr = GetCell(ws, r, colMneg);
                     string moStr = GetCell(ws, r, colMo);
                     string alphaStr = GetCell(ws, r, colAlpha);
@@ -247,7 +256,7 @@ namespace ConvertData.Infrastructure
                     string epsilonStr = GetCell(ws, r, colEpsilon);
                     string lambdaStr = GetCell(ws, r, colLambda);
 
-                    list.Add(Map19(name, code, profile, hStr, bStr, sStr, tgeomStr, ntStr, qStr, qoStr, tStr, ncStr, nStr, mStr, mnegStr, moStr, alphaStr, betaStr, gammaStr, deltaStr, epsilonStr, lambdaStr));
+                    list.Add(Map19(name, code, profile, hStr, bStr, sStr, tgeomStr, ntStr, qStr, qoStr, tStr, ncStr, nStr, mStr, variableStr, sjStr, sjoStr, mnegStr, moStr, alphaStr, betaStr, gammaStr, deltaStr, epsilonStr, lambdaStr));
                 }
                 else
                 {
@@ -297,6 +306,9 @@ namespace ConvertData.Infrastructure
             string nc,
             string n,
             string m,
+            string variable,
+            string sj,
+            string sjo,
             string mneg,
             string mo,
             string alpha,
@@ -318,6 +330,9 @@ namespace ConvertData.Infrastructure
             var ncInt = ParseInt(nc);
             var nInt = ParseInt(n);
             var mInt = ParseInt(m);
+            var variableInt = ParseInt(variable);
+            var sjInt = ParseInt(sj);
+            var sjoInt = ParseInt(sjo);
 
             var mnegDouble = ParseDouble(mneg);
             var moDouble = ParseDouble(mo);
@@ -344,6 +359,9 @@ namespace ConvertData.Infrastructure
                 Q = qInt,
                 T = tInt,
                 M = mInt,
+                variable = variableInt,
+                Sj = sjInt,
+                Sjo = sjoInt,
                 Mneg = mnegDouble,
                 Mo = moDouble,
                 Alpha = alphaDouble,
@@ -355,12 +373,20 @@ namespace ConvertData.Infrastructure
             };
         }
 
+        private static readonly CultureInfo RuCulture = new("ru-RU");
+
         private static double ParseDouble(string s)
         {
+            if (s.Contains(','))
+            {
+                if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, RuCulture, out var vr))
+                    return vr;
+            }
+
             if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var v))
                 return v;
 
-            if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, new CultureInfo("ru-RU"), out v))
+            if (double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, RuCulture, out v))
                 return v;
 
             return 0.0;
@@ -440,8 +466,12 @@ namespace ConvertData.Infrastructure
             if (int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var v))
                 return v;
 
-            if (int.TryParse(s, NumberStyles.Integer, new CultureInfo("ru-RU"), out v))
+            if (int.TryParse(s, NumberStyles.Integer, RuCulture, out v))
                 return v;
+
+            var d = ParseDouble(s);
+            if (d != 0.0)
+                return (int)Math.Round(d);
 
             return 0;
         }
@@ -502,17 +532,7 @@ namespace ConvertData.Infrastructure
             if (string.IsNullOrWhiteSpace(h))
                 return string.Empty;
 
-            var t = h.Trim();
-
-            // Иногда встречаются похожие символы/варианты.
-            if (string.Equals(t, "a", StringComparison.OrdinalIgnoreCase)) return "?";
-            if (string.Equals(t, "b", StringComparison.OrdinalIgnoreCase)) return "?";
-            if (string.Equals(t, "g", StringComparison.OrdinalIgnoreCase)) return "?";
-            if (string.Equals(t, "d", StringComparison.OrdinalIgnoreCase)) return "?";
-            if (string.Equals(t, "e", StringComparison.OrdinalIgnoreCase)) return "?";
-            if (string.Equals(t, "l", StringComparison.OrdinalIgnoreCase)) return "?";
-
-            return t;
+            return h.Trim();
         }
     }
 }
