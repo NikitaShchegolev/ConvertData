@@ -25,6 +25,10 @@ namespace ConvertData.Application
             var projectDir = _pathResolver.GetProjectDir(AppDomain.CurrentDomain.BaseDirectory) ?? AppDomain.CurrentDomain.BaseDirectory;
             var excelDir = Path.Combine(projectDir, "EXCEL");
             var excelProfileDir = Path.Combine(projectDir, "EXCEL_Profile");
+            // Allow overriding profile column header via command-line
+            var profileColumn = RunModeParser.GetProfileColumn(args);
+            if (!string.IsNullOrWhiteSpace(profileColumn))
+                ExcelHeaderResolver.ProfileColumnOverride = profileColumn.Trim();
             var jsonOutDir = Path.Combine(projectDir, "JSON_OUT");
             var jsonAllDir = Path.Combine(projectDir, "JSON_All");
             var excelProfileOutDir = Path.Combine(projectDir, "EXCEL_Profile_OUT");

@@ -17,7 +17,7 @@ internal static class HeaderUtils
     {
         for (int i = 0; i < header.Count; i++)
         {
-            if (string.Equals(header[i], name, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(header[i], name, StringComparison.Ordinal))
                 return i;
         }
         return -1;

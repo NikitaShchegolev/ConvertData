@@ -29,4 +29,15 @@ internal static class RunModeParser
 
         return args;
     }
+
+    public static string? GetProfileColumn(string[] args)
+    {
+        const string prefix = "--profile-column=";
+        foreach (var arg in args)
+        {
+            if (arg.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                return arg.Substring(prefix.Length);
+        }
+        return null;
+    }
 }

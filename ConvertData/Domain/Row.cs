@@ -5,6 +5,7 @@ internal sealed class Row
     public string Name { get; set; } = "";
     public string CONNECTION_CODE { get; set; } = "";
     public string Profile { get; set; } = "";
+    public string ProfileColumn { get; set; } = "";
 
     public double H { get; set; }
     public double B { get; set; }
@@ -14,17 +15,19 @@ internal sealed class Row
     public int Nt { get; set; }
     public int Nc { get; set; }
     public int N { get; set; }
-    public int Qo { get; set; }
-    public int Q { get; set; }
+    public int Qz { get; set; }
+    public int Qy { get; set; }
     public int T { get; set; }
-    public int M { get; set; }
+    public int My { get; set; }
 
     public int variable { get; set; }
     public int Sj { get; set; }
     public int Sjo { get; set; }
 
     public double Mneg { get; set; }
-    public double Mo { get; set; }
+    public double Mz { get; set; }
+    public double Mx { get; set; }
+    public double Mw { get; set; }
 
     public double Alpha { get; set; }
     public double Beta { get; set; }

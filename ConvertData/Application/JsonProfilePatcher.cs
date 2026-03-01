@@ -92,7 +92,9 @@ internal sealed class JsonProfilePatcher
             if (item is not JsonObject obj)
                 continue;
 
-            var key = NormalizeProfileKey(obj["Profile"]?.GetValue<string>());
+            var key = NormalizeProfileKey(
+                obj["ProfileBeam"]?.GetValue<string>()
+                ?? obj["Profile"]?.GetValue<string>());
             if (string.IsNullOrWhiteSpace(key) || !TryResolveProfile(profileLookup, key, out var g))
                 continue;
 

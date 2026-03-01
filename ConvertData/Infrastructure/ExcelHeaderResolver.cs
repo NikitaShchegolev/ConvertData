@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ConvertData.Infrastructure.Parsing;
 
@@ -13,9 +13,10 @@ internal sealed class ExcelColumnMap
     public int IdxName { get; set; } = -1;
     public int IdxCode { get; set; } = -1;
     public int IdxProfile { get; set; } = -1;
+    public int IdxProfileColumn { get; set; } = -1;
     public int IdxNt { get; set; } = -1;
-    public int IdxQ { get; set; } = -1;
-    public int IdxQo { get; set; } = -1;
+    public int IdxQy { get; set; } = -1;
+    public int IdxQz { get; set; } = -1;
     public int IdxT { get; set; } = -1;
     public int IdxNc { get; set; } = -1;
     public int IdxN { get; set; } = -1;
@@ -25,6 +26,8 @@ internal sealed class ExcelColumnMap
     public int IdxSjo { get; set; } = -1;
     public int IdxMneg { get; set; } = -1;
     public int IdxMo { get; set; } = -1;
+    public int IdxMx { get; set; } = -1;
+    public int IdxMw { get; set; } = -1;
     public int IdxAlpha { get; set; } = -1;
     public int IdxBeta { get; set; } = -1;
     public int IdxGamma { get; set; } = -1;
@@ -38,42 +41,59 @@ internal sealed class ExcelColumnMap
 
 internal static class ExcelHeaderResolver
 {
+    public static string? ProfileColumnOverride { get; set; }
+
     public static ExcelColumnMap Resolve(List<string> header)
     {
+        int idxProfile;
+        if (!string.IsNullOrWhiteSpace(ProfileColumnOverride))
+        {
+            idxProfile = HeaderUtils.IndexOfHeader(header, ProfileColumnOverride);
+            if (idxProfile < 0)
+                idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "Profile", "Профиль" });
+        }
+        else
+        {
+            idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "Profile", "Профиль" });
+        }
+
         var map = new ExcelColumnMap
         {
-            IdxH = HeaderUtils.IndexOfHeaderAny(header, new[] { "H", "�" }),
-            IdxB = HeaderUtils.IndexOfHeaderAny(header, new[] { "B", "�" }),
-            Idxs = HeaderUtils.IndexOfHeaderAny(header, new[] { "s", "S" }),
-            Idxt = HeaderUtils.IndexOfHeaderAny(header, new[] { "t", "T" }),
+            IdxH = HeaderUtils.IndexOfHeaderAny(header, new[] { "H" }),
+            IdxB = HeaderUtils.IndexOfHeaderAny(header, new[] { "B" }),
+            Idxs = HeaderUtils.IndexOfHeaderAny(header, new[] { "s" }),
+            Idxt = HeaderUtils.IndexOfHeaderAny(header, new[] { "t" }),
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
-            IdxCode = HeaderUtils.IndexOfHeaderAny(header, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "���" }),
-            IdxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "Profile", "�������" }),
+            IdxCode = HeaderUtils.IndexOfHeaderAny(header, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" }),
+            IdxProfile = idxProfile,
+            IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileColumn", "Profile_Column", "ПрофильКолонны" }),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
-            IdxQ = HeaderUtils.IndexOfHeader(header, "Q"),
-            IdxQo = HeaderUtils.IndexOfHeader(header, "Qo"),
+            IdxQy = HeaderUtils.IndexOfHeaderAny(header, new[] { "Qy"}),
+            IdxQz = HeaderUtils.IndexOfHeaderAny(header, new[] { "Qz" }),
             IdxT = HeaderUtils.IndexOfHeader(header, "T"),
             IdxNc = HeaderUtils.IndexOfHeader(header, "Nc"),
             IdxN = HeaderUtils.IndexOfHeader(header, "N"),
-            IdxM = HeaderUtils.IndexOfHeader(header, "M"),
+            IdxM = HeaderUtils.IndexOfHeaderAny(header, new[] { "My" }),
             IdxVariable = HeaderUtils.IndexOfHeaderAny(header, new[] { "variable", "Variable" }),
             IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
             IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
             IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
-            IdxMo = HeaderUtils.IndexOfHeader(header, "Mo")
+            IdxMo = HeaderUtils.IndexOfHeaderAny(header, new[] { "Mz" }),
+            IdxMx = HeaderUtils.IndexOfHeader(header, "Mx"),
+            IdxMw = HeaderUtils.IndexOfHeader(header, "Mw")
         };
 
-        map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "?");
+        map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");
         if (map.IdxAlpha < 0) map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "Alpha");
-        map.IdxBeta = HeaderUtils.IndexOfHeader(header, "?");
+        map.IdxBeta = HeaderUtils.IndexOfHeader(header, "β");
         if (map.IdxBeta < 0) map.IdxBeta = HeaderUtils.IndexOfHeader(header, "Beta");
-        map.IdxGamma = HeaderUtils.IndexOfHeader(header, "?");
+        map.IdxGamma = HeaderUtils.IndexOfHeader(header, "γ");
         if (map.IdxGamma < 0) map.IdxGamma = HeaderUtils.IndexOfHeader(header, "Gamma");
-        map.IdxDelta = HeaderUtils.IndexOfHeader(header, "?");
+        map.IdxDelta = HeaderUtils.IndexOfHeader(header, "δ");
         if (map.IdxDelta < 0) map.IdxDelta = HeaderUtils.IndexOfHeader(header, "Delta");
-        map.IdxEpsilon = HeaderUtils.IndexOfHeader(header, "?");
+        map.IdxEpsilon = HeaderUtils.IndexOfHeader(header, "ε");
         if (map.IdxEpsilon < 0) map.IdxEpsilon = HeaderUtils.IndexOfHeader(header, "Epsilon");
-        map.IdxLambda = HeaderUtils.IndexOfHeader(header, "?");
+        map.IdxLambda = HeaderUtils.IndexOfHeader(header, "λ");
         if (map.IdxLambda < 0) map.IdxLambda = HeaderUtils.IndexOfHeader(header, "Lambda");
 
         ResolveGreekFallback(header, map);
