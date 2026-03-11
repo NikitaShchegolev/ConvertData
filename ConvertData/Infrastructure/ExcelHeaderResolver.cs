@@ -20,12 +20,12 @@ internal sealed class ExcelColumnMap
     public int IdxT { get; set; } = -1;
     public int IdxNc { get; set; } = -1;
     public int IdxN { get; set; } = -1;
-    public int IdxM { get; set; } = -1;
+    public int IdxMy { get; set; } = -1;
     public int IdxVariable { get; set; } = -1;
     public int IdxSj { get; set; } = -1;
     public int IdxSjo { get; set; } = -1;
     public int IdxMneg { get; set; } = -1;
-    public int IdxMo { get; set; } = -1;
+    public int IdxMz { get; set; } = -1;
     public int IdxMx { get; set; } = -1;
     public int IdxMw { get; set; } = -1;
     public int IdxAlpha { get; set; } = -1;
@@ -73,12 +73,12 @@ internal static class ExcelHeaderResolver
             IdxT = HeaderUtils.IndexOfHeader(header, "T"),
             IdxNc = HeaderUtils.IndexOfHeader(header, "Nc"),
             IdxN = HeaderUtils.IndexOfHeader(header, "N"),
-            IdxM = HeaderUtils.IndexOfHeaderAny(header, new[] { "My" }),
+            IdxMy = HeaderUtils.IndexOfHeaderAny(header, new[] { "My" }),
             IdxVariable = HeaderUtils.IndexOfHeaderAny(header, new[] { "variable", "Variable" }),
             IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
             IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
             IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
-            IdxMo = HeaderUtils.IndexOfHeaderAny(header, new[] { "Mz" }),
+            IdxMz = HeaderUtils.IndexOfHeaderAny(header, new[] { "Mz" }),
             IdxMx = HeaderUtils.IndexOfHeader(header, "Mx"),
             IdxMw = HeaderUtils.IndexOfHeader(header, "Mw")
         };
@@ -103,7 +103,7 @@ internal static class ExcelHeaderResolver
 
     private static void ResolveGreekFallback(List<string> header, ExcelColumnMap map)
     {
-        if (map.IdxMo < 0)
+        if (map.IdxMz < 0)
             return;
         if (map.IdxAlpha >= 0 && map.IdxBeta >= 0 && map.IdxGamma >= 0
             && map.IdxDelta >= 0 && map.IdxEpsilon >= 0 && map.IdxLambda >= 0)
@@ -115,7 +115,7 @@ internal static class ExcelHeaderResolver
             .Select(x => x.i)
             .ToList();
 
-        int baseIdx = map.IdxMo + 1;
+        int baseIdx = map.IdxMz + 1;
         if (baseIdx < header.Count && header.Count - baseIdx >= 6)
         {
             if (map.IdxAlpha < 0) map.IdxAlpha = baseIdx + 0;
