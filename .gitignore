@@ -37,8 +37,12 @@ ConvertData/EXCEL/
 *.xls
 Profile.xls
 
+#  Ã1 folder
+ Ã1/
+
 # Temporary converted files (should normally be in %TEMP%, but ignore just in case)
 *_converted_*.xlsx
 
 # Temp/backups
 *.tmp
+/ConvertData/–ö–ú1
