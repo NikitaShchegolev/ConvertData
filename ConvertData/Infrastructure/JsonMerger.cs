@@ -17,11 +17,8 @@ namespace ConvertData.Infrastructure
         /// Читает все `.json` из <paramref name="jsonDir"/>, объединяет в один массив
         /// и сохраняет в <paramref name="outputDir"/> под именем <paramref name="outputFileName"/>.
         /// </summary>
-        public void MergeAll(string jsonDir, string outputDir, string outputFileName = "all.json")
+        public JsonArray MergeAll(string jsonDir)
         {
-            Directory.CreateDirectory(outputDir);
-            var outputPath = Path.Combine(outputDir, outputFileName);
-
             var merged = new JsonArray();
 
             var files = Directory.EnumerateFiles(jsonDir, "*.json", SearchOption.TopDirectoryOnly)
@@ -53,14 +50,19 @@ namespace ConvertData.Infrastructure
                 }
             }
 
+            Console.WriteLine($"  Merged {files.Count} files ({merged.Count} records)");
+            return merged;
+        }
+
+        public static void SaveToFile(JsonArray array, string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
-
-            File.WriteAllText(outputPath, merged.ToJsonString(options), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-            Console.WriteLine($"  Merged {files.Count} files ({merged.Count} records) => {outputPath}");
+            File.WriteAllText(path, array.ToJsonString(options), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
     }
 }

@@ -65,16 +65,19 @@ namespace ConvertData.Application
 
             Console.WriteLine();
             Console.WriteLine("=== Этап 3: Объединение всех JSON в один файл ===");
-            new JsonMerger().MergeAll(jsonOutDir, jsonAllDir);
+            var merged = new JsonMerger().MergeAll(jsonOutDir);
             Console.WriteLine("Этап 3 завершён.");
-
-            var allJsonPath = Path.Combine(jsonAllDir, "all.json");
-            var allNotDuplicateJsonPath = Path.Combine(jsonAllDir, "all_NotDuplicate.json");
 
             Console.WriteLine();
             Console.WriteLine("=== Этап 3.5: Обогащение неполных записей (Geometry, Bolts, Welds) ===");
-            var enrichedCount = new JsonRecordEnricher().Enrich(allJsonPath);
+            var enrichedCount = new JsonRecordEnricher().Enrich(merged);
             Console.WriteLine($"Этап 3.5 завершён. Обогащено записей: {enrichedCount}");
+
+            var allJsonPath = Path.Combine(jsonAllDir, "all.json");
+            JsonMerger.SaveToFile(merged, allJsonPath);
+            Console.WriteLine($"  Записано {merged.Count} записей => {allJsonPath}");
+
+            var allNotDuplicateJsonPath = Path.Combine(jsonAllDir, "all_NotDuplicate.json");
 
             Console.WriteLine();
             Console.WriteLine("=== Этап 4: Создание списков profile.txt и CONNECTION_CODE.txt ===");

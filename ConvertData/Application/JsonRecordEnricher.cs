@@ -1,9 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace ConvertData.Application;
@@ -17,11 +13,9 @@ internal sealed class JsonRecordEnricher
 {
     private static readonly string[] GeometrySubSections = ["Column", "Plate", "Flange", "Stiff"];
 
-    public int Enrich(string jsonPath)
+    public int Enrich(JsonArray arr)
     {
-        var text = File.ReadAllText(jsonPath, Encoding.UTF8);
-        var root = JsonNode.Parse(text);
-        if (root is not JsonArray arr || arr.Count == 0)
+        if (arr == null || arr.Count == 0)
             return 0;
 
         var groups = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
@@ -85,13 +79,6 @@ internal sealed class JsonRecordEnricher
         if (enriched == 0)
             return 0;
 
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-
-        File.WriteAllText(jsonPath, root.ToJsonString(options), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         return enriched;
     }
 
