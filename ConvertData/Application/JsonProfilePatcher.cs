@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using ConvertData.Domain;
 
 namespace ConvertData.Application;
 
 internal sealed class JsonProfilePatcher
 {
-    public void ApplyProfilesToJson(string jsonOutDir, Dictionary<string, (double H, double B, double s, double t)> profileLookup)
+    public void ApplyProfilesToJson(string jsonOutDir, Dictionary<string, ProfileGeometry> profileLookup)
     {
         foreach (var jsonPath in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly)
                      .OrderBy(f => f, StringComparer.OrdinalIgnoreCase))
@@ -19,16 +20,16 @@ internal sealed class JsonProfilePatcher
         }
     }
 
-    public void SelfCheckProfile(Dictionary<string, (double H, double B, double s, double t)> profileLookup)
+    public void SelfCheckProfile(Dictionary<string, ProfileGeometry> profileLookup)
     {
         var key = NormalizeProfileKey("10Á1");
         if (TryResolveProfile(profileLookup, key, out var g))
         {
-            Console.WriteLine($"Self-check Profile=10Á1 => H={g.H}, B={g.B}, s={g.s}, t={g.t}");
+            Console.WriteLine($"Self-check ProfileBeam=10Á1 => H={g.H}, B={g.B}, s={g.s}, t={g.t}");
             return;
         }
 
-        Console.WriteLine("Self-check Profile=10Á1 => NOT FOUND in Profile.xls");
+        Console.WriteLine("Self-check ProfileBeam=10Á1 => NOT FOUND in ProfileBeam.xls");
 
         var digits = new string(key.Where(char.IsDigit).ToArray());
         var sample = profileLookup.Keys
@@ -53,9 +54,9 @@ internal sealed class JsonProfilePatcher
     }
 
     public bool TryResolveProfile(
-        Dictionary<string, (double H, double B, double s, double t)> profileLookup,
+        Dictionary<string, ProfileGeometry> profileLookup,
         string normalizedProfile,
-        out (double H, double B, double s, double t) geometry)
+        out ProfileGeometry geometry)
     {
         if (profileLookup.TryGetValue(normalizedProfile, out geometry))
             return true;
@@ -76,11 +77,11 @@ internal sealed class JsonProfilePatcher
             }
         }
 
-        geometry = default;
+        geometry = default!;
         return false;
     }
 
-    private void PatchJsonFile(string jsonPath, Dictionary<string, (double H, double B, double s, double t)> profileLookup)
+    private void PatchJsonFile(string jsonPath, Dictionary<string, ProfileGeometry> profileLookup)
     {
         if (!TryReadJsonArray(jsonPath, out var root, out var arr))
             return;
@@ -92,17 +93,65 @@ internal sealed class JsonProfilePatcher
             if (item is not JsonObject obj)
                 continue;
 
-            var key = NormalizeProfileKey(
-                obj["ProfileBeam"]?.GetValue<string>()
-                ?? obj["Profile"]?.GetValue<string>());
-            if (string.IsNullOrWhiteSpace(key) || !TryResolveProfile(profileLookup, key, out var g))
+            var geometryNode = obj["Geometry"] as JsonObject;
+            if (geometryNode is null)
                 continue;
 
-            obj["H"] = g.H;
-            obj["B"] = g.B;
-            obj["s"] = g.s;
-            obj["t"] = g.t;
-            patched++;
+            bool itemPatched = false;
+
+            // Patch Beam geometry
+            var beamNode = geometryNode["Beam"];
+            var beamKey = NormalizeProfileKey(beamNode?["ProfileBeam"]?.GetValue<string>());
+            if (!string.IsNullOrWhiteSpace(beamKey) && TryResolveProfile(profileLookup, beamKey, out var bg) && beamNode is JsonObject beam)
+            {
+                beam["Beam_H"]  = bg.H;
+                beam["Beam_B"]  = bg.B;
+                beam["Beam_s"]  = bg.s;
+                beam["Beam_t"]  = bg.t;
+                beam["Beam_A"]  = bg.A;
+                beam["Beam_P"]  = bg.P;
+                beam["Beam_Iz"] = bg.Iz;
+                beam["Beam_Iy"] = bg.Iy;
+                beam["Beam_Ix"] = bg.Ix;
+                beam["Beam_Wz"] = bg.Wz;
+                beam["Beam_Wy"] = bg.Wy;
+                beam["Beam_Wx"] = bg.Wx;
+                beam["Beam_Sz"] = bg.Sz;
+                beam["Beam_Sy"] = bg.Sy;
+                beam["Beam_iz"] = bg.iz;
+                beam["Beam_iy"] = bg.iy;
+                beam["Beam_xo"] = bg.xo;
+                beam["Beam_yo"] = bg.yo;
+                itemPatched = true;
+            }
+
+            // Patch Column geometry
+            var columnNode = geometryNode["Column"];
+            var columnKey = NormalizeProfileKey(columnNode?["ProfileColumn"]?.GetValue<string>());
+            if (!string.IsNullOrWhiteSpace(columnKey) && TryResolveProfile(profileLookup, columnKey, out var cg) && columnNode is JsonObject column)
+            {
+                column["Column_H"]  = cg.H;
+                column["Column_B"]  = cg.B;
+                column["Column_s"]  = cg.s;
+                column["Column_t"]  = cg.t;
+                column["Column_A"]  = cg.A;
+                column["Column_P"]  = cg.P;
+                column["Column_Iz"] = cg.Iz;
+                column["Column_Iy"] = cg.Iy;
+                column["Column_Ix"] = cg.Ix;
+                column["Column_Wz"] = cg.Wz;
+                column["Column_Wy"] = cg.Wy;
+                column["Column_Wx"] = cg.Wx;
+                column["Column_Sz"] = cg.Sz;
+                column["Column_Sy"] = cg.Sy;
+                column["Column_iz"] = cg.iz;
+                column["Column_iy"] = cg.iy;
+                column["Column_xo"] = cg.xo;
+                column["Column_yo"] = cg.yo;
+                itemPatched = true;
+            }
+
+            if (itemPatched) patched++;
         }
 
         if (patched == 0)

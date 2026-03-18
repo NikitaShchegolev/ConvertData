@@ -25,7 +25,7 @@ namespace ConvertData.Infrastructure
             var merged = new JsonArray();
 
             var files = Directory.EnumerateFiles(jsonDir, "*.json", SearchOption.TopDirectoryOnly)
-                .Where(f => !string.Equals(Path.GetFileName(f), "Profile.json", StringComparison.OrdinalIgnoreCase))
+                .Where(f => !string.Equals(Path.GetFileName(f), "ProfileBeam.json", StringComparison.OrdinalIgnoreCase))
                 .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 

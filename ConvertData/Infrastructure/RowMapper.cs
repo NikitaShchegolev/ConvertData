@@ -39,15 +39,15 @@ internal static class RowMapper
         {
             Name = name,
             CONNECTION_CODE = code,
-            Profile = profile,
+            ProfileBeam = profile,
             ProfileColumn = profileColumn ?? "",
             variable = NumericParser.ParseInt(variable),
             Sj = NumericParser.ParseInt(sj),
             Sjo = NumericParser.ParseInt(sjo),
-            H = NumericParser.ParseDouble(h),
-            B = NumericParser.ParseDouble(b),
-            s = NumericParser.ParseDouble(s),
-            t = NumericParser.ParseDouble(tGeom),
+            Beam_H = NumericParser.ParseDouble(h),
+            Beam_B = NumericParser.ParseDouble(b),
+            Beam_s = NumericParser.ParseDouble(s),
+            Beam_t = NumericParser.ParseDouble(tGeom),
             Nt = NumericParser.ParseInt(nt),
             Nc = NumericParser.ParseInt(nc),
             N = NumericParser.ParseInt(n),
@@ -72,11 +72,11 @@ internal static class RowMapper
     {
         return new Row
         {
-            Profile = profile,
-            H = NumericParser.ParseDouble(h),
-            B = NumericParser.ParseDouble(b),
-            s = NumericParser.ParseDouble(s),
-            t = NumericParser.ParseDouble(t)
+            ProfileBeam = profile,
+            Beam_H = NumericParser.ParseDouble(h),
+            Beam_B = NumericParser.ParseDouble(b),
+            Beam_s = NumericParser.ParseDouble(s),
+            Beam_t = NumericParser.ParseDouble(t)
         };
     }
 }

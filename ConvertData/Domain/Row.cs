@@ -2,37 +2,430 @@
 
 internal sealed class Row
 {
+    /// <summary>
+    /// Имя группы узлового соединения
+    /// </summary>
     public string Name { get; set; } = "";
+    /// <summary>
+    /// Код соединения, который определяет тип соединения между балкой и колонной. 
+    /// Этот код может быть использован для определения геометрических 
+    /// характеристик балки и колонны, а также для расчета жесткости и внутренних сил в соединении.
+    /// </summary>
     public string CONNECTION_CODE { get; set; } = "";
-    public string Profile { get; set; } = "";
-    public string ProfileColumn { get; set; } = "";
-
-    public double H { get; set; }
-    public double B { get; set; }
-    public double s { get; set; }
-    public double t { get; set; }
-
-    public int Nt { get; set; }
-    public int Nc { get; set; }
-    public int N { get; set; }
-    public int Qz { get; set; }
-    public int Qy { get; set; }
-    public int T { get; set; }
-    public int My { get; set; }
-
+    #region Вариант расчета
+    /// <summary>
+    /// Вариант расчета, который определяет, какие данные будут использоваться для расчета.
+    /// </summary>
     public int variable { get; set; }
+    #endregion
+
+
+    // Geometry
+    #region Beam - геометрические характеристики балки
+    /// <summary>
+    /// "Beam": профиль балки
+    /// </summary>
+    public string ProfileBeam { get; set; } = "";
+    /// <summary>
+    /// "Beam": Высота сечения балки
+    /// </summary>
+    public double Beam_H { get; set; }
+    /// <summary>
+    /// "Beam": Ширина полки балки
+    /// </summary>
+    public double Beam_B { get; set; }
+    /// <summary>
+    /// "Beam": толщина стенки балки
+    /// </summary>
+    public double Beam_s { get; set; }
+    /// <summary>
+    /// "Beam":  толщина полки балки
+    /// </summary>
+    public double Beam_t { get; set; }
+    /// <summary>
+    /// "Beam": Площадь сечения балки
+    /// </summary>
+    public double Beam_A { get; set; }
+    /// <summary>
+    /// "Beam": Вес метра погонного балки
+    /// </summary>
+    public double Beam_P { get; set; }
+    /// <summary>
+    /// "Beam": Момент инерции балки относительно плоскости 
+    /// </summary>
+    public double Beam_Iz { get; set; }
+    /// <summary>
+    /// "Beam": Момент инерции балки относительно плоскости 
+    /// </summary>
+    public double Beam_Iy { get; set; }
+    /// <summary>
+    /// "Beam": Момент инерции балки относительно центральной оси x
+    /// </summary>
+    public double Beam_Ix { get; set; }
+    /// </summary>
+    /// "Beam":  Момент сопротивления балки относительно центральной оси z
+    /// </summary>
+    public double Beam_Wz { get; set; }
+    /// <summary>
+    /// "Beam": Момент сопротивления балки относительно центральной оси y
+    /// </summary>
+    public double Beam_Wy { get; set; }
+    /// "Beam": Момент сопротивления балки относительно центральной оси x
+    /// </summary>
+    public double Beam_Wx { get; set; }
+
+    /// "Beam": Статический момент балки относительно центральной оси z
+    /// </summary>
+    public double Beam_Sz { get; set; }
+    /// <summary>
+    /// "Beam": Статический момент балки относительно центральной оси y
+    /// </summary>
+    public double Beam_Sy { get; set; }
+    /// <summary>
+    /// "Beam": Радиус инерции балки относительно центральной оси z
+    /// </summary>
+    public double Beam_iz { get; set; }
+    /// <summary>
+    /// "Beam": Радиус инерции балки относительно центральной оси y
+    /// </summary>
+    public double Beam_iy { get; set; }
+    /// <summary>
+    /// "Beam": Координата центра тяжести балки в направления x
+    /// </summary>
+    public double Beam_xo { get; set; }
+    /// <summary>
+    /// "Beam": Координата центра тяжести балки в направления y
+    /// </summary>
+    public double Beam_yo { get; set; }
+    #endregion
+    #region Column - геометрическин характеристики колонны
+    /// <summary>
+    /// "Column": профиль колонны
+    /// </summary>
+    public string ProfileColumn { get; set; } = "";
+    /// <summary>
+    /// "Column": Высота сечения
+    /// </summary>
+    public double Column_H { get; set; }
+    /// <summary>
+    /// "Column": Ширина полки колонны
+    /// </summary>
+    public double Column_B { get; set; }
+    /// <summary>
+    /// "Column": толщна стенки колонны
+    /// </summary>
+    public double Column_s { get; set; }
+    /// <summary>
+    /// "Column": толщна полки колонны
+    /// </summary>
+    public double Column_t { get; set; }
+    /// <summary>
+    /// "Column":
+    /// </summary>
+    public double Column_A { get; set; }
+    /// <summary>
+    /// "Column": Вес метра погонного балки
+    /// </summary>
+    public double Column_P { get; set; }
+    /// <summary>
+    /// "Column": Момент инерции балки относительно плоскости
+    /// </summary>
+    public double Column_Iz { get; set; }
+    /// <summary>
+    /// "Column": Момент инерции балки относительно плоскости
+    /// </summary>
+    public double Column_Iy { get; set; }
+    /// <summary>
+    /// "Column": Момент инерции балки относительно плоскости
+    /// </summary>
+    public double Column_Ix { get; set; }
+    /// <summary>
+    /// "Column": Момент сопротивления балки относительно центральной оси z
+    /// </summary>
+    public double Column_Wz { get; set; }
+    /// <summary>
+    /// "Column": Момент сопротивления балки относительно центральной оси y
+    /// </summary>
+    public double Column_Wy { get; set; }
+    /// <summary>
+    /// "Column": Момент сопротивления балки относительно центральной оси x
+    /// </summary>
+    public double Column_Wx { get; set; }
+    /// <summary>
+    /// "Column": Статический момент балки относительно центральной оси z
+    /// </summary>
+    public double Column_Sz { get; set; }
+    /// <summary>
+    /// "Column": Статический момент балки относительно центральной оси y
+    /// </summary>
+    public double Column_Sy { get; set; }
+    /// <summary>
+    /// "Column":
+    /// </summary>
+    public double Column_iz { get; set; }
+    /// <summary>
+    /// "Column": Радиус инерции балки относительно центральной оси z
+    /// </summary>
+    public double Column_iy { get; set; }
+    /// <summary>
+    /// "Column": Координата центра тяжести балки в направления x
+    /// </summary>
+    public double Column_xo { get; set; }
+    /// <summary>
+    /// "Column": Координата центра тяжести балки в направления y
+    /// </summary>
+    public double Column_yo { get; set; }    
+    #endregion
+    #region Plate
+    /// <summary>
+    /// "Plate": Длина пластины
+    /// </summary>
+    public double Plate_H { get; set; }
+    /// <summary>
+    /// "Plate": Ширина пластины
+    /// </summary>
+    public double Plate_B { get; set; }
+    /// <summary>
+    /// "Plate": толщна пластины
+    /// </summary>
+    public double Plate_t { get; set; }
+    #endregion
+    #region Flange
+    /// <summary>
+    /// "Flange": Расстояние от верха полки колонны до края пластины для фланца, который крепится к полке колонны
+    /// </summary>
+    public double Flange_Lb { get; set; }
+    /// <summary>
+    /// "Flange": Длина пластины
+    /// </summary>
+    public double Flange_H { get; set; }
+    /// <summary>
+    /// "Flange": Ширина пластины
+    /// </summary>
+    public double Flange_B { get; set; }
+    /// <summary>
+    /// "Flange": толщна пластины
+    /// </summary>
+    public double Flange_t { get; set; }
+    #endregion
+    #region Stiff
+    /// <summary>
+    /// "Stiff": Расстояние от верха полки колонны до края пластины для фланца, который крепится к полке колонны
+    /// </summary>
+    public double Stiff_tbp { get; set; }
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_tg { get; set; }
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_tf { get; set; }
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_Lh { get; set; }
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_Hh { get; set; }
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_tr1 { get; set; }
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_tr2 { get; set; }
+
+    /// <summary>
+    /// "Stiff": 
+    /// </summary>
+    public double Stiff_twp { get; set; }
+    #endregion
+
+    //Bolts
+
+    #region Bolts
+    /// <summary>
+    /// "Bolts": Список коордниат для одного болта
+    /// </summary>
+    public List<CoordinatesBolts> CoordinatesBolts { get; set; } = new List<CoordinatesBolts>();
+    /// <summary>
+    /// "Bolts": Диаметр болта
+    /// </summary>
+    public int F { get; set; }
+    /// <summary>
+    /// "Bolts": Количество болтов
+    /// </summary>
+    public int Bolts_Nb { get; set; }
+    /// <summary>
+    /// "Bolts": Количество рядов болтов
+    /// </summary>
+    public int N_Rows { get; set; } 
+    #endregion
+
+    //Welds - Минимальные катеты сварных швов
+
+    #region Weld
+
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf1 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf2 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf3 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf4 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf5 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf6 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf7 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf8 { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf { get; set; }
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public int kf10 { get; set; }
+    #endregion
+
+    //Характеристики материала
+
+    #region Stiffness - жесткость
+    /// <summary>
+    ///  "Stiffness" - Sj, жесткость в направлении Uy
+    /// </summary>
     public int Sj { get; set; }
+    /// <summary>
+    /// "Stiffness" - Sjo, жесткость в направлении Uz
+    /// </summary>
     public int Sjo { get; set; }
+    #endregion
+    #region InternalForces - внутренние силы
+    /// <summary>
+    /// "InternalForces" - Nt, растяжение
+    /// </summary>
+    public int Nt { get; set; }
+    /// <summary>
+    /// "InternalForces" - Nt, Сжатие
+    /// </summary>
+    public int Nc { get; set; }
+    /// <summary>
+    /// "InternalForces" - Nt, растяжение/сжатие
+    /// </summary>
+    public int N { get; set; }
+    /// <summary>
+    /// "InternalForces" - Qz, поперечная сила в направлении z
+    /// </summary>
+    public int Qz { get; set; }
+    /// <summary>
+    /// "InternalForces" - Qy, поперечная сила в направлении y
+    /// </summary>
+    public int Qy { get; set; }
 
+    /// <summary>
+    /// "InternalForces" - Qx, поперечная сила в направлении x
+    /// </summary>
+    public int Qx { get; set; }
+    /// <summary>
+    /// "InternalForces" - My, изгибающий момент в направлении y
+    /// </summary>
+    public int My { get; set; }
+    /// <summary>
+    /// "InternalForces" - Mneg - обратный момент
+    /// </summary>
     public double Mneg { get; set; }
+    /// <summary>
+    /// "InternalForces" - Mz, изгибающий момент в направлении z
+    /// </summary>
     public double Mz { get; set; }
+    /// <summary>
+    /// "InternalForces" - Mx, изгибающий момент в направлении x
+    /// </summary>
     public double Mx { get; set; }
+    /// <summary>
+    /// "InternalForces" - Mw, крутящий момент
+    /// </summary>
     public double Mw { get; set; }
-
+    /// <summary>
+    /// "InternalForces" - T, крутящий момент
+    /// </summary>
+    public int T { get; set; }
+    #endregion
+    #region Coefficients - расчетные коэффициенты
+    /// <summary>
+    /// "Coefficients" - α
+    /// </summary>
     public double Alpha { get; set; }
+    /// <summary>
+    /// "Coefficients" - β
+    /// </summary>
     public double Beta { get; set; }
+    /// <summary>
+    /// "Coefficients" - γ
+    /// </summary>
     public double Gamma { get; set; }
+    /// <summary>
+    /// "Coefficients" - δ
+    /// </summary>
     public double Delta { get; set; }
+    /// <summary>
+    /// "Coefficients" - ε
+    /// </summary>
     public double Epsilon { get; set; }
+    /// <summary>
+    /// "Coefficients" - λ
+    /// </summary>
     public double Lambda { get; set; }
+    #endregion
+}
+
+/// <summary>
+/// Класс для расчета координат болтов 
+/// относительно расстояния между рядами 
+/// координат расстояния по ширина и высоте
+/// </summary>
+class CoordinatesBolts
+{
+    /// <summary>
+    /// Координата болта в направлении x
+    /// </summary>
+    public int X { get; set; }
+    /// <summary>
+    /// Координата болта в направлении y
+    /// </summary>
+    public int Y { get; set; }
+    /// <summary>
+    /// Координата болта в направлении z
+    /// </summary>
+    public int Z { get; set; }
+    public CoordinatesBolts(int x, int y, int z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+
 }

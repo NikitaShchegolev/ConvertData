@@ -50,19 +50,19 @@ internal static class ExcelHeaderResolver
         {
             idxProfile = HeaderUtils.IndexOfHeader(header, ProfileColumnOverride);
             if (idxProfile < 0)
-                idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "Profile", "Профиль" });
+                idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "ProfileBeam", "Профиль" });
         }
         else
         {
-            idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "Profile", "Профиль" });
+            idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "ProfileBeam", "Профиль" });
         }
 
         var map = new ExcelColumnMap
         {
-            IdxH = HeaderUtils.IndexOfHeaderAny(header, new[] { "H" }),
-            IdxB = HeaderUtils.IndexOfHeaderAny(header, new[] { "B" }),
-            Idxs = HeaderUtils.IndexOfHeaderAny(header, new[] { "s" }),
-            Idxt = HeaderUtils.IndexOfHeaderAny(header, new[] { "t" }),
+            IdxH = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_H" }),
+            IdxB = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_B" }),
+            Idxs = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_s" }),
+            Idxt = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_t" }),
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
             IdxCode = HeaderUtils.IndexOfHeaderAny(header, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" }),
             IdxProfile = idxProfile,

@@ -29,7 +29,7 @@ namespace ConvertData.Application
                 if (node is not JsonObject obj)
                     continue;
 
-                var profile = obj["Profile"]?.GetValue<string>();
+                var profile = (obj["Geometry"] as JsonObject)?["Beam"]?["ProfileBeam"]?.GetValue<string>();
                 if (!string.IsNullOrWhiteSpace(profile))
                     profiles.Add(profile.Trim());
 

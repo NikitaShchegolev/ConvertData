@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json.Nodes;
+using ConvertData.Domain;
 
 namespace ConvertData.Application;
 
 internal sealed class ProfileLookupLoader
 {
-    public Dictionary<string, (double H, double B, double s, double t)> Load(string excelProfileDir)
+    public Dictionary<string, ProfileGeometry> Load(string excelProfileDir)
     {
         var profilePath = Path.Combine(excelProfileDir, "Profile.json");
         if (!File.Exists(profilePath))
@@ -21,7 +22,7 @@ internal sealed class ProfileLookupLoader
             if (arr is null)
                 return new(StringComparer.OrdinalIgnoreCase);
 
-            var dict = new Dictionary<string, (double H, double B, double s, double t)>(StringComparer.OrdinalIgnoreCase);
+            var dict = new Dictionary<string, ProfileGeometry>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in arr)
             {
                 if (item is not JsonObject obj)
@@ -32,12 +33,27 @@ internal sealed class ProfileLookupLoader
                 if (string.IsNullOrWhiteSpace(key))
                     continue;
 
-                double h = obj["H"]?.GetValue<double>() ?? 0;
-                double b = obj["B"]?.GetValue<double>() ?? 0;
-                double s = obj["s"]?.GetValue<double>() ?? 0;
-                double t = obj["t"]?.GetValue<double>() ?? 0;
-
-                dict[key] = (h, b, s, t);
+                dict[key] = new ProfileGeometry
+                {
+                    H  = obj["H"]?.GetValue<double>()  ?? 0,
+                    B  = obj["B"]?.GetValue<double>()  ?? 0,
+                    s  = obj["s"]?.GetValue<double>()  ?? 0,
+                    t  = obj["t"]?.GetValue<double>()  ?? 0,
+                    A  = obj["A"]?.GetValue<double>()  ?? 0,
+                    P  = obj["P"]?.GetValue<double>()  ?? 0,
+                    Iz = obj["Iz"]?.GetValue<double>() ?? 0,
+                    Iy = obj["Iy"]?.GetValue<double>() ?? 0,
+                    Ix = obj["Ix"]?.GetValue<double>() ?? 0,
+                    Wz = obj["Wz"]?.GetValue<double>() ?? 0,
+                    Wy = obj["Wy"]?.GetValue<double>() ?? 0,
+                    Wx = obj["Wx"]?.GetValue<double>() ?? 0,
+                    Sz = obj["Sz"]?.GetValue<double>() ?? 0,
+                    Sy = obj["Sy"]?.GetValue<double>() ?? 0,
+                    iz = obj["iz"]?.GetValue<double>() ?? 0,
+                    iy = obj["iy"]?.GetValue<double>() ?? 0,
+                    xo = obj["xo"]?.GetValue<double>() ?? 0,
+                    yo = obj["yo"]?.GetValue<double>() ?? 0,
+                };
             }
 
             Console.WriteLine($"  Loaded profiles: {dict.Count} from {profilePath}");

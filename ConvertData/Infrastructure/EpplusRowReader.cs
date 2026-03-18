@@ -135,11 +135,11 @@ namespace ConvertData.Infrastructure
                 for (int c = startCol; c <= endCol; c++)
                     tokens.Add(HeaderUtils.NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
 
-                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Profile", "Профиль" }) >= 0;
-                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "H", "Н" }) >= 0;
-                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "B", "В" }) >= 0;
-                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "s", "S" }) >= 0;
-                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "t", "T" }) >= 0;
+                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "ProfileBeam", "Профиль" }) >= 0;
+                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_H", "Н" }) >= 0;
+                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_B", "В" }) >= 0;
+                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_s", "S" }) >= 0;
+                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_t", "T" }) >= 0;
 
                 bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" }) >= 0
                     && HeaderUtils.IndexOfHeader(tokens, "Name") >= 0

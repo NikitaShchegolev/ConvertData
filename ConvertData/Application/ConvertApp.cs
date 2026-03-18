@@ -50,7 +50,7 @@ namespace ConvertData.Application
             if (mode == RunMode.All || mode == RunMode.ApplyProfiles)
             {
                 Console.WriteLine();
-                Console.WriteLine("=== Этап 2: Применение справочника профилей (H, B, s, t) ===");
+                Console.WriteLine("=== Этап 2: Применение справочника профилей (Beam_H, Beam_B, Beam_s, Beam_t) ===");
                 ApplyProfilesToJson(jsonOutDir, excelProfileDir);
                 Console.WriteLine("Этап 2 завершён.");
             }
@@ -69,10 +69,10 @@ namespace ConvertData.Application
             Console.WriteLine("Этап 4 завершён.");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 5: Создание Profile.json и CONNECTION_CODE.json ===");
+            Console.WriteLine("=== Этап 5: Создание ProfileBeam.json и CONNECTION_CODE.json ===");
             new TextListToJsonExporter().ExportProfileJson(
                 Path.Combine(excelProfileOutDir, "profile.txt"),
-                Path.Combine(excelProfileOutDir, "Profile.json"));
+                Path.Combine(excelProfileOutDir, "ProfileBeam.json"));
             new TextListToJsonExporter().ExportConnectionCodeJson(
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE.txt"),
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE.json"));
@@ -129,7 +129,7 @@ namespace ConvertData.Application
         {
             if (args.Length > 0)
             {
-                return args.Where(p => !string.Equals(Path.GetFileName(p), "Profile.xls", StringComparison.OrdinalIgnoreCase));
+                return args.Where(p => !string.Equals(Path.GetFileName(p), "ProfileBeam.xls", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!Directory.Exists(excelDir))
@@ -157,7 +157,7 @@ namespace ConvertData.Application
             var profileLookup = _profileLookupLoader.Load(excelProfileDir);
             if (profileLookup.Count == 0)
             {
-                Console.WriteLine("Profile lookup is empty: EXCEL_Profile/Profile.xls was not parsed.");
+                Console.WriteLine("ProfileBeam lookup is empty: EXCEL_Profile/ProfileBeam.xls was not parsed.");
                 return;
             }
 
