@@ -117,6 +117,9 @@ namespace ConvertData.Infrastructure
                 }
             }
 
+            if (map.IsMainTable)
+                MergeAdditionalSheets(package, ws, list);
+
             return list;
         }
 
@@ -151,5 +154,173 @@ namespace ConvertData.Infrastructure
 
             return fromRow;
         }
+
+        #region Merge additional sheets (geometry, bolts, weld)
+
+        private static readonly string[] KeyColumnHeaders =
+            ["CONNECTION_CODE", "Connection_Code", "Code", "Код"];
+
+        private static readonly Dictionary<string, Action<Row, string>> GeometryColumnMap =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["H"] = (r, v) => { var d = NumericParser.ParseDouble(v); r.Plate_H = d; r.Flange_H = d; },
+                ["B"] = (r, v) => { var d = NumericParser.ParseDouble(v); r.Plate_B = d; r.Flange_B = d; },
+                ["tp"] = (r, v) => { var d = NumericParser.ParseDouble(v); r.Plate_t = d; r.Flange_t = d; },
+                ["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v),
+                ["tbp"] = (r, v) => r.Stiff_tbp = NumericParser.ParseDouble(v),
+                ["tg"] = (r, v) => r.Stiff_tg = NumericParser.ParseDouble(v),
+                ["tf"] = (r, v) => r.Stiff_tf = NumericParser.ParseDouble(v),
+                ["Lh"] = (r, v) => r.Stiff_Lh = NumericParser.ParseDouble(v),
+                ["Hh"] = (r, v) => r.Stiff_Hh = NumericParser.ParseDouble(v),
+                ["tr1"] = (r, v) => r.Stiff_tr1 = NumericParser.ParseDouble(v),
+                ["tr2"] = (r, v) => r.Stiff_tr2 = NumericParser.ParseDouble(v),
+                ["twp"] = (r, v) => r.Stiff_twp = NumericParser.ParseDouble(v),
+            };
+
+        private static readonly Dictionary<string, Action<Row, string>> WeldColumnMap =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["kf1"] = (r, v) => r.kf1 = NumericParser.ParseInt(v),
+                ["kf2"] = (r, v) => r.kf2 = NumericParser.ParseInt(v),
+                ["kf3"] = (r, v) => r.kf3 = NumericParser.ParseInt(v),
+                ["kf4"] = (r, v) => r.kf4 = NumericParser.ParseInt(v),
+                ["kf5"] = (r, v) => r.kf5 = NumericParser.ParseInt(v),
+                ["kf6"] = (r, v) => r.kf6 = NumericParser.ParseInt(v),
+                ["kf7"] = (r, v) => r.kf7 = NumericParser.ParseInt(v),
+                ["kf8"] = (r, v) => r.kf8 = NumericParser.ParseInt(v),
+                ["kf9"] = (r, v) => r.kf = NumericParser.ParseInt(v),
+                ["kf10"] = (r, v) => r.kf10 = NumericParser.ParseInt(v),
+            };
+
+        private static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = BuildBoltsColumnMap();
+
+        private static Dictionary<string, Action<Row, string>> BuildBoltsColumnMap()
+        {
+            var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.Bolts_Nb = 1; r.N_Rows = 1; },
+            };
+
+            map["e1"] = (r, v) => { EnsureBolts(r, 1); r.CoordinatesBolts[0].Y = NumericParser.ParseInt(v); };
+            for (int i = 1; i <= 10; i++)
+            {
+                int idx = i;
+                map[$"p{i}"] = (r, v) => { EnsureBolts(r, idx + 1); r.CoordinatesBolts[idx].Y = NumericParser.ParseInt(v); };
+            }
+
+            map["d1"] = (r, v) =>
+            {
+                EnsureBolts(r, 2);
+                r.CoordinatesBolts[1].X = NumericParser.ParseInt(v);
+            };
+
+            return map;
+        }
+
+        private static void EnsureBolts(Row r, int count)
+        {
+            while (r.CoordinatesBolts.Count < count)
+                r.CoordinatesBolts.Add(new CoordinatesBolts(0, 0, 0));
+        }
+
+        private static void MergeAdditionalSheets(ExcelPackage package, ExcelWorksheet mainWs, List<Row> list)
+        {
+            if (list.Count == 0)
+                return;
+
+            var codeLookup = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
+            foreach (var row in list)
+            {
+                if (!string.IsNullOrWhiteSpace(row.CONNECTION_CODE) && !codeLookup.ContainsKey(row.CONNECTION_CODE))
+                    codeLookup[row.CONNECTION_CODE] = row;
+            }
+
+            foreach (var ws in package.Workbook.Worksheets)
+            {
+                if (ws == mainWs || ws.Dimension == null)
+                    continue;
+
+                var sheetName = (ws.Name ?? "").Trim();
+                if (string.Equals(sheetName, "geometry", StringComparison.OrdinalIgnoreCase))
+                    MergeSheet(ws, GeometryColumnMap, codeLookup, list);
+                else if (string.Equals(sheetName, "bolts", StringComparison.OrdinalIgnoreCase))
+                    MergeSheet(ws, BoltsColumnMap, codeLookup, list);
+                else if (string.Equals(sheetName, "weld", StringComparison.OrdinalIgnoreCase))
+                    MergeSheet(ws, WeldColumnMap, codeLookup, list);
+            }
+        }
+
+        private static void MergeSheet(
+            ExcelWorksheet ws,
+            Dictionary<string, Action<Row, string>> propertyMap,
+            Dictionary<string, Row> codeLookup,
+            List<Row> list)
+        {
+            int startRow = ws.Dimension.Start.Row;
+            int endRow = ws.Dimension.End.Row;
+            int startCol = ws.Dimension.Start.Column;
+            int endCol = ws.Dimension.End.Column;
+
+            var headers = new List<string>();
+            for (int c = startCol; c <= endCol; c++)
+                headers.Add((ws.Cells[startRow, c].Text ?? "").Trim());
+
+            int keyCol = -1;
+            for (int i = 0; i < headers.Count; i++)
+            {
+                foreach (var name in KeyColumnHeaders)
+                {
+                    if (string.Equals(headers[i], name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        keyCol = i;
+                        break;
+                    }
+                }
+                if (keyCol >= 0) break;
+            }
+
+            var colMappings = new List<(int colIdx, Action<Row, string> setter)>();
+            for (int i = 0; i < headers.Count; i++)
+            {
+                if (i == keyCol || string.IsNullOrWhiteSpace(headers[i]))
+                    continue;
+                if (propertyMap.TryGetValue(headers[i], out var setter))
+                    colMappings.Add((i, setter));
+            }
+
+            if (colMappings.Count == 0)
+                return;
+
+            for (int r = startRow + 1; r <= endRow; r++)
+            {
+                Row? target = null;
+
+                if (keyCol >= 0)
+                {
+                    var key = (ws.Cells[r, startCol + keyCol].Text ?? "").Trim();
+                    if (!string.IsNullOrWhiteSpace(key))
+                        codeLookup.TryGetValue(key, out target);
+                }
+
+                if (target == null)
+                {
+                    int idx = r - startRow - 1;
+                    if (idx >= 0 && idx < list.Count)
+                        target = list[idx];
+                }
+
+                if (target == null)
+                    continue;
+
+                foreach (var (colIdx, setter) in colMappings)
+                {
+                    var text = (ws.Cells[r, startCol + colIdx].Text ?? "").Trim();
+                    if (!string.IsNullOrWhiteSpace(text))
+                        setter(target, text);
+                }
+            }
+        }
+
+        #endregion
     }
 }

@@ -9,7 +9,7 @@ using ConvertData.Entitys;
 
 namespace ConvertData.Application
 {
-    internal sealed class ProfileAndConnectionCodeExporter
+    public sealed class ProfileAndConnectionCodeExporter
     {
         public void Export(string jsonAllFilePath, string outDir)
         {

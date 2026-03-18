@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +16,7 @@ namespace ConvertData.Application
 
         private readonly ProfileLookupLoader _profileLookupLoader = new();
         private readonly JsonProfilePatcher _profilePatcher = new();
+        private readonly ProfileExcelToJsonExporter _profileExcelExporter = new();
 
         public void Run(string[] args)
         {
@@ -38,63 +39,75 @@ namespace ConvertData.Application
 
             if (mode == RunMode.All || mode == RunMode.CreateJson)
             {
-                Console.WriteLine("=== Этап 1: Создание JSON из Excel (без профилей) ===");
+                Console.WriteLine("=== Р­С‚Р°Рї 1: РЎРѕР·РґР°РЅРёРµ JSON РёР· Excel (Р±РµР· РїСЂРѕС„РёР»РµР№) ===");
                 ClearJsonOut(jsonOutDir);
 
                 foreach (var input in GetInputFiles(RunModeParser.GetInputArgsForCreateJson(args), excelDir))
                     ConvertOne(input, jsonOutDir);
 
-                Console.WriteLine("Этап 1 завершён.");                
+                Console.WriteLine("Р­С‚Р°Рї 1 Р·Р°РІРµСЂС€С‘РЅ.");                
             }
 
             if (mode == RunMode.All || mode == RunMode.ApplyProfiles)
             {
                 Console.WriteLine();
-                Console.WriteLine("=== Этап 2: Применение справочника профилей (Beam_H, Beam_B, Beam_s, Beam_t) ===");
+                Console.WriteLine("=== Р­С‚Р°Рї 2: РџСЂРёРјРµРЅРµРЅРёРµ СЃРїСЂР°РІРѕС‡РЅРёРєР° РїСЂРѕС„РёР»РµР№ (Beam_H, Beam_B, Beam_s, Beam_t) ===");
                 ApplyProfilesToJson(jsonOutDir, excelProfileDir);
-                Console.WriteLine("Этап 2 завершён.");
+                Console.WriteLine("Р­С‚Р°Рї 2 Р·Р°РІРµСЂС€С‘РЅ.");
+
+                Console.WriteLine();
+                Console.WriteLine("=== РЁР°Рі 1.5: Р­РєСЃРїРѕСЂС‚ РїСЂРѕС„РёР»РµР№ РёР· Excel в†’ Profile.json ===");
+                _profileExcelExporter.Export(
+                    excelProfileDir,
+                    Path.Combine(excelProfileOutDir, "Profile.json"));
+                Console.WriteLine("РЁР°Рі 1.5 Р·Р°РІРµСЂС€С‘РЅ.");
             }
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 3: Объединение всех JSON в один файл ===");
+            Console.WriteLine("=== Р­С‚Р°Рї 3: РћР±СЉРµРґРёРЅРµРЅРёРµ РІСЃРµС… JSON РІ РѕРґРёРЅ С„Р°Р№Р» ===");
             new JsonMerger().MergeAll(jsonOutDir, jsonAllDir);
-            Console.WriteLine("Этап 3 завершён.");
+            Console.WriteLine("Р­С‚Р°Рї 3 Р·Р°РІРµСЂС€С‘РЅ.");
 
             var allJsonPath = Path.Combine(jsonAllDir, "all.json");
             var allNotDuplicateJsonPath = Path.Combine(jsonAllDir, "all_NotDuplicate.json");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 4: Создание списков profile.txt и CONNECTION_CODE.txt ===");
-            new ProfileAndConnectionCodeExporter().Export(allJsonPath, excelProfileOutDir);
-            Console.WriteLine("Этап 4 завершён.");
+            Console.WriteLine("=== Р­С‚Р°Рї 3.5: РћР±РѕРіР°С‰РµРЅРёРµ РЅРµРїРѕР»РЅС‹С… Р·Р°РїРёСЃРµР№ (Geometry, Bolts, Welds) ===");
+            var enrichedCount = new JsonRecordEnricher().Enrich(allJsonPath);
+            Console.WriteLine($"Р­С‚Р°Рї 3.5 Р·Р°РІРµСЂС€С‘РЅ. РћР±РѕРіР°С‰РµРЅРѕ Р·Р°РїРёСЃРµР№: {enrichedCount}");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 5: Создание ProfileBeam.json и CONNECTION_CODE.json ===");
+            Console.WriteLine("=== Р­С‚Р°Рї 4: РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєРѕРІ profile.txt Рё CONNECTION_CODE.txt ===");
+            new ProfileAndConnectionCodeExporter().Export(allJsonPath, excelProfileOutDir);
+            Console.WriteLine("Р­С‚Р°Рї 4 Р·Р°РІРµСЂС€С‘РЅ.");
+
+            Console.WriteLine();
+            Console.WriteLine("=== Р­С‚Р°Рї 5: РЎРѕР·РґР°РЅРёРµ ProfileBeam.json Рё CONNECTION_CODE.json ===");
             new TextListToJsonExporter().ExportProfileJson(
                 Path.Combine(excelProfileOutDir, "profile.txt"),
                 Path.Combine(excelProfileOutDir, "ProfileBeam.json"));
             new TextListToJsonExporter().ExportConnectionCodeJson(
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE.txt"),
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE.json"));
-            Console.WriteLine("Этап 5 завершён.");
+            Console.WriteLine("Р­С‚Р°Рї 5 Р·Р°РІРµСЂС€С‘РЅ.");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 6: Проверка all.json на дубликаты CONNECTION_CODE ===");
+            Console.WriteLine("=== Р­С‚Р°Рї 6: РџСЂРѕРІРµСЂРєР° all.json РЅР° РґСѓР±Р»РёРєР°С‚С‹ CONNECTION_CODE ===");
             var duplicates = new ConnectionCodeDuplicateChecker().FindDuplicates(
                 allJsonPath,
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE_duplicates.txt"));
-            Console.WriteLine($"Этап 6 завершён. Найдено дубликатов: {duplicates.Count}");
+            Console.WriteLine($"Р­С‚Р°Рї 6 Р·Р°РІРµСЂС€С‘РЅ. РќР°Р№РґРµРЅРѕ РґСѓР±Р»РёРєР°С‚РѕРІ: {duplicates.Count}");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 7: Создание all_NotDuplicate.json с заменой дубликатов ===");
+            Console.WriteLine("=== Р­С‚Р°Рї 7: РЎРѕР·РґР°РЅРёРµ all_NotDuplicate.json СЃ Р·Р°РјРµРЅРѕР№ РґСѓР±Р»РёРєР°С‚РѕРІ ===");
             var changedCodes = new ConnectionCodeDeduplicator().CreateDeduplicatedJson(
                 allJsonPath,
                 allNotDuplicateJsonPath,
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE_replacements.txt"));
-            Console.WriteLine($"Этап 7 завершён. Заменено CONNECTION_CODE: {changedCodes}");
+            Console.WriteLine($"Р­С‚Р°Рї 7 Р·Р°РІРµСЂС€С‘РЅ. Р—Р°РјРµРЅРµРЅРѕ CONNECTION_CODE: {changedCodes}");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 8: Создание CONNECTION_CODE_new.json и CONNECTION_CODE_new.txt из all_NotDuplicate.json ===");
+            Console.WriteLine("=== Р­С‚Р°Рї 8: РЎРѕР·РґР°РЅРёРµ CONNECTION_CODE_new.json Рё CONNECTION_CODE_new.txt РёР· all_NotDuplicate.json ===");
             var exporter = new ProfileAndConnectionCodeExporter();
             exporter.ExportConnectionCodesOnly(
                 allNotDuplicateJsonPath,
@@ -103,17 +116,17 @@ namespace ConvertData.Application
                 allNotDuplicateJsonPath,
                 Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.txt"));
             if (remainingDuplicates > 0)
-                Console.WriteLine($"  ВНИМАНИЕ: в all_NotDuplicate.json осталось дубликатов CONNECTION_CODE: {remainingDuplicates}");
+                Console.WriteLine($"  Р’РќРРњРђРќРР•: РІ all_NotDuplicate.json РѕСЃС‚Р°Р»РѕСЃСЊ РґСѓР±Р»РёРєР°С‚РѕРІ CONNECTION_CODE: {remainingDuplicates}");
             else
-                Console.WriteLine("  Проверка: дубликатов CONNECTION_CODE нет.");
-            Console.WriteLine("Этап 8 завершён.");
+                Console.WriteLine("  РџСЂРѕРІРµСЂРєР°: РґСѓР±Р»РёРєР°С‚РѕРІ CONNECTION_CODE РЅРµС‚.");
+            Console.WriteLine("Р­С‚Р°Рї 8 Р·Р°РІРµСЂС€С‘РЅ.");
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 9: Создание NameConnections.json из all_NotDuplicate.json ===");
+            Console.WriteLine("=== Р­С‚Р°Рї 9: РЎРѕР·РґР°РЅРёРµ NameConnections.json РёР· all_NotDuplicate.json ===");
             new NameConnectionsExporter().Export(
                 allNotDuplicateJsonPath,
                 Path.Combine(excelProfileOutDir, "NameConnections.json"));
-            Console.WriteLine("Этап 9 завершён.");
+            Console.WriteLine("Р­С‚Р°Рї 9 Р·Р°РІРµСЂС€С‘РЅ.");
         }
 
         private static void ClearJsonOut(string jsonOutDir)
@@ -149,7 +162,7 @@ namespace ConvertData.Application
 
             var outPath = Path.Combine(jsonOutDir, Path.GetFileNameWithoutExtension(inputPath) + ".json");
             _writer.Write(rows, outPath);
-            Console.WriteLine("Written: " + outPath);
+            Console.WriteLine("РЎРѕР·РґР°РЅ json: " + outPath);
         }
 
         private void ApplyProfilesToJson(string jsonOutDir, string excelProfileDir)
@@ -160,7 +173,6 @@ namespace ConvertData.Application
                 Console.WriteLine("ProfileBeam lookup is empty: EXCEL_Profile/ProfileBeam.xls was not parsed.");
                 return;
             }
-
             _profilePatcher.SelfCheckProfile(profileLookup);
             _profilePatcher.ApplyProfilesToJson(jsonOutDir, profileLookup);
         }

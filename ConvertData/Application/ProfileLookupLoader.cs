@@ -35,24 +35,31 @@ internal sealed class ProfileLookupLoader
 
                 dict[key] = new ProfileGeometry
                 {
-                    H  = obj["H"]?.GetValue<double>()  ?? 0,
-                    B  = obj["B"]?.GetValue<double>()  ?? 0,
-                    s  = obj["s"]?.GetValue<double>()  ?? 0,
-                    t  = obj["t"]?.GetValue<double>()  ?? 0,
-                    A  = obj["A"]?.GetValue<double>()  ?? 0,
-                    P  = obj["P"]?.GetValue<double>()  ?? 0,
+                    H = obj["H"]?.GetValue<double>() ?? 0,
+                    B = obj["B"]?.GetValue<double>() ?? 0,
+                    s = obj["s"]?.GetValue<double>() ?? 0,
+                    t = obj["t"]?.GetValue<double>() ?? 0,
+                    r1 = obj["r1"]?.GetValue<double>() ?? 0,
+                    r2 = obj["r2"]?.GetValue<double>() ?? 0,
+                    A = obj["A"]?.GetValue<double>() ?? 0,
+                    P = obj["P"]?.GetValue<double>() ?? 0,
                     Iz = obj["Iz"]?.GetValue<double>() ?? 0,
                     Iy = obj["Iy"]?.GetValue<double>() ?? 0,
                     Ix = obj["Ix"]?.GetValue<double>() ?? 0,
+                    Iv = obj["Iv"]?.GetValue<double>() ?? 0,
+                    Iyz = obj["Iyz"]?.GetValue<double>() ?? 0,
                     Wz = obj["Wz"]?.GetValue<double>() ?? 0,
                     Wy = obj["Wy"]?.GetValue<double>() ?? 0,
                     Wx = obj["Wx"]?.GetValue<double>() ?? 0,
+                    Wvo = obj["Wvo"]?.GetValue<double>() ?? 0,
                     Sz = obj["Sz"]?.GetValue<double>() ?? 0,
                     Sy = obj["Sy"]?.GetValue<double>() ?? 0,
                     iz = obj["iz"]?.GetValue<double>() ?? 0,
                     iy = obj["iy"]?.GetValue<double>() ?? 0,
                     xo = obj["xo"]?.GetValue<double>() ?? 0,
                     yo = obj["yo"]?.GetValue<double>() ?? 0,
+                    iu = obj["iu"]?.GetValue<double>() ?? 0,
+                    iv = obj["iv"]?.GetValue<double>() ?? 0,
                 };
             }
 
