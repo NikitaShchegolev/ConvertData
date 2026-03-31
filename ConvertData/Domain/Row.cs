@@ -123,40 +123,41 @@ internal sealed class Row
     /// "Column":
     /// </summary>
     public double Column_A { get; set; }
+
     /// <summary>
-    /// "Column": Вес метра погонного балки
+    /// "Column": Вес метра погонного колонны
     /// </summary>
     public double Column_P { get; set; }
     /// <summary>
-    /// "Column": Момент инерции балки относительно плоскости
+    /// "Column": Момент инерции колонны относительно плоскости
     /// </summary>
     public double Column_Iz { get; set; }
     /// <summary>
-    /// "Column": Момент инерции балки относительно плоскости
+    /// "Column": Момент инерции колонны относительно плоскости
     /// </summary>
     public double Column_Iy { get; set; }
     /// <summary>
-    /// "Column": Момент инерции балки относительно плоскости
+    /// "Column": Момент инерции колонны относительно плоскости
     /// </summary>
     public double Column_Ix { get; set; }
     /// <summary>
-    /// "Column": Момент сопротивления балки относительно центральной оси z
+    /// "Column": Момент сопротивления колонны относительно центральной оси z
     /// </summary>
     public double Column_Wz { get; set; }
     /// <summary>
-    /// "Column": Момент сопротивления балки относительно центральной оси y
+    /// "Column": Момент сопротивления колонны относительно центральной оси y
     /// </summary>
     public double Column_Wy { get; set; }
     /// <summary>
-    /// "Column": Момент сопротивления балки относительно центральной оси x
+    /// "Column": Момент сопротивления колонны относительно центральной оси x
     /// </summary>
     public double Column_Wx { get; set; }
     /// <summary>
-    /// "Column": Статический момент балки относительно центральной оси z
+    /// "Column": Статический момент колонны относительно центральной оси z
     /// </summary>
     public double Column_Sz { get; set; }
     /// <summary>
-    /// "Column": Статический момент балки относительно центральной оси y
+    /// "Column": Статический момент колонны относительно центральной оси y
     /// </summary>
     public double Column_Sy { get; set; }
     /// <summary>
@@ -164,11 +165,11 @@ internal sealed class Row
     /// </summary>
     public double Column_iz { get; set; }
     /// <summary>
-    /// "Column": Радиус инерции балки относительно центральной оси z
+    /// "Column": Радиус инерции колонны относительно центральной оси z
     /// </summary>
     public double Column_iy { get; set; }
     /// <summary>
-    /// "Column": Координата центра тяжести балки в направления x
+    /// "Column": Координата центра тяжести колонны в направления x
     /// </summary>
     public double Column_xo { get; set; }
     /// <summary>
@@ -263,9 +264,13 @@ internal sealed class Row
     /// "Bolts": Количество рядов болтов
     /// </summary>
     public int N_Rows { get; set; }
-    #endregion
+    /// <summary>
+    /// "Bolts": Версия использования болтов
+    /// </summary>
+    public int OptionBolts { get; set; } = 0;
 
-    public string OptionBolts { get; set; } = "";
+
+    #endregion
 
 
     //Welds - Минимальные катеты сварных швов
@@ -307,7 +312,7 @@ internal sealed class Row
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf { get; set; }
+    public int kf9 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
@@ -410,7 +415,7 @@ internal sealed class Row
 /// относительно расстояния между рядами 
 /// координат расстояния по ширина и высоте
 /// </summary>
-class CoordinatesBolts
+internal class CoordinatesBolts
 {
     /// <summary>
     /// Координата болта в направлении x

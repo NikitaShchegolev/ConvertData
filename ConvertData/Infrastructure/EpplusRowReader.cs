@@ -188,7 +188,7 @@ namespace ConvertData.Infrastructure
                 ["kf6"] = (r, v) => r.kf6 = NumericParser.ParseInt(v),
                 ["kf7"] = (r, v) => r.kf7 = NumericParser.ParseInt(v),
                 ["kf8"] = (r, v) => r.kf8 = NumericParser.ParseInt(v),
-                ["kf9"] = (r, v) => r.kf = NumericParser.ParseInt(v),
+                ["kf9"] = (r, v) => r.kf9 = NumericParser.ParseInt(v),
                 ["kf10"] = (r, v) => r.kf10 = NumericParser.ParseInt(v),
             };
 
@@ -199,7 +199,7 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.Bolts_Nb = 1; r.N_Rows = 1; },
-                ["version"] = (r, v) => r.OptionBolts = v ?? "",
+                ["version"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
             };
 
             map["e1"] = (r, v) => { EnsureBolts(r, 1); r.CoordinatesBolts[0].Y = NumericParser.ParseInt(v); };

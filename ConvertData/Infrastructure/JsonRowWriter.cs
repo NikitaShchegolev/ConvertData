@@ -166,7 +166,7 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("    \"Bolts\": {");
             sb.AppendLine("      \"Option\": {");
-            sb.AppendLine("        \"version\": \"" + JsonEscape(r.OptionBolts) + "\"");
+            sb.AppendLine("        \"version\": \"" + r.OptionBolts + "\"");
             sb.AppendLine("      },");
             sb.AppendLine("      \"DiameterBolt\": {");
             sb.AppendLine("        \"F\": " + r.F);
@@ -232,7 +232,7 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("      \"kf6\": " + r.kf6 + ",");
             sb.AppendLine("      \"kf7\": " + r.kf7 + ",");
             sb.AppendLine("      \"kf8\": " + r.kf8 + ",");
-            sb.AppendLine("      \"kf9\": " + r.kf + ",");
+            sb.AppendLine("      \"kf9\": " + r.kf9 + ",");
             sb.AppendLine("      \"kf10\": " + r.kf10);
             sb.AppendLine("    },");
         }
