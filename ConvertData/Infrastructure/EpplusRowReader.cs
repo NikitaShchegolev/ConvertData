@@ -201,8 +201,17 @@ namespace ConvertData.Infrastructure
                 ["Option"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
                 ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.N_Rows = 1; },
                 ["Nb"] = (r, v) => r.Bolts_Nb = NumericParser.ParseInt(v),
-                ["d1"] = (r, v) => r.d1 = NumericParser.ParseInt(v),
-                ["d2"] = (r, v) => r.d2 = NumericParser.ParseInt(v),
+                ["d1"] = (r, v) =>
+                {
+                    EnsureBolts(r, 1);
+                    r.CoordinatesBolts[0].X = NumericParser.ParseInt(v);
+                },
+                ["d2"] = (r, v) =>
+                {
+                    EnsureBolts(r, 2);
+                    r.CoordinatesBolts[1].X = NumericParser.ParseInt(v);
+                    if (r.N_Rows < 2) r.N_Rows = 2;
+                },
                 ["e1"] = (r, v) => r.e1 = NumericParser.ParseInt(v),
                 ["p1"] = (r, v) => r.p1 = NumericParser.ParseInt(v),
                 ["p2"] = (r, v) => r.p2= NumericParser.ParseInt(v),
@@ -216,25 +225,15 @@ namespace ConvertData.Infrastructure
                 ["p10"] = (r, v) => r.p10 = NumericParser.ParseInt(v),
                 ["Марка опорного столика"] = (r, v) => r.TableBrand = v
             };
-
-            
-
-            map["d1"] = (r, v) =>
-            {
-                EnsureBolts(r, 1);
-                r.CoordinatesBolts[0].X = NumericParser.ParseInt(v);
-            };
-
-            map["d2"] = (r, v) =>
-            {
-                EnsureBolts(r, 2);
-                r.CoordinatesBolts[1].X = NumericParser.ParseInt(v);
-                if (r.N_Rows < 2) r.N_Rows = 2;
-            };
-
             return map;
         }
-
+        /// <summary>
+        /// Метод для присвоения координат болтов, гарантируя, 
+        /// что список CoordinatesBolts имеет достаточное количество 
+        /// элементов для доступа по индексу.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="count"></param>
         private static void EnsureBolts(Row r, int count)
         {
             while (r.CoordinatesBolts.Count < count)
