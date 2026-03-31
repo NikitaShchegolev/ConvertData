@@ -51,11 +51,11 @@ internal sealed class Row
     /// </summary>
     public double Beam_P { get; set; }
     /// <summary>
-    /// "Beam": Момент инерции балки относительно плоскости 
+    /// "Beam": Момент инерции балки относительно плоскости наименьшей жескости
     /// </summary>
     public double Beam_Iz { get; set; }
     /// <summary>
-    /// "Beam": Момент инерции балки относительно плоскости 
+    /// "Beam": Момент инерции балки относительно плоскости наибольшей жескости
     /// </summary>
     public double Beam_Iy { get; set; }
     /// <summary>
@@ -252,24 +252,26 @@ internal sealed class Row
     /// "Bolts": Список коордниат для одного болта
     /// </summary>
     public List<CoordinatesBolts> CoordinatesBolts { get; set; } = new List<CoordinatesBolts>();
+    
     /// <summary>
     /// "Bolts": Диаметр болта
     /// </summary>
     public int F { get; set; }
+
     /// <summary>
     /// "Bolts": Количество болтов
     /// </summary>
     public int Bolts_Nb { get; set; }
+
     /// <summary>
     /// "Bolts": Количество рядов болтов
     /// </summary>
     public int N_Rows { get; set; }
+
     /// <summary>
     /// "Bolts": Версия использования болтов
     /// </summary>
     public int OptionBolts { get; set; } = 0;
-
-
     #endregion
 
 

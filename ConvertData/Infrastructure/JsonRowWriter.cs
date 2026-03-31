@@ -166,7 +166,7 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("    \"Bolts\": {");
             sb.AppendLine("      \"Option\": {");
-            sb.AppendLine("        \"version\": \"" + r.OptionBolts + "\"");
+            sb.AppendLine("        \"version\": " + r.OptionBolts);
             sb.AppendLine("      },");
             sb.AppendLine("      \"DiameterBolt\": {");
             sb.AppendLine("        \"F\": " + r.F);
@@ -271,7 +271,7 @@ namespace ConvertData.Infrastructure
                     case '\f': sb.Append("\\f"); break;
                     case '\n': sb.Append("\\n"); break;
                     case '\r': sb.Append("\\r"); break;
-                    case '\t': sb.Append("\\t"); break;
+                    case '\t': sb.Append("\\t_f"); break;
                     default:
                         if (ch < 32)
                             sb.Append("\\u" + ((int)ch).ToString("x4"));

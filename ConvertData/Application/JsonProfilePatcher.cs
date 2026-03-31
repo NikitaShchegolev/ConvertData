@@ -25,7 +25,7 @@ internal sealed class JsonProfilePatcher
         var key = NormalizeProfileKey("10Á1");
         if (TryResolveProfile(profileLookup, key, out var g))
         {
-            Console.WriteLine($"Self-check ProfileBeam=10Á1 => H={g.H}, B={g.B}, s={g.s}, t={g.t}");
+            Console.WriteLine($"Self-check ProfileBeam=10Á1 => H={g.H}, B={g.B}, t_w={g.t_w}, t_f={g.t_f}");
             return;
         }
 
@@ -106,8 +106,8 @@ internal sealed class JsonProfilePatcher
             {
                 beam["Beam_H"]  = bg.H;
                 beam["Beam_B"]  = bg.B;
-                beam["Beam_s"]  = bg.s;
-                beam["Beam_t"]  = bg.t;
+                beam["Beam_s"]  = bg.t_w;
+                beam["Beam_t"]  = bg.t_f;
                 beam["Beam_A"]  = bg.A;
                 beam["Beam_P"]  = bg.P;
                 beam["Beam_Iz"] = bg.Iz;
@@ -132,8 +132,8 @@ internal sealed class JsonProfilePatcher
             {
                 column["Column_H"]  = cg.H;
                 column["Column_B"]  = cg.B;
-                column["Column_s"]  = cg.s;
-                column["Column_t"]  = cg.t;
+                column["Column_s"]  = cg.t_w;
+                column["Column_t"]  = cg.t_f;
                 column["Column_A"]  = cg.A;
                 column["Column_P"]  = cg.P;
                 column["Column_Iz"] = cg.Iz;

@@ -37,8 +37,8 @@ internal sealed class ProfileLookupLoader
                 {
                     H = obj["H"]?.GetValue<double>() ?? 0,
                     B = obj["B"]?.GetValue<double>() ?? 0,
-                    s = obj["s"]?.GetValue<double>() ?? 0,
-                    t = obj["t"]?.GetValue<double>() ?? 0,
+                    t_w = obj["t_w"]?.GetValue<double>() ?? 0,
+                    t_f = obj["t_f"]?.GetValue<double>() ?? 0,
                     r1 = obj["r1"]?.GetValue<double>() ?? 0,
                     r2 = obj["r2"]?.GetValue<double>() ?? 0,
                     A = obj["A"]?.GetValue<double>() ?? 0,
