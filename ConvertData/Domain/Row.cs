@@ -272,7 +272,50 @@ internal sealed class Row
     /// "Bolts": Версия использования болтов
     /// </summary>
     public double OptionBolts { get; set; } = 0;
-
+    public string TableBrand { get; set; } = "";
+    public int e1 { get; set; }
+    public int d1 { get; set; }
+    public int d2 { get; set; }
+    /// <summary>
+    /// Расстояние от края пластины до 1 ряда болтов
+    /// </summary>
+    public double p1 { get; set; }
+    /// <summary>
+    /// Расстояние между 1 и 2 рядом болтов
+    /// </summary>
+    public double p2 { get; set; }
+    /// <summary>
+    /// Расстояние между 2 и 3 рядом болтов
+    /// </summary>
+    public double p3 { get; set; }
+    /// <summary>
+    /// Расстояние между 3 и 4 рядом болтов
+    /// </summary>
+    public double p4 { get; set; }
+    /// <summary>
+    /// Расстояние между 4 и 5 рядом болтов
+    /// </summary>
+    public double p5 { get; set; }
+    /// <summary>
+    /// Расстояние между 5 и 6 рядом болтов
+    /// </summary>
+    public double p6 { get; set; }
+    /// <summary>
+    /// Расстояние между 6 и 7 рядом болтов
+    /// </summary>
+    public double p7 { get; set; }
+    /// <summary>
+    /// Расстояние между 7 и 8 рядом болтов
+    /// </summary>
+    public double p8 { get; set; }
+    /// <summary>
+    /// Расстояние между 8 и 9 рядом болтов
+    /// </summary>
+    public double p9 { get; set; }
+    /// <summary>
+    /// Расстояние между 9 и 10 рядом болтов
+    /// </summary>
+    public double p10 { get; set; }
 
 
     #endregion

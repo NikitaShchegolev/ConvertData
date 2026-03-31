@@ -25,6 +25,8 @@ internal sealed class ProfileExcelToJsonExporter
         ["b"]     = ["B"],
         ["t_w"]     = ["t_w"],
         ["t_f"]     = ["t_f"],
+        ["s"]       = ["t_w"],
+        ["t"]       = ["t_f"],
         ["A"]     = ["A"],
         ["P"]     = ["P"],
         ["Iz"]    = ["Iz"],
@@ -70,6 +72,13 @@ internal sealed class ProfileExcelToJsonExporter
         "Profile", "Профиль", "Сечение", "Наименование"
     };
 
+    private static readonly Dictionary<string, string> FileCategoryMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["ProfileI.xlsx"] = "Двутавр",
+        ["ProfileL.xlsx"] = "Уголок",
+        ["ProfileC.xlsx"] = "Швеллер",
+    };
+
     public void Export(string excelProfileDir, string outputJsonPath)
     {
         var files = new[] { "ProfileI.xlsx", "ProfileC.xlsx", "ProfileL.xlsx" };
@@ -84,7 +93,8 @@ internal sealed class ProfileExcelToJsonExporter
                 continue;
             }
 
-            var profiles = ReadExcelFile(filePath);
+            var category = FileCategoryMap.GetValueOrDefault(fileName, "");
+            var profiles = ReadExcelFile(filePath, category);
             allProfiles.AddRange(profiles);
             Console.WriteLine($"  {fileName}: прочитано {profiles.Count} профилей");
         }
@@ -100,7 +110,7 @@ internal sealed class ProfileExcelToJsonExporter
         Console.WriteLine($"  Итого записано {allProfiles.Count} профилей → {outputJsonPath}");
     }
 
-    private static List<Dictionary<string, object>> ReadExcelFile(string path)
+    private static List<Dictionary<string, object>> ReadExcelFile(string path, string category)
     {
         using var package = new ExcelPackage(new FileInfo(path));
 
@@ -162,6 +172,7 @@ internal sealed class ProfileExcelToJsonExporter
                     entry = new Dictionary<string, object>
                     {
                         ["CONNECTION_GUID"] = Guid.NewGuid().ToString("D"),
+                        ["Category"] = category,
                         ["Profile"] = profileName
                     };
 

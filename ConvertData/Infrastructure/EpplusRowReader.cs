@@ -198,21 +198,38 @@ namespace ConvertData.Infrastructure
         {
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
-                ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.Bolts_Nb = 1; r.N_Rows = 1; },
                 ["Option"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
+                ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.N_Rows = 1; },
+                ["Nb"] = (r, v) => r.Bolts_Nb = NumericParser.ParseInt(v),
+                ["d1"] = (r, v) => r.d1 = NumericParser.ParseInt(v),
+                ["d2"] = (r, v) => r.d2 = NumericParser.ParseInt(v),
+                ["e1"] = (r, v) => r.e1 = NumericParser.ParseInt(v),
+                ["p1"] = (r, v) => r.p1 = NumericParser.ParseInt(v),
+                ["p2"] = (r, v) => r.p2= NumericParser.ParseInt(v),
+                ["p3"] = (r, v) => r.p3= NumericParser.ParseInt(v),
+                ["p4"] = (r, v) => r.p4= NumericParser.ParseInt(v),
+                ["p5"] = (r, v) => r.p5= NumericParser.ParseInt(v),
+                ["p6"] = (r, v) => r.p6= NumericParser.ParseInt(v),
+                ["p7"] = (r, v) => r.p7= NumericParser.ParseInt(v),
+                ["p8"] = (r, v) => r.p8= NumericParser.ParseInt(v),
+                ["p9"] = (r, v) => r.p9= NumericParser.ParseInt(v),
+                ["p10"] = (r, v) => r.p10 = NumericParser.ParseInt(v),
+                ["Марка опорного столика"] = (r, v) => r.TableBrand = v
             };
 
-            map["e1"] = (r, v) => { EnsureBolts(r, 1); r.CoordinatesBolts[0].Y = NumericParser.ParseInt(v); };
-            for (int i = 1; i <= 10; i++)
-            {
-                int idx = i;
-                map[$"p{i}"] = (r, v) => { EnsureBolts(r, idx + 1); r.CoordinatesBolts[idx].Y = NumericParser.ParseInt(v); };
-            }
+            
 
             map["d1"] = (r, v) =>
             {
+                EnsureBolts(r, 1);
+                r.CoordinatesBolts[0].X = NumericParser.ParseInt(v);
+            };
+
+            map["d2"] = (r, v) =>
+            {
                 EnsureBolts(r, 2);
                 r.CoordinatesBolts[1].X = NumericParser.ParseInt(v);
+                if (r.N_Rows < 2) r.N_Rows = 2;
             };
 
             return map;

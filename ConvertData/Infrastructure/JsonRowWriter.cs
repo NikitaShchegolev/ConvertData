@@ -16,7 +16,7 @@ namespace ConvertData.Infrastructure
             "Bolt6_p5", "Bolt7_p6", "Bolt8_p7", "Bolt9_p8", "Bolt10_p9", "Bolt11_p10"
         ];
 
-        private static readonly string[] BoltXKeys = ["BoltRow1_d1", "BoltRow2_d1"];
+        private static readonly string[] BoltXKeys = ["d1", "d2"];
 
         public void Write(List<Row> rows, string outputPath)
         {
