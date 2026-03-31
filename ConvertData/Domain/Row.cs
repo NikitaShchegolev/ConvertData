@@ -271,7 +271,7 @@ internal sealed class Row
     /// <summary>
     /// "Bolts": Версия использования болтов
     /// </summary>
-    public int OptionBolts { get; set; } = 0;
+    public double OptionBolts { get; set; } = 0;
     #endregion
 
 

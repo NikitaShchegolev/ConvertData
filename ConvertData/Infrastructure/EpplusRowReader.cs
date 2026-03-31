@@ -199,7 +199,7 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.Bolts_Nb = 1; r.N_Rows = 1; },
-                ["version"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
+                ["Option"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
             };
 
             map["e1"] = (r, v) => { EnsureBolts(r, 1); r.CoordinatesBolts[0].Y = NumericParser.ParseInt(v); };
