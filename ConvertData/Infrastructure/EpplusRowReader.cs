@@ -144,7 +144,7 @@ namespace ConvertData.Infrastructure
                 bool hass = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_s", "S" }) >= 0;
                 bool hast = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_t", "T" }) >= 0;
 
-                bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" }) >= 0
+                bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, KeyColumnHeaders) >= 0
                     && HeaderUtils.IndexOfHeader(tokens, "Name") >= 0
                     && hasProfile;
 
@@ -199,6 +199,7 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.Bolts_Nb = 1; r.N_Rows = 1; },
+                ["version"] = (r, v) => r.OptionBolts = v ?? "",
             };
 
             map["e1"] = (r, v) => { EnsureBolts(r, 1); r.CoordinatesBolts[0].Y = NumericParser.ParseInt(v); };

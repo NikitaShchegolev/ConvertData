@@ -165,6 +165,9 @@ namespace ConvertData.Infrastructure
         private static void WriteBolts(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"Bolts\": {");
+            sb.AppendLine("      \"Option\": {");
+            sb.AppendLine("        \"version\": \"" + JsonEscape(r.OptionBolts) + "\"");
+            sb.AppendLine("      },");
             sb.AppendLine("      \"DiameterBolt\": {");
             sb.AppendLine("        \"F\": " + r.F);
             sb.AppendLine("      },");

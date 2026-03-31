@@ -262,8 +262,11 @@ internal sealed class Row
     /// <summary>
     /// "Bolts": Количество рядов болтов
     /// </summary>
-    public int N_Rows { get; set; } 
+    public int N_Rows { get; set; }
     #endregion
+
+    public string OptionBolts { get; set; } = "";
+
 
     //Welds - Минимальные катеты сварных швов
 
