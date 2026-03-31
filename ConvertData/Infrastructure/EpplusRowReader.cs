@@ -264,7 +264,7 @@ namespace ConvertData.Infrastructure
 
             var headers = new List<string>();
             for (int c = startCol; c <= endCol; c++)
-                headers.Add((ws.Cells[startRow, c].Text ?? "").Trim());
+                headers.Add(HeaderUtils.NormalizeHeader((ws.Cells[startRow, c].Text ?? "").Trim()));
 
             int keyCol = -1;
             for (int i = 0; i < headers.Count; i++)
