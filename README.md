@@ -71,8 +71,3 @@ dotnet run --project .\ConvertData\ConvertData.csproj -- "C:\path\to\file1.xls" 
   - `JsonRowWriter` — генерация JSON.
   - `EpplusLicenseConfigurator` — `ExcelPackage.LicenseContext = NonCommercial`.
   - `PathResolver` — поиск проекта (`*.csproj`) и фильтрация входных файлов.
-
-## Примечание про `Console.ReadKey()`
-
-В `Program.cs` стоит `Console.ReadKey()` — приложение будет ждать нажатия клавиши перед выходом (удобно при запуске двойным кликом).
-Если запускаешь в CI/скриптах, можно удалить эту строку.
