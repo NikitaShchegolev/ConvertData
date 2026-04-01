@@ -19,6 +19,12 @@ internal class CoordinatesBolts
     /// Координата болта в направлении z
     /// </summary>
     public int Z { get; set; }
+    /// <summary>
+    /// Конструктор для создания координат болта.
+    /// </summary>
+    /// <param name="x">Координата по оси X.</param>
+    /// <param name="y">Координата по оси Y.</param>
+    /// <param name="z">Координата по оси Z.</param>
     public CoordinatesBolts(int x, int y, int z)
     {
         X = x;

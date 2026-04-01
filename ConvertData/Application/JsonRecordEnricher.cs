@@ -108,6 +108,12 @@ internal sealed class JsonRecordEnricher
         }
     }
 
+    /// <summary>
+    /// Выполняет глубокое копирование узла JSON из источника в целевой объект.
+    /// </summary>
+    /// <param name="source">Исходный JSON-объект.</param>
+    /// <param name="target">Целевой JSON-объект.</param>
+    /// <param name="key">Ключ узла для копирования.</param>
     private static void DeepCopyNode(JsonObject source, JsonObject target, string key)
     {
         var src = source[key];
@@ -157,6 +163,12 @@ internal sealed class JsonRecordEnricher
         }
         return count;
     }
+
+    /// <summary>
+    /// Извлекает числовое значение из JSON-узла.
+    /// </summary>
+    /// <param name="node">JSON-узел.</param>
+    /// <returns>Числовое значение (double или int) или 0, если узел не содержит число.</returns>
     private static double GetNumericValue(JsonNode? node)
     {
         if (node is not JsonValue val)

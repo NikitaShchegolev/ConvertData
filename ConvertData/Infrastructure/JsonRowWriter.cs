@@ -8,16 +8,30 @@ using ConvertData.Domain;
 
 namespace ConvertData.Infrastructure
 {
+    /// <summary>
+    /// Записывает список объектов Row в JSON-файл с форматированием.
+    /// </summary>
     internal sealed class JsonRowWriter : IRowWriter
     {
+        /// <summary>
+        /// Ключи для координат Y болтов (e1, p1-p10).
+        /// </summary>
         private static readonly string[] BoltYKeys =
         [
             "Bolt1_e1", "Bolt2_p1", "Bolt3_p2", "Bolt4_p3", "Bolt5_p4",
             "Bolt6_p5", "Bolt7_p6", "Bolt8_p7", "Bolt9_p8", "Bolt10_p9", "Bolt11_p10"
         ];
 
+        /// <summary>
+        /// Ключи для координат X болтов (d1, d2).
+        /// </summary>
         private static readonly string[] BoltXKeys = ["d1", "d2"];
 
+        /// <summary>
+        /// Записывает список объектов Row в JSON-файл.
+        /// </summary>
+        /// <param name="rows">Список объектов Row.</param>
+        /// <param name="outputPath">Путь к выходному JSON-файлу.</param>
         public void Write(List<Row> rows, string outputPath)
         {
             var sb = new StringBuilder();

@@ -4,45 +4,90 @@ using ConvertData.Infrastructure.Parsing;
 
 namespace ConvertData.Infrastructure;
 
+/// <summary>
+/// Карта индексов колонок Excel для отображения заголовков на свойства Row.
+/// Хранит индексы всех возможных колонок из входных таблиц.
+/// </summary>
 internal sealed class ExcelColumnMap
 {
+    /// <summary>Индекс колонки "Beam_H" (высота балки).</summary>
     public int IdxH { get; set; } = -1;
+    /// <summary>Индекс колонки "Beam_B" (ширина полки балки).</summary>
     public int IdxB { get; set; } = -1;
+    /// <summary>Индекс колонки "Beam_s" (толщина стенки балки).</summary>
     public int Idxs { get; set; } = -1;
+    /// <summary>Индекс колонки "Beam_t" (толщина полки балки).</summary>
     public int Idxt { get; set; } = -1;
+    /// <summary>Индекс колонки "Name" (имя соединения).</summary>
     public int IdxName { get; set; } = -1;
+    /// <summary>Индекс колонки "CONNECTION_CODE" (код соединения).</summary>
     public int IdxCode { get; set; } = -1;
+    /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
     public int IdxProfile { get; set; } = -1;
+    /// <summary>Индекс колонки "ProfileColumn" (профиль колонны).</summary>
     public int IdxProfileColumn { get; set; } = -1;
+    /// <summary>Индекс колонки "Nt" (усилие растяжения).</summary>
     public int IdxNt { get; set; } = -1;
+    /// <summary>Индекс колонки "Qy" (поперечная сила по Y).</summary>
     public int IdxQy { get; set; } = -1;
+    /// <summary>Индекс колонки "Qz" (поперечная сила по Z).</summary>
     public int IdxQz { get; set; } = -1;
+    /// <summary>Индекс колонки "T" (крутящий момент).</summary>
     public int IdxT { get; set; } = -1;
+    /// <summary>Индекс колонки "Nc" (усилие сжатия).</summary>
     public int IdxNc { get; set; } = -1;
+    /// <summary>Индекс колонки "N" (усилие растяжения/сжатия).</summary>
     public int IdxN { get; set; } = -1;
+    /// <summary>Индекс колонки "My" (изгибающий момент по Y).</summary>
     public int IdxMy { get; set; } = -1;
+    /// <summary>Индекс колонки "variable" (вариант расчета).</summary>
     public int IdxVariable { get; set; } = -1;
+    /// <summary>Индекс колонки "Sj" (жесткость Sj).</summary>
     public int IdxSj { get; set; } = -1;
+    /// <summary>Индекс колонки "Sjo" (жесткость Sjo).</summary>
     public int IdxSjo { get; set; } = -1;
+    /// <summary>Индекс колонки "Mneg" (обратный момент).</summary>
     public int IdxMneg { get; set; } = -1;
+    /// <summary>Индекс колонки "Mz" (изгибающий момент по Z).</summary>
     public int IdxMz { get; set; } = -1;
+    /// <summary>Индекс колонки "Mx" (изгибающий момент по X).</summary>
     public int IdxMx { get; set; } = -1;
+    /// <summary>Индекс колонки "Mw" (крутящий момент Mw).</summary>
     public int IdxMw { get; set; } = -1;
+    /// <summary>Индекс колонки "α" или "Alpha" (коэффициент альфа).</summary>
     public int IdxAlpha { get; set; } = -1;
+    /// <summary>Индекс колонки "β" или "Beta" (коэффициент бета).</summary>
     public int IdxBeta { get; set; } = -1;
+    /// <summary>Индекс колонки "γ" или "Gamma" (коэффициент гамма).</summary>
     public int IdxGamma { get; set; } = -1;
+    /// <summary>Индекс колонки "δ" или "Delta" (коэффициент дельта).</summary>
     public int IdxDelta { get; set; } = -1;
+    /// <summary>Индекс колонки "ε" или "Epsilon" (коэффициент эпсилон).</summary>
     public int IdxEpsilon { get; set; } = -1;
+    /// <summary>Индекс колонки "λ" или "Lambda" (коэффициент лямбда).</summary>
     public int IdxLambda { get; set; } = -1;
 
+    /// <summary>Проверяет, является ли таблица основной (содержит Name, Code, Profile).</summary>
     public bool IsMainTable => IdxName >= 0 && IdxCode >= 0 && IdxProfile >= 0;
+    /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
     public bool IsProfileTable => IdxProfile >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0;
 }
 
+/// <summary>
+/// Разрешает заголовки колонок Excel в карту индексов для отображения на свойства Row.
+/// </summary>
 internal static class ExcelHeaderResolver
 {
+    /// <summary>
+    /// Переопределение имени колонки профиля из аргументов командной строки (--profile-column).
+    /// </summary>
     public static string? ProfileColumnOverride { get; set; }
 
+    /// <summary>
+    /// Разрешает список заголовков в карту индексов колонок.
+    /// </summary>
+    /// <param name="header">Список нормализованных заголовков из Excel.</param>
+    /// <returns>Карта индексов колонок.</returns>
     public static ExcelColumnMap Resolve(List<string> header)
     {
         int idxProfile;
@@ -50,35 +95,35 @@ internal static class ExcelHeaderResolver
         {
             idxProfile = HeaderUtils.IndexOfHeader(header, ProfileColumnOverride);
             if (idxProfile < 0)
-                idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "ProfileBeam", "Профиль" });
+                idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
         }
         else
         {
-            idxProfile = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileBeam", "ProfileBeam", "Профиль" });
+            idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
         }
 
         var map = new ExcelColumnMap
         {
-            IdxH = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_H" }),
-            IdxB = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_B" }),
-            Idxs = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_s" }),
-            Idxt = HeaderUtils.IndexOfHeaderAny(header, new[] { "Beam_t" }),
+            IdxH = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),
+            IdxB = HeaderUtils.IndexOfHeaderAny(header, ["Beam_B"]),
+            Idxs = HeaderUtils.IndexOfHeaderAny(header, ["Beam_s"]),
+            Idxt = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
-            IdxCode = HeaderUtils.IndexOfHeaderAny(header, new[] { "CONNECTION_CODE", "Connection_Code", "Code", "Код" }),
+            IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
             IdxProfile = idxProfile,
-            IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, new[] { "ProfileColumn", "Profile_Column", "ПрофильКолонны" }),
+            IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
-            IdxQy = HeaderUtils.IndexOfHeaderAny(header, new[] { "Qy"}),
-            IdxQz = HeaderUtils.IndexOfHeaderAny(header, new[] { "Qz" }),
+            IdxQy = HeaderUtils.IndexOfHeaderAny(header, ["Qy"]),
+            IdxQz = HeaderUtils.IndexOfHeaderAny(header, ["Qz"]),
             IdxT = HeaderUtils.IndexOfHeader(header, "T"),
             IdxNc = HeaderUtils.IndexOfHeader(header, "Nc"),
             IdxN = HeaderUtils.IndexOfHeader(header, "N"),
-            IdxMy = HeaderUtils.IndexOfHeaderAny(header, new[] { "My" }),
-            IdxVariable = HeaderUtils.IndexOfHeaderAny(header, new[] { "variable", "Variable" }),
+            IdxMy = HeaderUtils.IndexOfHeaderAny(header, ["My"]),
+            IdxVariable = HeaderUtils.IndexOfHeaderAny(header, ["variable", "Variable"]),
             IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
             IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
             IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
-            IdxMz = HeaderUtils.IndexOfHeaderAny(header, new[] { "Mz" }),
+            IdxMz = HeaderUtils.IndexOfHeaderAny(header, ["Mz"]),
             IdxMx = HeaderUtils.IndexOfHeader(header, "Mx"),
             IdxMw = HeaderUtils.IndexOfHeader(header, "Mw")
         };
@@ -101,6 +146,12 @@ internal static class ExcelHeaderResolver
         return map;
     }
 
+    /// <summary>
+    /// Пытается определить индексы греческих коэффициентов (α, β, γ, δ, ε, λ),
+    /// если они не были найдены по заголовкам. Использует позиционную логику или "?" заголовки.
+    /// </summary>
+    /// <param name="header">Список заголовков.</param>
+    /// <param name="map">Карта индексов колонок.</param>
     private static void ResolveGreekFallback(List<string> header, ExcelColumnMap map)
     {
         if (map.IdxMz < 0)
@@ -136,6 +187,13 @@ internal static class ExcelHeaderResolver
         }
     }
 
+    /// <summary>
+    /// Применяет логику определения колонок профиля по позициям,
+    /// если таблица не распознана как основная или профильная.
+    /// Предполагает, что H, B, s, t идут сразу после колонки Profile.
+    /// </summary>
+    /// <param name="map">Карта индексов колонок.</param>
+    /// <param name="header">Список заголовков.</param>
     public static void ApplyProfileFallback(ExcelColumnMap map, List<string> header)
     {
         if (map.IsMainTable || map.IsProfileTable)

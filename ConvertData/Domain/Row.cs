@@ -272,9 +272,21 @@ internal sealed class Row
     /// "Bolts": Версия использования болтов
     /// </summary>
     public double OptionBolts { get; set; } = 0;
+    /// <summary>
+    /// "Bolts": Марка опорного столика
+    /// </summary>
     public string TableBrand { get; set; } = "";
+    /// <summary>
+    /// "Bolts": Координата Y первого болта (расстояние от края пластины)
+    /// </summary>
     public int e1 { get; set; }
+    /// <summary>
+    /// "Bolts": Координата X первого ряда болтов
+    /// </summary>
     public int d1 { get; set; }
+    /// <summary>
+    /// "Bolts": Координата X второго ряда болтов
+    /// </summary>
     public int d2 { get; set; }
     /// <summary>
     /// Расстояние от края пластины до 1 ряда болтов

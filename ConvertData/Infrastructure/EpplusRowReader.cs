@@ -10,8 +10,17 @@ using OfficeOpenXml;
 
 namespace ConvertData.Infrastructure
 {
+    /// <summary>
+    /// Читает строки из Excel-файлов (.xls/.xlsx) используя библиотеку EPPlus.
+    /// Поддерживает автоматическую конвертацию .xls в .xlsx через COM Interop.
+    /// </summary>
     internal sealed class EpplusRowReader : IRowReader
     {
+        /// <summary>
+        /// Читает данные из Excel-файла и возвращает список объектов Row.
+        /// </summary>
+        /// <param name="path">Путь к Excel-файлу (.xls или .xlsx).</param>
+        /// <returns>Список прочитанных строк.</returns>
         public List<Row> Read(string path)
         {
             var format = ExcelFileSignature.Detect(path);
@@ -33,6 +42,12 @@ namespace ConvertData.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Читает XLSX-файл используя EPPlus и возвращает список Row.
+        /// Обрабатывает основной лист и объединяет данные из дополнительных листов (geometry, bolts, weld).
+        /// </summary>
+        /// <param name="path">Путь к XLSX-файлу.</param>
+        /// <returns>Список объектов Row.</returns>
         private static List<Row> ReadXlsxWithEpplus(string path)
         {
             using var package = new ExcelPackage(new FileInfo(path));
@@ -123,6 +138,13 @@ namespace ConvertData.Infrastructure
             return list;
         }
 
+        /// <summary>
+        /// Извлекает текст из ячейки Excel.
+        /// </summary>
+        /// <param name="ws">Лист Excel.</param>
+        /// <param name="row">Номер строки.</param>
+        /// <param name="col">Номер колонки (null, если колонка не найдена).</param>
+        /// <returns>Текст ячейки или пустая строка.</returns>
         private static string GetCell(ExcelWorksheet ws, int row, int? col)
         {
             if (col == null)
@@ -130,6 +152,15 @@ namespace ConvertData.Infrastructure
             return (ws.Cells[row, col.Value].Text ?? "").Trim();
         }
 
+        /// <summary>
+        /// Ищет строку с заголовками в указанном диапазоне листа Excel.
+        /// </summary>
+        /// <param name="ws">Лист Excel.</param>
+        /// <param name="fromRow">Начальная строка поиска.</param>
+        /// <param name="toRow">Конечная строка поиска.</param>
+        /// <param name="startCol">Начальная колонка.</param>
+        /// <param name="endCol">Конечная колонка.</param>
+        /// <returns>Номер строки с заголовками.</returns>
         private static int FindHeaderRow(ExcelWorksheet ws, int fromRow, int toRow, int startCol, int endCol)
         {
             for (int r = fromRow; r <= toRow; r++)
@@ -138,11 +169,11 @@ namespace ConvertData.Infrastructure
                 for (int c = startCol; c <= endCol; c++)
                     tokens.Add(HeaderUtils.NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
 
-                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "ProfileBeam", "Профиль" }) >= 0;
-                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_H", "Н" }) >= 0;
-                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_B", "В" }) >= 0;
-                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_s", "S" }) >= 0;
-                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, new[] { "Beam_t", "T" }) >= 0;
+                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, ["ProfileBeam", "Профиль"]) >= 0;
+                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_H", "Н"]) >= 0;
+                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_B", "В"]) >= 0;
+                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_s", "S"]) >= 0;
+                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_t", "T"]) >= 0;
 
                 bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, KeyColumnHeaders) >= 0
                     && HeaderUtils.IndexOfHeader(tokens, "Name") >= 0
@@ -157,9 +188,15 @@ namespace ConvertData.Infrastructure
 
         #region Merge additional sheets (geometry, bolts, weld)
 
+        /// <summary>
+        /// Ключевые заголовки для колонки с кодом соединения.
+        /// </summary>
         private static readonly string[] KeyColumnHeaders =
             ["CONNECTION_CODE", "Connection_Code", "Code", "Код"];
 
+        /// <summary>
+        /// Карта отображения колонок листа "geometry" на свойства Row.
+        /// </summary>
         private static readonly Dictionary<string, Action<Row, string>> GeometryColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
@@ -177,6 +214,9 @@ namespace ConvertData.Infrastructure
                 ["twp"] = (r, v) => r.Stiff_twp = NumericParser.ParseDouble(v),
             };
 
+        /// <summary>
+        /// Карта отображения колонок листа "weld" на свойства Row.
+        /// </summary>
         private static readonly Dictionary<string, Action<Row, string>> WeldColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
@@ -192,8 +232,16 @@ namespace ConvertData.Infrastructure
                 ["kf10"] = (r, v) => r.kf10 = NumericParser.ParseInt(v),
             };
 
+        /// <summary>
+        /// Карта отображения колонок листа "bolts" на свойства Row (создаётся динамически).
+        /// </summary>
         private static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = BuildBoltsColumnMap();
 
+        /// <summary>
+        /// Создаёт карту отображения колонок листа "bolts" на свойства Row.
+        /// Включает варианты написания для "Марка опорного столика".
+        /// </summary>
+        /// <returns>Словарь с отображением заголовков на действия обновления Row.</returns>
         private static Dictionary<string, Action<Row, string>> BuildBoltsColumnMap()
         {
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
@@ -230,19 +278,24 @@ namespace ConvertData.Infrastructure
             };
             return map;
         }
+
         /// <summary>
-        /// Метод для присвоения координат болтам, гарантируя, 
-        /// что список CoordinatesBolts имеет достаточное количество 
-        /// элементов для доступа по индексу.
+        /// Гарантирует, что список CoordinatesBolts содержит достаточное количество элементов.
         /// </summary>
-        /// <param name="r"></param>
-        /// <param name="count"></param>
+        /// <param name="r">Объект Row.</param>
+        /// <param name="count">Требуемое количество элементов.</param>
         private static void EnsureBolts(Row r, int count)
         {
             while (r.CoordinatesBolts.Count < count)
                 r.CoordinatesBolts.Add(new CoordinatesBolts(0, 0, 0));
         }
 
+        /// <summary>
+        /// Объединяет данные из дополнительных листов (geometry, bolts, weld) с основным списком Row.
+        /// </summary>
+        /// <param name="package">Пакет Excel.</param>
+        /// <param name="mainWs">Основной лист.</param>
+        /// <param name="list">Список объектов Row для обогащения.</param>
         private static void MergeAdditionalSheets(ExcelPackage package, ExcelWorksheet mainWs, List<Row> list)
         {
             if (list.Count == 0)
@@ -270,6 +323,14 @@ namespace ConvertData.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Объединяет данные из одного дополнительного листа с основным списком Row.
+        /// Использует CONNECTION_CODE или позицию строки для сопоставления.
+        /// </summary>
+        /// <param name="ws">Дополнительный лист Excel.</param>
+        /// <param name="propertyMap">Карта отображения заголовков на свойства Row.</param>
+        /// <param name="codeLookup">Словарь для поиска Row по CONNECTION_CODE.</param>
+        /// <param name="list">Список объектов Row.</param>
         private static void MergeSheet(
             ExcelWorksheet ws,
             Dictionary<string, Action<Row, string>> propertyMap,
