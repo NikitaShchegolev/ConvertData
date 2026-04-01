@@ -94,6 +94,18 @@ internal sealed class JsonRecordEnricher
 
         DeepCopyNode(template, target, "Bolts");
         DeepCopyNode(template, target, "Welds");
+
+        // Копируем TableBrand, если он есть в шаблоне и пуст в целевой записи
+        if (template["TableBrand"] is JsonNode brandNode)
+        {
+            var brandValue = brandNode.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(brandValue))
+            {
+                var targetBrand = target["TableBrand"]?.GetValue<string>();
+                if (string.IsNullOrWhiteSpace(targetBrand))
+                    target["TableBrand"] = brandValue;
+            }
+        }
     }
 
     private static void DeepCopyNode(JsonObject source, JsonObject target, string key)
