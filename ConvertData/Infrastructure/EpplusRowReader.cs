@@ -221,9 +221,12 @@ namespace ConvertData.Infrastructure
                 ["p6"] = (r, v) => r.p6= NumericParser.ParseInt(v),
                 ["p7"] = (r, v) => r.p7= NumericParser.ParseInt(v),
                 ["p8"] = (r, v) => r.p8= NumericParser.ParseInt(v),
-                ["p9"] = (r, v) => r.p9= NumericParser.ParseInt(v),
+                ["p9"] = (r, v) => r.p9 = NumericParser.ParseInt(v),
                 ["p10"] = (r, v) => r.p10 = NumericParser.ParseInt(v),
-                ["Марка опорного столика"] = (r, v) => r.TableBrand = v
+                ["Марка опорного столика"] = (r, v) => r.TableBrand = v,
+                ["Маркаопорногостолика"] = (r, v) => r.TableBrand = v,
+                ["марка"] = (r, v) => r.TableBrand = v,
+                ["Марка"] = (r, v) => r.TableBrand = v
             };
             return map;
         }
@@ -312,18 +315,47 @@ namespace ConvertData.Infrastructure
             {
                 Row? target = null;
 
-                if (keyCol >= 0)
+                // Стратегия 1: Индексный поиск (строки обычно совпадают по порядку)
+                int idx = r - startRow - 1;
+                if (idx >= 0 && idx < list.Count)
+                    target = list[idx];
+
+                // Стратегия 2: Поиск по CONNECTION_CODE (если есть колонка с кодом)
+                if (target == null && keyCol >= 0)
                 {
                     var key = (ws.Cells[r, startCol + keyCol].Text ?? "").Trim();
                     if (!string.IsNullOrWhiteSpace(key))
                         codeLookup.TryGetValue(key, out target);
                 }
 
+                // Стратегия 3: Если обе стратегии не сработали, но данные есть, 
+                // попробуем найти первую незаполненную строку с TableBrand=="" для bolts листа
                 if (target == null)
                 {
-                    int idx = r - startRow - 1;
-                    if (idx >= 0 && idx < list.Count)
-                        target = list[idx];
+                    // Проверяем, есть ли вообще данные в этой строке
+                    bool hasData = false;
+                    foreach (var (colIdx, _) in colMappings)
+                    {
+                        var text = (ws.Cells[r, startCol + colIdx].Text ?? "").Trim();
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            hasData = true;
+                            break;
+                        }
+                    }
+
+                    if (hasData)
+                    {
+                        // Для листа bolts: найдем первую строку с пустым TableBrand
+                        foreach (var row in list)
+                        {
+                            if (string.IsNullOrEmpty(row.TableBrand))
+                            {
+                                target = row;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 if (target == null)

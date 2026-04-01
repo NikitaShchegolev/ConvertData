@@ -15,7 +15,7 @@ internal sealed class ProfileExcelToJsonExporter
     /// Маппинг: заголовок Excel (case-insensitive) → JSON-поле(я).
     /// "Iy=Iz" → заполняет и Iy, и Iz одним значением.
     /// </summary>
-    private static readonly Dictionary<string, string[]> HeaderMap = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, string[]> HeaderMap = new()
     {
         ["H"]     = ["H"],
         ["h"]     = ["H"],
@@ -23,16 +23,17 @@ internal sealed class ProfileExcelToJsonExporter
         ["r2"]    = ["r2"],
         ["B"]     = ["B"],
         ["b"]     = ["B"],
-        ["t_w"]     = ["t_w"],
-        ["t_f"]     = ["t_f"],
-        ["s"]       = ["t_w"],
-        ["t"]       = ["t_f"],
+        ["t_w"]   = ["t_w"],
+        ["t_f"]   = ["t_f"],
+        ["s"]     = ["t_w"],
+        ["t"]     = ["t_f"],
         ["A"]     = ["A"],
         ["P"]     = ["P"],
         ["Iz"]    = ["Iz"],
         ["Iy"]    = ["Iy"],
         ["Ix"]    = ["Ix"],
         ["Iv"]    = ["Iv"],
+        ["Iu"]    = ["Iu"],
         ["Iy=Iz"] = ["Iy", "Iz"],
         ["Iyz"]   = ["Iyz"],
         ["Wz"]    = ["Wz"],
@@ -43,10 +44,10 @@ internal sealed class ProfileExcelToJsonExporter
         ["Sy"]    = ["Sy"],
         ["iz"]    = ["iz"],
         ["iy"]    = ["iy"],
-        ["xo"]    = ["xo"],
-        ["yo"]    = ["yo"],
         ["iu"]    = ["iu"],
         ["iv"]    = ["iv"],
+        ["xo"]    = ["xo"],
+        ["yo"]    = ["yo"],
     };
 
     /// <summary>

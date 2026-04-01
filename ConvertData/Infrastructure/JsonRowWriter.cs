@@ -29,6 +29,7 @@ namespace ConvertData.Infrastructure
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
                 sb.AppendLine("    \"variable\": " + r.variable + ",");
+                sb.AppendLine("    \"TableBrand\": \"" + JsonEscape(r.TableBrand) + "\",");
                 sb.AppendLine();
 
                 // Stiffness
@@ -188,28 +189,27 @@ namespace ConvertData.Infrastructure
         private static void WriteBoltY(StringBuilder sb, Row r)
         {
             sb.AppendLine("        \"Y\": {");
-            var bolts = r.CoordinatesBolts;
-            for (int j = 0; j < BoltYKeys.Length; j++)
-            {
-                int val = j < bolts.Count ? bolts[j].Y : 0;
-                sb.Append("          \"" + BoltYKeys[j] + "\": " + val);
-                if (j < BoltYKeys.Length - 1) sb.Append(',');
-                sb.AppendLine();
-            }
+            sb.AppendLine("          \"Bolt1_e1\": " + r.e1 + ",");
+            sb.AppendLine("          \"Bolt2_p1\": " + Dbl(r.p1) + ",");
+            sb.AppendLine("          \"Bolt3_p2\": " + Dbl(r.p2) + ",");
+            sb.AppendLine("          \"Bolt4_p3\": " + Dbl(r.p3) + ",");
+            sb.AppendLine("          \"Bolt5_p4\": " + Dbl(r.p4) + ",");
+            sb.AppendLine("          \"Bolt6_p5\": " + Dbl(r.p5) + ",");
+            sb.AppendLine("          \"Bolt7_p6\": " + Dbl(r.p6) + ",");
+            sb.AppendLine("          \"Bolt8_p7\": " + Dbl(r.p7) + ",");
+            sb.AppendLine("          \"Bolt9_p8\": " + Dbl(r.p8) + ",");
+            sb.AppendLine("          \"Bolt10_p9\": " + Dbl(r.p9) + ",");
+            sb.AppendLine("          \"Bolt11_p10\": " + Dbl(r.p10));
             sb.AppendLine("        },");
         }
 
         private static void WriteBoltX(StringBuilder sb, Row r)
         {
             sb.AppendLine("        \"X\": {");
-            var bolts = r.CoordinatesBolts;
-            for (int j = 0; j < BoltXKeys.Length; j++)
-            {
-                int val = j < bolts.Count ? bolts[j].X : 0;
-                sb.Append("          \"" + BoltXKeys[j] + "\": " + val);
-                if (j < BoltXKeys.Length - 1) sb.Append(',');
-                sb.AppendLine();
-            }
+            int d1 = r.CoordinatesBolts.Count > 0 ? r.CoordinatesBolts[0].X : 0;
+            int d2 = r.CoordinatesBolts.Count > 1 ? r.CoordinatesBolts[1].X : 0;
+            sb.AppendLine("          \"d1\": " + d1 + ",");
+            sb.AppendLine("          \"d2\": " + d2);
             sb.AppendLine("        },");
         }
 
