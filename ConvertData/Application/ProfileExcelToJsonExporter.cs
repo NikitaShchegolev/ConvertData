@@ -78,11 +78,12 @@ internal sealed class ProfileExcelToJsonExporter
         ["ProfileI.xlsx"] = "Двутавр",
         ["ProfileL.xlsx"] = "Уголок",
         ["ProfileC.xlsx"] = "Швеллер",
+        ["ProfileP.xlsx"] = "Трубы",
     };
 
     public void Export(string excelProfileDir, string outputJsonPath)
     {
-        var files = new[] { "ProfileI.xlsx", "ProfileC.xlsx", "ProfileL.xlsx" };
+        var files = new[] { "ProfileI.xlsx", "ProfileC.xlsx", "ProfileL.xlsx","ProfileP.xlsx" };
         var allProfiles = new List<Dictionary<string, object>>();
 
         foreach (var fileName in files)

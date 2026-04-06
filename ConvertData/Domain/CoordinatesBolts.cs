@@ -31,5 +31,4 @@ internal class CoordinatesBolts
         Y = y;
         Z = z;
     }
-
 }
