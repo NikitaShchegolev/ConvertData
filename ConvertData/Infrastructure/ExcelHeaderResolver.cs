@@ -114,7 +114,16 @@ internal static class ExcelHeaderResolver
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
             IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
             IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),            
-            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, ["Explanations", "Объяснения", "Пояснения", "Дополнения", "Примечания"]),            
+            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, [
+                "Explanations", "Explanation",
+                "Объяснения", "Объяснение",
+                "Пояснения", "Пояснение",
+                "Дополнения", "Дополнение",
+                "Примечания", "Примечание",
+                "Описание", "Описания",
+                "Комментарий", "Комментарии",
+                "Прим."
+            ]),            
             IdxProfile = idxProfile,
             IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
