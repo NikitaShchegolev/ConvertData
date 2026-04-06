@@ -42,6 +42,7 @@ namespace ConvertData.Infrastructure
                 sb.AppendLine("  {");
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
+                sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
                 sb.AppendLine("    \"variable\": " + r.variable + ",");
                 sb.AppendLine("    \"TableBrand\": \"" + JsonEscape(r.TableBrand) + "\",");
                 sb.AppendLine();

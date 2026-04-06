@@ -200,9 +200,15 @@ namespace ConvertData.Infrastructure
         private static readonly Dictionary<string, Action<Row, string>> GeometryColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["H"] = (r, v) => { var d = NumericParser.ParseDouble(v); r.Plate_H = d; r.Flange_H = d; },
-                ["B"] = (r, v) => { var d = NumericParser.ParseDouble(v); r.Plate_B = d; r.Flange_B = d; },
-                ["tp"] = (r, v) => { var d = NumericParser.ParseDouble(v); r.Plate_t = d; r.Flange_t = d; },
+                ["H"] = (r, v) => { 
+                    var d = NumericParser.ParseDouble(v); 
+                    r.Plate_H = d; r.Flange_H = d; },
+                ["B"] = (r, v) => { 
+                    var d = NumericParser.ParseDouble(v); 
+                    r.Plate_B = d; r.Flange_B = d; },
+                ["tp"] = (r, v) => { 
+                    var d = NumericParser.ParseDouble(v); 
+                    r.Plate_t = d; r.Flange_t = d; },
                 ["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v),
                 ["tbp"] = (r, v) => r.Stiff_tbp = NumericParser.ParseDouble(v),
                 ["tg"] = (r, v) => r.Stiff_tg = NumericParser.ParseDouble(v),
@@ -274,7 +280,10 @@ namespace ConvertData.Infrastructure
                 ["Марка опорного столика"] = (r, v) => r.TableBrand = v,
                 ["Маркаопорногостолика"] = (r, v) => r.TableBrand = v,
                 ["марка"] = (r, v) => r.TableBrand = v,
-                ["Марка"] = (r, v) => r.TableBrand = v
+                ["Марка"] = (r, v) => r.TableBrand = v,
+                ["TypeNode"] = (r, v) => r.TypeNode = v,
+                ["Тип узла"] = (r, v) => r.TypeNode = v,
+                ["ТипУзла"] = (r, v) => r.TypeNode = v
             };
             return map;
         }
