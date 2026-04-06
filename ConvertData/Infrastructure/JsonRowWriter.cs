@@ -45,6 +45,7 @@ namespace ConvertData.Infrastructure
                 sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
                 sb.AppendLine("    \"variable\": " + r.variable + ",");
                 sb.AppendLine("    \"TableBrand\": \"" + JsonEscape(r.TableBrand) + "\",");
+                sb.AppendLine("    \"Explanations\": \"" + JsonEscape(r.Explanations) + "\",");
                 sb.AppendLine();
 
                 // Stiffness
@@ -239,17 +240,31 @@ namespace ConvertData.Infrastructure
         private static void WriteWelds(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"Welds\": {");
-            sb.AppendLine("      \"kf1\": " + r.kf1 + ",");
-            sb.AppendLine("      \"kf2\": " + r.kf2 + ",");
-            sb.AppendLine("      \"kf3\": " + r.kf3 + ",");
-            sb.AppendLine("      \"kf4\": " + r.kf4 + ",");
-            sb.AppendLine("      \"kf5\": " + r.kf5 + ",");
-            sb.AppendLine("      \"kf6\": " + r.kf6 + ",");
-            sb.AppendLine("      \"kf7\": " + r.kf7 + ",");
-            sb.AppendLine("      \"kf8\": " + r.kf8 + ",");
-            sb.AppendLine("      \"kf9\": " + r.kf9 + ",");
-            sb.AppendLine("      \"kf10\": " + r.kf10);
+            sb.AppendLine("      \"kf1\": " + WeldValue(r.kf1) + ",");
+            sb.AppendLine("      \"kf2\": " + WeldValue(r.kf2) + ",");
+            sb.AppendLine("      \"kf3\": " + WeldValue(r.kf3) + ",");
+            sb.AppendLine("      \"kf4\": " + WeldValue(r.kf4) + ",");
+            sb.AppendLine("      \"kf5\": " + WeldValue(r.kf5) + ",");
+            sb.AppendLine("      \"kf6\": " + WeldValue(r.kf6) + ",");
+            sb.AppendLine("      \"kf7\": " + WeldValue(r.kf7) + ",");
+            sb.AppendLine("      \"kf8\": " + WeldValue(r.kf8) + ",");
+            sb.AppendLine("      \"kf9\": " + WeldValue(r.kf9) + ",");
+            sb.AppendLine("      \"kf10\": " + WeldValue(r.kf10));
             sb.AppendLine("    },");
+        }
+        /// <summary>
+        /// Метод для обработки значения сварки. 
+        /// Если значение может быть преобразовано в число, 
+        /// оно записывается как число. В противном случае
+        /// оно записывается как строка с экранированием.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        private static string WeldValue(string v)
+        {
+            if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)) 
+                return result.ToString(CultureInfo.InvariantCulture);
+            return "\"" + JsonEscape(v)+"\"";
         }
 
         private static void WriteInternalForces(StringBuilder sb, Row r)
@@ -269,7 +284,11 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("      \"Qx\": " + r.Qx);
             sb.AppendLine("    },");
         }
-
+        /// <summary>
+        /// Метод для преобразования double в строку
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         private static string Dbl(double v) => v.ToString(CultureInfo.InvariantCulture);
 
         private static string JsonEscape(string s)

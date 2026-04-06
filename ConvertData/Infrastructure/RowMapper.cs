@@ -14,6 +14,8 @@ internal static class RowMapper
     /// </summary>
     /// <param name="name">Имя соединения.</param>
     /// <param name="code">Код соединения (CONNECTION_CODE).</param>
+    /// <param name="typeNode">Тип узла.</param>
+    /// <param name="explanations">Пояснения.</param>
     /// <param name="profileBeam">Профиль балки.</param>
     /// <param name="profileColumn">Профиль колонны.</param>
     /// <param name="h">Высота сечения балки.</param>
@@ -47,6 +49,7 @@ internal static class RowMapper
         string typeNode,
         string profileBeam,
         string profileColumn,
+        string explanations,
         string h,
         string b,
         string s,
@@ -79,6 +82,7 @@ internal static class RowMapper
             TypeNode = typeNode ?? "",
             ProfileBeam = profileBeam ?? "",
             ProfileColumn = profileColumn ?? "",
+            Explanations = explanations ?? "",
             variable = NumericParser.ParseInt(variable),
             Sj = NumericParser.ParseInt(sj),
             Sjo = NumericParser.ParseInt(sjo),

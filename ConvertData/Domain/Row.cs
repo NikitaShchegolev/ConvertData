@@ -8,6 +8,10 @@ internal sealed class Row
     public string Name { get; set; } = "";
     public string TypeNode { get; set; } = "";
     /// <summary>
+    /// Пояснения к узловому соединению, которые могут включать в себя описание типа соединения,
+    /// </summary>
+    public string Explanations { get; set; } = "";
+    /// <summary>
     /// Код соединения, который определяет тип соединения между балкой и колонной. 
     /// Этот код может быть использован для определения геометрических 
     /// характеристик балки и колонны, а также для расчета жесткости и внутренних сил в соединении.
@@ -341,43 +345,43 @@ internal sealed class Row
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf1 { get; set; }
+    public string kf1 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf2 { get; set; }
+    public string kf2 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf3 { get; set; }
+    public string kf3 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf4 { get; set; }
+    public string kf4 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf5 { get; set; }
+    public string kf5 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf6 { get; set; }
+    public string kf6 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf7 { get; set; }
+    public string kf7 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf8 { get; set; }
+    public string kf8 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf9 { get; set; }
+    public string kf9 { get; set; }
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public int kf10 { get; set; }
+    public string kf10 { get; set; }
     #endregion
 
     //Характеристики материала

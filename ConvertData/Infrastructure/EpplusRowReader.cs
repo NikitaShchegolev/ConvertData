@@ -227,16 +227,16 @@ namespace ConvertData.Infrastructure
         private static readonly Dictionary<string, Action<Row, string>> WeldColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["kf1"] = (r, v) => r.kf1 = NumericParser.ParseInt(v),
-                ["kf2"] = (r, v) => r.kf2 = NumericParser.ParseInt(v),
-                ["kf3"] = (r, v) => r.kf3 = NumericParser.ParseInt(v),
-                ["kf4"] = (r, v) => r.kf4 = NumericParser.ParseInt(v),
-                ["kf5"] = (r, v) => r.kf5 = NumericParser.ParseInt(v),
-                ["kf6"] = (r, v) => r.kf6 = NumericParser.ParseInt(v),
-                ["kf7"] = (r, v) => r.kf7 = NumericParser.ParseInt(v),
-                ["kf8"] = (r, v) => r.kf8 = NumericParser.ParseInt(v),
-                ["kf9"] = (r, v) => r.kf9 = NumericParser.ParseInt(v),
-                ["kf10"] = (r, v) => r.kf10 = NumericParser.ParseInt(v),
+                ["kf1"] = (r, v) => r.kf1 = v,
+                ["kf2"] = (r, v) => r.kf2 = v,
+                ["kf3"] = (r, v) => r.kf3 = v,
+                ["kf4"] = (r, v) => r.kf4 = v,
+                ["kf5"] = (r, v) => r.kf5 = v,
+                ["kf6"] = (r, v) => r.kf6 = v,
+                ["kf7"] = (r, v) => r.kf7 = v,
+                ["kf8"] = (r, v) => r.kf8 = v,
+                ["kf9"] = (r, v) => r.kf9 = v,
+                ["kf10"] = (r, v) => r.kf10 = v
             };
 
         /// <summary>

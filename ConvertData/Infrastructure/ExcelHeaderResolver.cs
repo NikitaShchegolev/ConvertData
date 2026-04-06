@@ -68,7 +68,8 @@ internal sealed class ExcelColumnMap
     public int IdxEpsilon { get; set; } = -1;
     /// <summary>Индекс колонки "λ" или "Lambda" (коэффициент лямбда).</summary>
     public int IdxLambda { get; set; } = -1;
-
+    /// <summary>Индекс для пояснений</summary>
+    public int IdxExplanations { get; set; } = -1;
     /// <summary>Проверяет, является ли таблица основной (содержит Name, Code, Profile).</summary>
     public bool IsMainTable => IdxName >= 0 && IdxCode >= 0 && IdxProfile >= 0;
     /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
@@ -113,6 +114,7 @@ internal static class ExcelHeaderResolver
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
             IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
             IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),            
+            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, ["Explanations", "Объяснения", "Пояснения", "Дополнения", "Примечания"]),            
             IdxProfile = idxProfile,
             IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
