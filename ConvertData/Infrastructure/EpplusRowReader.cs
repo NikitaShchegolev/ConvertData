@@ -93,6 +93,7 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
                         GetCell(ws, r, startCol + map.IdxProfile),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ? startCol + map.IdxProfileColumn : null),
+                        GetCell(ws, r, map.IdxExplanations >= 0 ? startCol + map.IdxExplanations : null),
                         GetCell(ws, r, map.IdxH >= 0 ? startCol + map.IdxH : null),
                         GetCell(ws, r, map.IdxB >= 0 ? startCol + map.IdxB : null),
                         GetCell(ws, r, map.Idxs >= 0 ? startCol + map.Idxs : null),
