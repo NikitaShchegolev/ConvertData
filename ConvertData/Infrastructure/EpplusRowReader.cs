@@ -90,6 +90,7 @@ namespace ConvertData.Infrastructure
                     list.Add(RowMapper.MapMainRow(
                         GetCell(ws, r, startCol + map.IdxName),
                         code,
+                        GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
                         GetCell(ws, r, startCol + map.IdxProfile),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ? startCol + map.IdxProfileColumn : null),
                         GetCell(ws, r, map.IdxH >= 0 ? startCol + map.IdxH : null),
@@ -283,7 +284,7 @@ namespace ConvertData.Infrastructure
                 ["Марка"] = (r, v) => r.TableBrand = v,
                 ["TypeNode"] = (r, v) => r.TypeNode = v,
                 ["Тип узла"] = (r, v) => r.TypeNode = v,
-                ["ТипУзла"] = (r, v) => r.TypeNode = v
+                ["Вид узла"] = (r, v) => r.TypeNode = v
             };
             return map;
         }

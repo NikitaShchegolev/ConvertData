@@ -22,6 +22,8 @@ internal sealed class ExcelColumnMap
     public int IdxName { get; set; } = -1;
     /// <summary>Индекс колонки "CONNECTION_CODE" (код соединения).</summary>
     public int IdxCode { get; set; } = -1;
+    /// <summary> Индекс колонки "TypeNode" или "ТипУзла" (тип узла соединения).</summary>
+    public int IdxTypeNode { get; set; } = -1;
     /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
     public int IdxProfile { get; set; } = -1;
     /// <summary>Индекс колонки "ProfileColumn" (профиль колонны).</summary>
@@ -110,6 +112,7 @@ internal static class ExcelHeaderResolver
             Idxt = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
             IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
+            IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),            
             IdxProfile = idxProfile,
             IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),

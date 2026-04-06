@@ -21,7 +21,6 @@ internal sealed class ConnectionCodeDeduplicator
         if (clonedRoot is not JsonArray clonedArr)
             return 0;
 
-        var maxByPrefix = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var countsByCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var node in clonedArr)
@@ -39,15 +38,17 @@ internal sealed class ConnectionCodeDeduplicator
                 countsByCode[code] = c + 1;
             else
                 countsByCode[code] = 1;
-
-            if (TryParsePrefixedNumber(code, out var prefix, out var number))
-            {
-                if (!maxByPrefix.TryGetValue(prefix, out var currentMax) || number > currentMax)
-                    maxByPrefix[prefix] = number;
-            }
         }
 
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var duplicateCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kvp in countsByCode)
+        {
+            if (kvp.Value > 1)
+                duplicateCodes.Add(kvp.Key);
+        }
+
+        var currentIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var allUsedCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var changed = 0;
         var replacementsReport = replacementsTxtPath is null ? null : new StringBuilder();
 
@@ -62,36 +63,31 @@ internal sealed class ConnectionCodeDeduplicator
 
             code = code.Trim();
 
-            if (!countsByCode.TryGetValue(code, out var total) || total <= 1)
+            if (!duplicateCodes.Contains(code))
             {
-                seen.Add(code);
+                allUsedCodes.Add(code);
                 continue;
             }
 
-            if (seen.Add(code))
-                continue;
+            if (!currentIndex.TryGetValue(code, out var idx))
+                idx = 0;
+            idx++;
+            currentIndex[code] = idx;
 
-            if (!TryParsePrefixedNumber(code, out var prefix, out _))
-                continue;
-
-            maxByPrefix.TryGetValue(prefix, out var max);
-            var next = max + 1;
-            string newCode;
-            do
+            var newCode = $"{code}_{idx}";
+            while (allUsedCodes.Contains(newCode) || countsByCode.ContainsKey(newCode))
             {
-                newCode = prefix + "-" + next;
-                next++;
+                idx++;
+                currentIndex[code] = idx;
+                newCode = $"{code}_{idx}";
             }
-            while (seen.Contains(newCode) || countsByCode.ContainsKey(newCode));
 
             obj["CONNECTION_CODE"] = newCode;
 
             replacementsReport?.AppendLine($"{code} => {newCode}");
 
-            seen.Add(newCode);
+            allUsedCodes.Add(newCode);
             changed++;
-
-            maxByPrefix[prefix] = int.Parse(newCode.AsSpan(prefix.Length + 1));
         }
 
         var options = new JsonSerializerOptions
@@ -110,19 +106,5 @@ internal sealed class ConnectionCodeDeduplicator
         }
 
         return changed;
-    }
-
-    private static bool TryParsePrefixedNumber(string code, out string prefix, out int number)
-    {
-        prefix = "";
-        number = 0;
-
-        var dash = code.IndexOf('-');
-        if (dash <= 0 || dash == code.Length - 1)
-            return false;
-
-        prefix = code[..dash].Trim();
-        var numPart = code[(dash + 1)..].Trim();
-        return !string.IsNullOrWhiteSpace(prefix) && int.TryParse(numPart, out number) && number >= 0;
     }
 }
