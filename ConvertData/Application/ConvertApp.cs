@@ -130,6 +130,16 @@ namespace ConvertData.Application
                 allNotDuplicateJsonPath,
                 Path.Combine(excelProfileOutDir, "NameConnections.json"));
             Console.WriteLine("Этап 9 завершён.");
+
+            Console.WriteLine();
+            Console.WriteLine("=== Этап 10: Копирование all_NotDuplicate.json в ConvertData.Data\\JSON\\ ===");
+            var dataJsonDir = Path.Combine(projectDir, "..", "ConvertData.Data", "JSON");
+            dataJsonDir = Path.GetFullPath(dataJsonDir);
+            Directory.CreateDirectory(dataJsonDir);
+            var destPath = Path.Combine(dataJsonDir, "all_NotDuplicate.json");
+            File.Copy(allNotDuplicateJsonPath, destPath, overwrite: true);
+            Console.WriteLine($"  Скопировано: {allNotDuplicateJsonPath} -> {destPath}");
+            Console.WriteLine("Этап 10 завершён.");
         }
 
         private static void ClearJsonOut(string jsonOutDir)
