@@ -54,3 +54,6 @@ Profile.xls
 /.github/copilot-instructions.md
 /.gitignore
 /.github/copilot-instructions.md
+
+# ConvertData.Data project
+/ConvertData.Data/
