@@ -31,6 +31,11 @@ namespace ConvertData.Infrastructure
                 try
                 {
                     var text = File.ReadAllText(file, Encoding.UTF8);
+                    if (string.IsNullOrWhiteSpace(text))
+                        continue;
+                    // Если файл не начинается с '[', оборачиваем содержимое в массив
+                    if (!text.StartsWith('['))
+                        text = "[" + text + "]";
                     var node = JsonNode.Parse(text);
 
                     if (node is JsonArray arr)

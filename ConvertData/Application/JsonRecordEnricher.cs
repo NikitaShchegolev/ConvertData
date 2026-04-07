@@ -95,15 +95,40 @@ internal sealed class JsonRecordEnricher
         DeepCopyNode(template, target, "Bolts");
         DeepCopyNode(template, target, "Welds");
 
-        // Копируем TableBrand, если он есть в шаблоне и пуст в целевой записи
-        if (template["TableBrand"] is JsonNode brandNode)
+        CopyStringIfEmpty(template,target,"TableBrand");
+        CopyStringIfEmpty(template,target,"Explanations");
+        CopyStringIfEmpty(template,target,"TypeNode");
+
+        #region Delete
+        //// Копируем TableBrand, если он есть в шаблоне и пуст в целевой записи
+        //if (template["TableBrand"] is JsonNode brandNode)
+        //{
+        //    var brandValue = brandNode.GetValue<string>();
+        //    if (!string.IsNullOrWhiteSpace(brandValue))
+        //    {
+        //        var targetBrand = target["TableBrand"]?.GetValue<string>();
+        //        if (string.IsNullOrWhiteSpace(targetBrand))
+        //            target["TableBrand"] = brandValue;
+        //    }
+        //} 
+        #endregion
+    }
+    /// <summary>
+    /// Копирует строковое значение из шаблона в целевой объект, если в целевом оно пусто.
+    /// </summary>
+    /// <param name="template">Шаблонный JSON-объект.</param>
+    /// <param name="target">Целевой JSON-объект.</param>
+    /// <param name="key">Ключ строки для копирования.</param>
+    private static void CopyStringIfEmpty(JsonObject template, JsonObject target, string key)
+    {
+        if (template[key] is JsonNode srcNode)
         {
-            var brandValue = brandNode.GetValue<string>();
-            if (!string.IsNullOrWhiteSpace(brandValue))
+            var srcValue = srcNode.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(srcValue))
             {
-                var targetBrand = target["TableBrand"]?.GetValue<string>();
-                if (string.IsNullOrWhiteSpace(targetBrand))
-                    target["TableBrand"] = brandValue;
+                var targetValue = target[key]?.GetValue<string>();
+                if (string.IsNullOrWhiteSpace(targetValue))
+                    target[key] = srcValue;
             }
         }
     }

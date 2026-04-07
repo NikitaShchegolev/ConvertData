@@ -345,43 +345,43 @@ internal sealed class Row
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf1 { get; set; }
+    public string kf1 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf2 { get; set; }
+    public string kf2 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf3 { get; set; }
+    public string kf3 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf4 { get; set; }
+    public string kf4 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf5 { get; set; }
+    public string kf5 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf6 { get; set; }
+    public string kf6 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf7 { get; set; }
+    public string kf7 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf8 { get; set; }
+    public string kf8 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf9 { get; set; }
+    public string kf9 { get; set; } = "";
     /// <summary>
     /// Минимальный катет сварного шва
     /// </summary>
-    public string kf10 { get; set; }
+    public string kf10 { get; set; } = "";
     #endregion
 
     //Характеристики материала

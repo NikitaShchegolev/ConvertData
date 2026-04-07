@@ -48,6 +48,7 @@ internal sealed class ConnectionCodeDeduplicator
         }
 
         var currentIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var allUsedCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var changed = 0;
         var replacementsReport = replacementsTxtPath is null ? null : new StringBuilder();
@@ -63,17 +64,17 @@ internal sealed class ConnectionCodeDeduplicator
 
             code = code.Trim();
 
-            if (!duplicateCodes.Contains(code))
+            // ѕервое вхождение Ч оставл€ем без изменений
+            if (!seen.Add(code))
             {
                 allUsedCodes.Add(code);
                 continue;
             }
-
+            // ¬торое и далее Ч добавл€ем суффикс _1, _2, ...
             if (!currentIndex.TryGetValue(code, out var idx))
                 idx = 0;
             idx++;
             currentIndex[code] = idx;
-
             var newCode = $"{code}_{idx}";
             while (allUsedCodes.Contains(newCode) || countsByCode.ContainsKey(newCode))
             {
