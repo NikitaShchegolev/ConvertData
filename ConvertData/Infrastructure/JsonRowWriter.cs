@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using ConvertData.Application;
 using ConvertData.Domain;
+using ConvertData.Infrastructure.Parsing;
 
 namespace ConvertData.Infrastructure
 {
@@ -262,9 +263,27 @@ namespace ConvertData.Infrastructure
         /// <returns></returns>
         private static string WeldValue(string v)
         {
-            if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)) 
-                return result.ToString(CultureInfo.InvariantCulture);
-            return "\"" + JsonEscape(v)+"\"";
+            if (string.IsNullOrWhiteSpace(v))
+                return "\"\"";
+
+            var value = v.Trim();
+            var numeric = NumericParser.ParseDouble(value);
+
+            if (IsNumericValue(value, numeric))
+                return numeric.ToString(CultureInfo.InvariantCulture);
+
+            return "\"" + JsonEscape(value) + "\"";
+        }
+
+        private static bool IsNumericValue(string source, double parsed)
+        {
+            if (double.TryParse(source, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out _))
+                return true;
+
+            if (double.TryParse(source, NumberStyles.Float | NumberStyles.AllowThousands, new CultureInfo("ru-RU"), out _))
+                return true;
+
+            return false;
         }
 
         private static void WriteInternalForces(StringBuilder sb, Row r)
