@@ -74,6 +74,40 @@ internal sealed class ExcelColumnMap
     public bool IsMainTable => IdxName >= 0 && IdxCode >= 0 && IdxProfile >= 0;
     /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
     public bool IsProfileTable => IdxProfile >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0;
+
+
+    #region Анкера
+    /// <summary> Усилие отрыва </summary>
+    public int IdF_base { get; set; } = -1;
+    /// <summary> Длина стороны шайбы под анкер </summary>
+    public int IdLws_base { get; set; } = -1;
+    /// <summary> Ширина колодца под упор </summary>
+    public int IdLp_base { get; set; } = -1;
+    /// <summary> Ширина противосдвигового упора в плоскости наибольшей жесткости</summary>
+    public int IdLs_base { get; set; } = -1;
+    /// <summary> Толщина шайбы под анкер </summary>
+    public int IdTws_base { get; set; } = -1;
+    /// <summary> Диаметр отверстия в шайбе под анкер </summary>
+    public int IdD_ws_base { get; set; } = -1;
+    /// <summary> Диаметр отверстия под анкер </summary>
+    public int IdD_p_base { get; set; } = -1;
+    /// <summary> Расстояние между монтажными отверстиями </summary>
+    public int IdXh_base { get; set; } = -1;
+    /// <summary> Катет сварного шва крепления базы </summary>
+    public int IdK_fws_base { get; set; } = -1;
+    /// <summary> Количество отверстий для базы варианта 1</summary>
+    public int IdNh_base_var1 { get; set; } = -1;
+    /// <summary> Количество отверстий для базы варианта 2</summary>
+    public int IdNh_base_var2 { get; set; } = -1;
+    /// <summary> Наимернование соединения вариант 1</summary>
+    public int IdAnchor_var_1 { get; set; } = -1;
+    /// <summary> Наимернование соединения вариант 2</summary>
+    public int IdAnchor_var_2 { get; set; } = -1;
+    /// <summary> Наимернование соединения вариант 3</summary>
+    public int IdAnchor_var_3 { get; set; } = -1;
+    /// <summary> Наимернование соединения вариант 4</summary>
+    public int IdAnchor_var_4 { get; set; } = -1;
+    #endregion
 }
 
 /// <summary>
@@ -139,7 +173,22 @@ internal static class ExcelHeaderResolver
             IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
             IdxMz = HeaderUtils.IndexOfHeaderAny(header, ["Mz"]),
             IdxMx = HeaderUtils.IndexOfHeader(header, "Mx"),
-            IdxMw = HeaderUtils.IndexOfHeader(header, "Mw")
+            IdxMw = HeaderUtils.IndexOfHeader(header, "Mw"),
+            IdF_base = HeaderUtils.IndexOfHeader(header, "F_base"),
+            IdLws_base = HeaderUtils.IndexOfHeader(header, "Lws"),
+            IdLp_base = HeaderUtils.IndexOfHeader(header, "Lp_base"),
+            IdLs_base = HeaderUtils.IndexOfHeader(header, "Ls_base"),
+            IdTws_base = HeaderUtils.IndexOfHeader(header, "tws"),
+            IdD_ws_base = HeaderUtils.IndexOfHeader(header, "Dws"),
+            IdD_p_base = HeaderUtils.IndexOfHeader(header, "Dp"),
+            IdXh_base = HeaderUtils.IndexOfHeader(header, "xh"),
+            IdK_fws_base = HeaderUtils.IndexOfHeader(header, "kfws"),
+            IdNh_base_var1 = HeaderUtils.IndexOfHeader(header, "Nh_1_2"),
+            IdNh_base_var2 = HeaderUtils.IndexOfHeader(header, "Nh_3_4"),
+            IdAnchor_var_1 = HeaderUtils.IndexOfHeader(header, "Анкер1"),
+            IdAnchor_var_2 = HeaderUtils.IndexOfHeader(header, "Анкер2"),
+            IdAnchor_var_3 = HeaderUtils.IndexOfHeader(header, "Анкер3"),
+            IdAnchor_var_4 = HeaderUtils.IndexOfHeader(header, "Анкер4")
         };
 
         map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");

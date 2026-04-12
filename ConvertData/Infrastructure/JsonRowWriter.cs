@@ -73,6 +73,9 @@ namespace ConvertData.Infrastructure
                 // Welds
                 WriteWelds(sb, r);
                 sb.AppendLine();
+                // Anchor
+                WriteAnchor(sb, r);
+                sb.AppendLine();
 
                 // InternalForces
                 WriteInternalForces(sb, r);
@@ -220,6 +223,25 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        },");
         }
 
+        private static void WriteAnchor(StringBuilder sb, Row r)
+        {
+            sb.AppendLine("      \"Anchor\": {");
+            sb.AppendLine("        \"Anchor_F_base\": " +       Dbl(r.F_base) + ",");
+            sb.AppendLine("        \"Anchor_Lws\": " +          Dbl(r.Lws_base) + ",");
+            sb.AppendLine("        \"Anchor_Lp_base\": " +      Dbl(r.Lp_base) + ",");
+            sb.AppendLine("        \"Anchor_Ls_base\": " +      Dbl(r.Ls_base) + ",");
+            sb.AppendLine("        \"Anchor_tws_base\": " +     Dbl(r.Tws_base) + ",");
+            sb.AppendLine("        \"Anchor_d_ws_base\": " +    Dbl(r.D_ws_base) + ",");
+            sb.AppendLine("        \"Anchor_d_p_base\": " +     Dbl(r.D_p_base) + ",");
+            sb.AppendLine("        \"Anchor_xh_base\": " +      Dbl(r.Xh_base) + ",");
+            sb.AppendLine("        \"Anchor_nh_base_var1\": " + Dbl(r.Nh_base_var1) + ",");
+            sb.AppendLine("        \"Anchor_nh_base_var2\": " + Dbl(r.Nh_base_var2) + ",");
+            sb.AppendLine("        \"Anchor_anchor_var_1\": \"" + JsonEscape(r.Anchor_var_1) + "\",");
+            sb.AppendLine("        \"Anchor_anchor_var_2\": \"" + JsonEscape(r.Anchor_var_2) + "\",");
+            sb.AppendLine("        \"Anchor_anchor_var_3\": \"" + JsonEscape(r.Anchor_var_3) + "\",");
+            sb.AppendLine("        \"Anchor_anchor_var_4\": \"" + JsonEscape(r.Anchor_var_4) + "\"");
+            sb.AppendLine("      },");
+        }
         private static void WriteBoltX(StringBuilder sb, Row r)
         {
             sb.AppendLine("        \"X\": {");
@@ -241,16 +263,17 @@ namespace ConvertData.Infrastructure
         private static void WriteWelds(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"Welds\": {");
-            sb.AppendLine("      \"kf1\": " + WeldValue(r.kf1) + ",");
-            sb.AppendLine("      \"kf2\": " + WeldValue(r.kf2) + ",");
-            sb.AppendLine("      \"kf3\": " + WeldValue(r.kf3) + ",");
-            sb.AppendLine("      \"kf4\": " + WeldValue(r.kf4) + ",");
-            sb.AppendLine("      \"kf5\": " + WeldValue(r.kf5) + ",");
-            sb.AppendLine("      \"kf6\": " + WeldValue(r.kf6) + ",");
-            sb.AppendLine("      \"kf7\": " + WeldValue(r.kf7) + ",");
-            sb.AppendLine("      \"kf8\": " + WeldValue(r.kf8) + ",");
-            sb.AppendLine("      \"kf9\": " + WeldValue(r.kf9) + ",");
-            sb.AppendLine("      \"kf10\": " + WeldValue(r.kf10));
+            sb.AppendLine("      \"kf1\": " +               WeldValue(r.kf1) + ",");
+            sb.AppendLine("      \"kf2\": " +               WeldValue(r.kf2) + ",");
+            sb.AppendLine("      \"kf3\": " +               WeldValue(r.kf3) + ",");
+            sb.AppendLine("      \"kf4\": " +               WeldValue(r.kf4) + ",");
+            sb.AppendLine("      \"kf5\": " +               WeldValue(r.kf5) + ",");
+            sb.AppendLine("      \"kf6\": " +               WeldValue(r.kf6) + ",");
+            sb.AppendLine("      \"kf7\": " +               WeldValue(r.kf7) + ",");
+            sb.AppendLine("      \"kf8\": " +               WeldValue(r.kf8) + ",");
+            sb.AppendLine("      \"kf9\": " +               WeldValue(r.kf9) + ",");
+            sb.AppendLine("      \"kf10\": " +              WeldValue(r.kf10) + ",");
+            sb.AppendLine("      \"Anchor_k_fws_base\": " + WeldValue(r.K_fws_base));
             sb.AppendLine("    },");
         }
         /// <summary>
@@ -324,7 +347,7 @@ namespace ConvertData.Infrastructure
                     case '\f': sb.Append("\\f"); break;
                     case '\n': sb.Append("\\n"); break;
                     case '\r': sb.Append("\\r"); break;
-                    case '\t': sb.Append("\\t_f"); break;
+                    case '\t': sb.Append("\\t"); break;
                     default:
                         if (ch < 32)
                             sb.Append("\\u" + ((int)ch).ToString("x4"));

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using ConvertData.Application;
+﻿using ConvertData.Application;
 using ConvertData.Domain;
 using ConvertData.Infrastructure.Interop;
 using ConvertData.Infrastructure.Parsing;
@@ -93,31 +89,47 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
                         GetCell(ws, r, startCol + map.IdxProfile),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ? startCol + map.IdxProfileColumn : null),
-                        GetCell(ws, r, map.IdxExplanations >= 0 ? startCol + map.IdxExplanations : null),
-                        GetCell(ws, r, map.IdxH >= 0 ? startCol + map.IdxH : null),
-                        GetCell(ws, r, map.IdxB >= 0 ? startCol + map.IdxB : null),
-                        GetCell(ws, r, map.Idxs >= 0 ? startCol + map.Idxs : null),
-                        GetCell(ws, r, map.Idxt >= 0 ? startCol + map.Idxt : null),
-                        GetCell(ws, r, map.IdxNt >= 0 ? startCol + map.IdxNt : null),
-                        GetCell(ws, r, map.IdxQy >= 0 ? startCol + map.IdxQy : null),
-                        GetCell(ws, r, map.IdxQz >= 0 ? startCol + map.IdxQz : null),
-                        GetCell(ws, r, map.IdxT >= 0 ? startCol + map.IdxT : null),
-                        GetCell(ws, r, map.IdxNc >= 0 ? startCol + map.IdxNc : null),
-                        GetCell(ws, r, map.IdxN >= 0 ? startCol + map.IdxN : null),
-                        GetCell(ws, r, map.IdxMy >= 0 ? startCol + map.IdxMy : null),
-                        GetCell(ws, r, map.IdxVariable >= 0 ? startCol + map.IdxVariable : null),
-                        GetCell(ws, r, map.IdxSj >= 0 ? startCol + map.IdxSj : null),
-                        GetCell(ws, r, map.IdxSjo >= 0 ? startCol + map.IdxSjo : null),
-                        GetCell(ws, r, map.IdxMneg >= 0 ? startCol + map.IdxMneg : null),
-                        GetCell(ws, r, map.IdxMz >= 0 ? startCol + map.IdxMz : null),
-                        GetCell(ws, r, map.IdxMx >= 0 ? startCol + map.IdxMx : null),
-                        GetCell(ws, r, map.IdxMw >= 0 ? startCol + map.IdxMw : null),
-                        GetCell(ws, r, map.IdxAlpha >= 0 ? startCol + map.IdxAlpha : null),
-                        GetCell(ws, r, map.IdxBeta >= 0 ? startCol + map.IdxBeta : null),
-                        GetCell(ws, r, map.IdxGamma >= 0 ? startCol + map.IdxGamma : null),
-                        GetCell(ws, r, map.IdxDelta >= 0 ? startCol + map.IdxDelta : null),
-                        GetCell(ws, r, map.IdxEpsilon >= 0 ? startCol + map.IdxEpsilon : null),
-                        GetCell(ws, r, map.IdxLambda >= 0 ? startCol + map.IdxLambda : null)));
+                        GetCell(ws, r, map.IdxExplanations >= 0 ?  startCol + map.IdxExplanations : null),
+                        GetCell(ws, r, map.IdxH >= 0 ?             startCol + map.IdxH : null),
+                        GetCell(ws, r, map.IdxB >= 0 ?             startCol + map.IdxB : null),
+                        GetCell(ws, r, map.Idxs >= 0 ?             startCol + map.Idxs : null),
+                        GetCell(ws, r, map.Idxt >= 0 ?             startCol + map.Idxt : null),
+                        GetCell(ws, r, map.IdxNt >= 0 ?            startCol + map.IdxNt : null),
+                        GetCell(ws, r, map.IdxQy >= 0 ?            startCol + map.IdxQy : null),
+                        GetCell(ws, r, map.IdxQz >= 0 ?            startCol + map.IdxQz : null),
+                        GetCell(ws, r, map.IdxT >= 0 ?             startCol + map.IdxT : null),
+                        GetCell(ws, r, map.IdxNc >= 0 ?            startCol + map.IdxNc : null),
+                        GetCell(ws, r, map.IdxN >= 0 ?             startCol + map.IdxN : null),
+                        GetCell(ws, r, map.IdxMy >= 0 ?            startCol + map.IdxMy : null),
+                        GetCell(ws, r, map.IdxVariable >= 0 ?      startCol + map.IdxVariable : null),
+                        GetCell(ws, r, map.IdxSj >= 0 ?            startCol + map.IdxSj : null),
+                        GetCell(ws, r, map.IdxSjo >= 0 ?           startCol + map.IdxSjo : null),
+                        GetCell(ws, r, map.IdxMneg >= 0 ?          startCol + map.IdxMneg : null),
+                        GetCell(ws, r, map.IdxMz >= 0 ?            startCol + map.IdxMz : null),
+                        GetCell(ws, r, map.IdxMx >= 0 ?            startCol + map.IdxMx : null),
+                        GetCell(ws, r, map.IdxMw >= 0 ?            startCol + map.IdxMw : null),
+                        GetCell(ws, r, map.IdxAlpha >= 0 ?         startCol + map.IdxAlpha : null),
+                        GetCell(ws, r, map.IdxBeta >= 0 ?          startCol + map.IdxBeta : null),
+                        GetCell(ws, r, map.IdxGamma >= 0 ?         startCol + map.IdxGamma : null),
+                        GetCell(ws, r, map.IdxDelta >= 0 ?         startCol + map.IdxDelta : null),
+                        GetCell(ws, r, map.IdxEpsilon >= 0 ?       startCol + map.IdxEpsilon : null),
+                        GetCell(ws, r, map.IdxLambda >= 0 ?        startCol + map.IdxLambda : null),
+                        GetCell(ws, r, map.IdF_base >= 0 ?         startCol + map.IdF_base : null),
+                        GetCell(ws, r, map.IdLws_base >= 0 ?       startCol + map.IdLws_base : null),
+                        GetCell(ws, r, map.IdLp_base >= 0 ?        startCol + map.IdLp_base : null),
+                        GetCell(ws, r, map.IdLs_base >= 0 ?        startCol + map.IdLs_base : null),
+                        GetCell(ws, r, map.IdTws_base >= 0 ?       startCol + map.IdTws_base : null),
+                        GetCell(ws, r, map.IdD_ws_base >= 0 ?      startCol + map.IdD_ws_base : null),
+                        GetCell(ws, r, map.IdD_p_base >= 0 ?       startCol + map.IdD_p_base : null),
+                        GetCell(ws, r, map.IdXh_base >= 0 ?        startCol + map.IdXh_base : null),
+                        GetCell(ws, r, map.IdK_fws_base >= 0 ?     startCol + map.IdK_fws_base : null),
+                        GetCell(ws, r, map.IdNh_base_var1 >= 0 ?   startCol + map.IdNh_base_var1 : null),
+                        GetCell(ws, r, map.IdNh_base_var2 >= 0 ?   startCol + map.IdNh_base_var2 : null),
+                        GetCell(ws, r, map.IdAnchor_var_1 >= 0 ?   startCol + map.IdAnchor_var_1 : null),
+                        GetCell(ws, r, map.IdAnchor_var_2 >= 0 ?   startCol + map.IdAnchor_var_2 : null),
+                        GetCell(ws, r, map.IdAnchor_var_3 >= 0 ?   startCol + map.IdAnchor_var_3 : null),
+                        GetCell(ws, r, map.IdAnchor_var_4 >= 0 ?   startCol + map.IdAnchor_var_4 : null)
+                        ));
                 }
                 else
                 {
@@ -197,30 +209,48 @@ namespace ConvertData.Infrastructure
             ["CONNECTION_CODE", "Connection_Code", "Code", "Код"];
 
         /// <summary>
-        /// Карта отображения колонок листа "geometry" на свойства Row.
+        /// Карта отображения параметров пластины на свойства Row.
         /// </summary>
-        private static readonly Dictionary<string, Action<Row, string>> GeometryColumnMap =
+        private static readonly Dictionary<string, Action<Row, string>> PlateGeometryColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["H"] = (r, v) => { 
-                    var d = NumericParser.ParseDouble(v); 
-                    r.Plate_H = d; r.Flange_H = d; },
-                ["B"] = (r, v) => { 
-                    var d = NumericParser.ParseDouble(v); 
-                    r.Plate_B = d; r.Flange_B = d; },
-                ["tp"] = (r, v) => { 
-                    var d = NumericParser.ParseDouble(v); 
-                    r.Plate_t = d; r.Flange_t = d; },
-                ["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v),
-                ["tbp"] = (r, v) => r.Stiff_tbp = NumericParser.ParseDouble(v),
-                ["tg"] = (r, v) => r.Stiff_tg = NumericParser.ParseDouble(v),
-                ["tf"] = (r, v) => r.Stiff_tf = NumericParser.ParseDouble(v),
-                ["Lh"] = (r, v) => r.Stiff_Lh = NumericParser.ParseDouble(v),
-                ["Hh"] = (r, v) => r.Stiff_Hh = NumericParser.ParseDouble(v),
-                ["tr1"] = (r, v) => r.Stiff_tr1 = NumericParser.ParseDouble(v),
-                ["tr2"] = (r, v) => r.Stiff_tr2 = NumericParser.ParseDouble(v),
-                ["twp"] = (r, v) => r.Stiff_twp = NumericParser.ParseDouble(v),
+                ["Plate_H"] = (r, v) => r.Plate_H = NumericParser.ParseDouble(v),
+                ["Plate_B"] = (r, v) => r.Plate_B = NumericParser.ParseDouble(v),
+                ["Plate_t"] = (r, v) => r.Plate_t = NumericParser.ParseDouble(v)
             };
+
+        /// <summary>
+        /// Карта отображения параметров фланца на свойства Row.
+        /// </summary>
+        private static readonly Dictionary<string, Action<Row, string>> FlangeGeometryColumnMap =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Flange_Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v),
+                ["Flange_H"]  = (r, v) => r.Flange_H = NumericParser.ParseDouble(v),
+                ["Flange_B"]  = (r, v) => r.Flange_B = NumericParser.ParseDouble(v),
+                ["Flange_t"]  = (r, v) => r.Flange_t = NumericParser.ParseDouble(v)
+            };
+
+        /// <summary>
+        /// Карта отображения параметров ребер жесткости на свойства Row.
+        /// </summary>
+        private static readonly Dictionary<string, Action<Row, string>> StiffGeometryColumnMap =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Stiff_tbp"] = (r, v) => r.Stiff_tbp = NumericParser.ParseDouble(v),
+                ["Stiff_tg"]  = (r, v) => r.Stiff_tg = NumericParser.ParseDouble(v),
+                ["Stiff_tf"]  = (r, v) => r.Stiff_tf = NumericParser.ParseDouble(v),
+                ["Stiff_Lh"]  = (r, v) => r.Stiff_Lh = NumericParser.ParseDouble(v),
+                ["Stiff_Hh"]  = (r, v) => r.Stiff_Hh = NumericParser.ParseDouble(v),
+                ["Stiff_tr1"] = (r, v) => r.Stiff_tr1 = NumericParser.ParseDouble(v),
+                ["Stiff_tr2"] = (r, v) => r.Stiff_tr2 = NumericParser.ParseDouble(v),
+                ["Stiff_twp"] = (r, v) => r.Stiff_twp = NumericParser.ParseDouble(v)
+            };
+
+        /// <summary>
+        /// Общая карта отображения колонок листа "geometry" на свойства Row.
+        /// </summary>
+        private static readonly Dictionary<string, Action<Row, string>> GeometryColumnMap = BuildGeometryColumnMap();
 
         /// <summary>
         /// Карта отображения колонок листа "weld" на свойства Row.
@@ -228,15 +258,15 @@ namespace ConvertData.Infrastructure
         private static readonly Dictionary<string, Action<Row, string>> WeldColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["kf1"] = (r, v) => r.kf1 = v,
-                ["kf2"] = (r, v) => r.kf2 = v,
-                ["kf3"] = (r, v) => r.kf3 = v,
-                ["kf4"] = (r, v) => r.kf4 = v,
-                ["kf5"] = (r, v) => r.kf5 = v,
-                ["kf6"] = (r, v) => r.kf6 = v,
-                ["kf7"] = (r, v) => r.kf7 = v,
-                ["kf8"] = (r, v) => r.kf8 = v,
-                ["kf9"] = (r, v) => r.kf9 = v,
+                ["kf1"]  = (r, v) => r.kf1 = v,
+                ["kf2"]  = (r, v) => r.kf2 = v,
+                ["kf3"]  = (r, v) => r.kf3 = v,
+                ["kf4"]  = (r, v) => r.kf4 = v,
+                ["kf5"]  = (r, v) => r.kf5 = v,
+                ["kf6"]  = (r, v) => r.kf6 = v,
+                ["kf7"]  = (r, v) => r.kf7 = v,
+                ["kf8"]  = (r, v) => r.kf8 = v,
+                ["kf9"]  = (r, v) => r.kf9 = v,
                 ["kf10"] = (r, v) => r.kf10 = v
             };
 
@@ -244,6 +274,22 @@ namespace ConvertData.Infrastructure
         /// Карта отображения колонок листа "bolts" на свойства Row (создаётся динамически).
         /// </summary>
         private static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = BuildBoltsColumnMap();
+
+        private static Dictionary<string, Action<Row, string>> BuildGeometryColumnMap()
+        {
+            var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var pair in PlateGeometryColumnMap)
+                map[pair.Key] = pair.Value;
+
+            foreach (var pair in FlangeGeometryColumnMap)
+                map[pair.Key] = pair.Value;
+
+            foreach (var pair in StiffGeometryColumnMap)
+                map[pair.Key] = pair.Value;
+
+            return map;
+        }
 
         /// <summary>
         /// Создаёт карту отображения колонок листа "bolts" на свойства Row.
@@ -270,13 +316,13 @@ namespace ConvertData.Infrastructure
                 },
                 ["e1"] = (r, v) => r.e1 = NumericParser.ParseInt(v),
                 ["p1"] = (r, v) => r.p1 = NumericParser.ParseInt(v),
-                ["p2"] = (r, v) => r.p2= NumericParser.ParseInt(v),
-                ["p3"] = (r, v) => r.p3= NumericParser.ParseInt(v),
-                ["p4"] = (r, v) => r.p4= NumericParser.ParseInt(v),
-                ["p5"] = (r, v) => r.p5= NumericParser.ParseInt(v),
-                ["p6"] = (r, v) => r.p6= NumericParser.ParseInt(v),
-                ["p7"] = (r, v) => r.p7= NumericParser.ParseInt(v),
-                ["p8"] = (r, v) => r.p8= NumericParser.ParseInt(v),
+                ["p2"] = (r, v) => r.p2 = NumericParser.ParseInt(v),
+                ["p3"] = (r, v) => r.p3 = NumericParser.ParseInt(v),
+                ["p4"] = (r, v) => r.p4 = NumericParser.ParseInt(v),
+                ["p5"] = (r, v) => r.p5 = NumericParser.ParseInt(v),
+                ["p6"] = (r, v) => r.p6 = NumericParser.ParseInt(v),
+                ["p7"] = (r, v) => r.p7 = NumericParser.ParseInt(v),
+                ["p8"] = (r, v) => r.p8 = NumericParser.ParseInt(v),
                 ["p9"] = (r, v) => r.p9 = NumericParser.ParseInt(v),
                 ["p10"] = (r, v) => r.p10 = NumericParser.ParseInt(v),
                 ["Марка опорного столика"] = (r, v) => r.TableBrand = v,

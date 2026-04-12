@@ -1,5 +1,7 @@
 using ConvertData.Domain;
 using ConvertData.Infrastructure.Parsing;
+using System.Reflection.PortableExecutable;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ConvertData.Infrastructure;
 
@@ -42,6 +44,20 @@ internal static class RowMapper
     /// <param name="delta">Коэффициент δ.</param>
     /// <param name="epsilon">Коэффициент ε.</param>
     /// <param name="lambda">Коэффициент λ.</param>
+    /// <param name="lws_base">Расстояние между точками крепления.</param>
+    /// <param name="lp_base">Расстояние между точками крепления.</param>
+    /// <param name="ls_base">Расстояние между точками крепления.</param>
+    /// <param name="tws_base">Толщина пластины для базы.</param>
+    /// <param name="d_ws_base"></param>
+    /// <param name="d_p_base"></param>
+    /// <param name="xh_base">Расстояние</param>
+    /// <param name="k_fws_base">Сварка для базы.</param>
+    /// <param name="nh_base_var1">Вариант.</param>
+    /// <param name="nh_base_var2">Вариант</param>
+    /// <param name= "anchor_var_1">Вариант анкера.</param>
+    /// <param name= "anchor_var_2">Вариант анкера.</param>
+    /// <param name= "anchor_var_3">Вариант анкера.</param>
+    /// <param name= "anchor_var_4">Вариант анкера.</param>
     /// <returns>Объект Row с заполненными свойствами.</returns>
     public static Row MapMainRow(
         string name,
@@ -73,14 +89,31 @@ internal static class RowMapper
         string gamma,
         string delta,
         string epsilon,
-        string lambda)
+        string lambda,
+        string f_base,
+        string lws_base,
+        string lp_base,
+        string ls_base,
+        string tws_base,
+        string d_ws_base,
+        string d_p_base,
+        string xh_base,
+        string k_fws_base,
+        string nh_base_var1,
+        string nh_base_var2,
+        string anchor_var_1,
+        string anchor_var_2,
+        string anchor_var_3,
+        string anchor_var_4
+
+        )
     {
         return new Row
         {
             Name = name,
             CONNECTION_CODE = code,
             TypeNode = typeNode ?? "",
-            ProfileBeam = profileBeam ?? "",
+            ProfileBeam = profileBeam ?? "",            
             ProfileColumn = profileColumn ?? "",
             Explanations = explanations ?? "",
             variable = NumericParser.ParseInt(variable),
@@ -106,7 +139,22 @@ internal static class RowMapper
             Gamma = NumericParser.ParseDouble(gamma),
             Delta = NumericParser.ParseDouble(delta),
             Epsilon = NumericParser.ParseDouble(epsilon),
-            Lambda = NumericParser.ParseDouble(lambda)
+            Lambda = NumericParser.ParseDouble(lambda),
+            F_base = NumericParser.ParseDouble(f_base),
+            Lws_base = NumericParser.ParseDouble(lws_base),
+            Lp_base = NumericParser.ParseDouble(lp_base),
+            Ls_base = NumericParser.ParseDouble(ls_base),
+            Tws_base = NumericParser.ParseDouble(tws_base),
+            D_ws_base = NumericParser.ParseDouble(d_ws_base),
+            D_p_base = NumericParser.ParseDouble(d_p_base),
+            Xh_base = NumericParser.ParseDouble(xh_base),
+            K_fws_base = k_fws_base,
+            Nh_base_var1 = NumericParser.ParseDouble(nh_base_var1),
+            Nh_base_var2 = NumericParser.ParseDouble(nh_base_var2),
+            Anchor_var_1 = anchor_var_1,
+            Anchor_var_2 = anchor_var_2,
+            Anchor_var_3 = anchor_var_3,
+            Anchor_var_4 = anchor_var_4
         };
     }
 

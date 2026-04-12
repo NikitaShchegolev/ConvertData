@@ -473,4 +473,40 @@ internal sealed class Row
     /// </summary>
     public double Lambda { get; set; }
     #endregion
+
+    //Анкера
+
+    #region Анкера
+    /// <summary> Усилие отрыва </summary>
+    public double F_base { get; set; }
+    /// <summary> Длина стороны шайбы под анкер </summary>
+    public double Lws_base { get; set; }
+    /// <summary> Ширина колодца под упор </summary>
+    public double Lp_base { get; set; }
+    /// <summary> Ширина противосдвигового упора в плоскости наибольшей жесткости</summary>
+    public double Ls_base { get; set; }
+    /// <summary> Толщина шайбы под анкер </summary>
+    public double Tws_base { get; set; }
+    /// <summary> Диаметр отверстия в шайбе под анкер </summary>
+    public double D_ws_base { get; set; }
+    /// <summary> Диаметр отверстия под анкер </summary>
+    public double D_p_base { get; set; }
+    /// <summary> Расстояние между монтажными отверстиями </summary>
+    public double Xh_base { get; set; }
+    /// <summary> Катет сварного шва крепления базы </summary>
+    public string K_fws_base { get; set; } = "";
+    /// <summary> Количество отверстий для базы варианта 1</summary>
+    public double Nh_base_var1 { get; set; }
+    /// <summary> Количество отверстий для базы варианта 2</summary>
+    public double Nh_base_var2 { get; set; } 
+    /// <summary> Наимернование соединения вариант 1</summary>
+    public string Anchor_var_1 { get; set; } = "";
+    /// <summary> Наимернование соединения вариант 2</summary>
+    public string Anchor_var_2 { get; set; } = "";
+    /// <summary> Наимернование соединения вариант 3</summary>
+    public string Anchor_var_3 { get; set; } = "";
+    /// <summary> Наимернование соединения вариант 4</summary>
+    public string Anchor_var_4 { get; set; } = ""; 
+    #endregion
+
 }
