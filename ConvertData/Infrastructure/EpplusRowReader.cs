@@ -331,7 +331,11 @@ namespace ConvertData.Infrastructure
                 ["Марка"] =                  (r, v) => r.TableBrand = v,
                 ["TypeNode"] =               (r, v) => r.TypeNode = v,
                 ["Тип узла"] =               (r, v) => r.TypeNode = v,
-                ["Вид узла"] =               (r, v) => r.TypeNode = v
+                ["Вид узла"] =               (r, v) => r.TypeNode = v,
+                ["Lp_base"] =                (r, v) => r.Lp_base = NumericParser.ParseDouble(v),
+                ["Ls_base"] =                (r, v) => r.Ls_base = NumericParser.ParseDouble(v),
+                ["Lws"] =                    (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
+                ["tws"] =                    (r, v) => r.Tws_base = NumericParser.ParseDouble(v)
             };
             return map;
         }

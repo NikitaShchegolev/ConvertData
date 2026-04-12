@@ -226,7 +226,6 @@ namespace ConvertData.Infrastructure
         private static void WriteAnchor(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Anchor\": {");
-            sb.AppendLine("        \"Anchor_F_base\": " +       Dbl(r.F_base) + ",");
             sb.AppendLine("        \"Anchor_Lws\": " +          Dbl(r.Lws_base) + ",");
             sb.AppendLine("        \"Anchor_Lp_base\": " +      Dbl(r.Lp_base) + ",");
             sb.AppendLine("        \"Anchor_Ls_base\": " +      Dbl(r.Ls_base) + ",");
@@ -236,6 +235,7 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Anchor_xh_base\": " +      Dbl(r.Xh_base) + ",");
             sb.AppendLine("        \"Anchor_nh_base_var1\": " + Dbl(r.Nh_base_var1) + ",");
             sb.AppendLine("        \"Anchor_nh_base_var2\": " + Dbl(r.Nh_base_var2) + ",");
+            sb.AppendLine("        \"Anchor_k_fws_base\": " +   WeldValue(r.K_fws_base) + ",");
             sb.AppendLine("        \"Anchor_anchor_var_1\": \"" + JsonEscape(r.Anchor_var_1) + "\",");
             sb.AppendLine("        \"Anchor_anchor_var_2\": \"" + JsonEscape(r.Anchor_var_2) + "\",");
             sb.AppendLine("        \"Anchor_anchor_var_3\": \"" + JsonEscape(r.Anchor_var_3) + "\",");
@@ -323,7 +323,8 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("      \"T\": " + r.T + ",");
             sb.AppendLine("      \"Qy\": " + r.Qy + ",");
             sb.AppendLine("      \"Qz\": " + r.Qz + ",");
-            sb.AppendLine("      \"Qx\": " + r.Qx);
+            sb.AppendLine("      \"Qx\": " + r.Qx + ",");
+            sb.AppendLine("      \"Anchor_F_base\": " + Dbl(r.F_base));
             sb.AppendLine("    },");
         }
         /// <summary>
