@@ -122,7 +122,6 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdD_ws_base >= 0 ?      startCol + map.IdD_ws_base : null),
                         GetCell(ws, r, map.IdD_p_base >= 0 ?       startCol + map.IdD_p_base : null),
                         GetCell(ws, r, map.IdXh_base >= 0 ?        startCol + map.IdXh_base : null),
-                        GetCell(ws, r, map.IdK_fws_base >= 0 ?     startCol + map.IdK_fws_base : null),
                         GetCell(ws, r, map.IdNh_base_var1 >= 0 ?   startCol + map.IdNh_base_var1 : null),
                         GetCell(ws, r, map.IdNh_base_var2 >= 0 ?   startCol + map.IdNh_base_var2 : null),
                         GetCell(ws, r, map.IdAnchor_var_1 >= 0 ?   startCol + map.IdAnchor_var_1 : null),
@@ -267,7 +266,8 @@ namespace ConvertData.Infrastructure
                 ["kf7"]  = (r, v) => r.kf7 = v,
                 ["kf8"]  = (r, v) => r.kf8 = v,
                 ["kf9"]  = (r, v) => r.kf9 = v,
-                ["kf10"] = (r, v) => r.kf10 = v
+                ["kf10"] = (r, v) => r.kf10 = v,
+                ["kfws"] = (r, v) => r.K_fws_base = v
             };
 
         /// <summary>
@@ -314,24 +314,24 @@ namespace ConvertData.Infrastructure
                     r.CoordinatesBolts[1].X = NumericParser.ParseInt(v);
                     if (r.N_Rows < 2) r.N_Rows = 2;
                 },
-                ["e1"] = (r, v) => r.e1 = NumericParser.ParseInt(v),
-                ["p1"] = (r, v) => r.p1 = NumericParser.ParseInt(v),
-                ["p2"] = (r, v) => r.p2 = NumericParser.ParseInt(v),
-                ["p3"] = (r, v) => r.p3 = NumericParser.ParseInt(v),
-                ["p4"] = (r, v) => r.p4 = NumericParser.ParseInt(v),
-                ["p5"] = (r, v) => r.p5 = NumericParser.ParseInt(v),
-                ["p6"] = (r, v) => r.p6 = NumericParser.ParseInt(v),
-                ["p7"] = (r, v) => r.p7 = NumericParser.ParseInt(v),
-                ["p8"] = (r, v) => r.p8 = NumericParser.ParseInt(v),
-                ["p9"] = (r, v) => r.p9 = NumericParser.ParseInt(v),
-                ["p10"] = (r, v) => r.p10 = NumericParser.ParseInt(v),
+                ["e1"] =                     (r, v) => r.e1 = NumericParser.ParseInt(v),
+                ["p1"] =                     (r, v) => r.p1 = NumericParser.ParseInt(v),
+                ["p2"] =                     (r, v) => r.p2 = NumericParser.ParseInt(v),
+                ["p3"] =                     (r, v) => r.p3 = NumericParser.ParseInt(v),
+                ["p4"] =                     (r, v) => r.p4 = NumericParser.ParseInt(v),
+                ["p5"] =                     (r, v) => r.p5 = NumericParser.ParseInt(v),
+                ["p6"] =                     (r, v) => r.p6 = NumericParser.ParseInt(v),
+                ["p7"] =                     (r, v) => r.p7 = NumericParser.ParseInt(v),
+                ["p8"] =                     (r, v) => r.p8 = NumericParser.ParseInt(v),
+                ["p9"] =                     (r, v) => r.p9 = NumericParser.ParseInt(v),
+                ["p10"] =                    (r, v) => r.p10 = NumericParser.ParseInt(v),
                 ["Марка опорного столика"] = (r, v) => r.TableBrand = v,
-                ["Маркаопорногостолика"] = (r, v) => r.TableBrand = v,
-                ["марка"] = (r, v) => r.TableBrand = v,
-                ["Марка"] = (r, v) => r.TableBrand = v,
-                ["TypeNode"] = (r, v) => r.TypeNode = v,
-                ["Тип узла"] = (r, v) => r.TypeNode = v,
-                ["Вид узла"] = (r, v) => r.TypeNode = v
+                ["Маркаопорногостолика"] =   (r, v) => r.TableBrand = v,
+                ["марка"] =                  (r, v) => r.TableBrand = v,
+                ["Марка"] =                  (r, v) => r.TableBrand = v,
+                ["TypeNode"] =               (r, v) => r.TypeNode = v,
+                ["Тип узла"] =               (r, v) => r.TypeNode = v,
+                ["Вид узла"] =               (r, v) => r.TypeNode = v
             };
             return map;
         }

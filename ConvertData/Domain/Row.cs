@@ -382,6 +382,10 @@ internal sealed class Row
     /// Минимальный катет сварного шва
     /// </summary>
     public string kf10 { get; set; } = "";
+    /// <summary>
+    /// Минимальный катет сварного шва
+    /// </summary>
+    public string K_fws_base { get; set; } = "";
     #endregion
 
     //Характеристики материала
@@ -494,7 +498,6 @@ internal sealed class Row
     /// <summary> Расстояние между монтажными отверстиями </summary>
     public double Xh_base { get; set; }
     /// <summary> Катет сварного шва крепления базы </summary>
-    public string K_fws_base { get; set; } = "";
     /// <summary> Количество отверстий для базы варианта 1</summary>
     public double Nh_base_var1 { get; set; }
     /// <summary> Количество отверстий для базы варианта 2</summary>
