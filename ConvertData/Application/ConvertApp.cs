@@ -21,6 +21,21 @@ namespace ConvertData.Application
 
         public void Run(string[] args)
         {
+            Console.WriteLine("=== Интерактивный выбор блоков для выполнения ===");
+            Console.WriteLine("Выберите номера блоков через запятую (например, 1,2,3) или введите 'all' для всех:");
+            Console.WriteLine("  1. CreateJson - создание JSON из Excel");
+            Console.WriteLine("  2. ApplyProfiles - применение справочника профилей");
+            Console.WriteLine("  3. MergeAndEnrich - объединение и обогащение");
+            Console.WriteLine("  4. ExportProfiles - экспорт профилей и кодов");
+            Console.WriteLine("  5. Deduplication - дедупликация");
+            Console.WriteLine("  6. CopyToData - копирование в Data проект");
+            Console.WriteLine("  7. AnchorExport - экспорт анкеров из Anchor.xlsx");
+            Console.WriteLine("  8. SteelExport - экспорт анкеров из MarkSteel.xlsx");
+            Console.WriteLine("  9. Conversion - блок конвертации (1+2)");
+            Console.WriteLine("  10. Processing - блок обработки (3+4+5+6)");
+            Console.WriteLine("  11. Anchors - блок анкеров (7+8)");
+            Console.WriteLine("  12. All - все блоки");
+            Console.WriteLine();            
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _licenseConfigurator.Configure();
 
@@ -40,16 +55,61 @@ namespace ConvertData.Application
             var exceSteelDirOut = Path.Combine(projectDir, "EXCEL_MARK_STEEL_OUT");
             Directory.CreateDirectory(jsonOutDir);
 
-            var blocks = RunModeParser.GetBlocks(args);
-            Console.WriteLine($"Выполняемые блоки: {blocks}");
+            // Если есть аргументы командной строки, выполняем один раз и выходим
+            if (args.Length > 0 &&
+                !args.Contains("--interactive", StringComparer.OrdinalIgnoreCase) &&
+                !args.Contains("-i", StringComparer.OrdinalIgnoreCase))
+            {
+                // Режим командной строки: выполняем один раз
+                var blocks = RunModeParser.GetBlocks(args);
+                Console.WriteLine($"Выполняемые блоки: {blocks}");
+                ExecuteBlocks(blocks, projectDir, excelDir, excelProfileDir, jsonOutDir, jsonAllDir,
+                    excelProfileOutDir, excelAnchorDir, excelAnchorOutDir, exceSteelDir, exceSteelDirOut);
+                Console.WriteLine();
+                Console.WriteLine("Все указанные блоки завершены.");
+                Console.WriteLine("Нажмите любую клавишу для выхода...");
+                Console.ReadKey();
+                return;
+            }
 
+            // Интерактивный режим с бесконечным циклом
+            Console.WriteLine("=== Интерактивный режим ConvertData ===");
+            Console.WriteLine("Введите 'exit' для выхода из программы.");
+            Console.WriteLine();
+
+            while (true)
+            {
+                var blocks = InteractiveBlockSelection();
+                if (blocks == Block.None)
+                {
+                    Console.WriteLine("Не выбрано ни одного блока. Введите 'exit' для выхода или нажмите Enter для продолжения.");
+                    var input = Console.ReadLine();
+                    if (input?.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase) == true)
+                        break;
+                    continue;
+                }
+
+                ExecuteBlocks(blocks, projectDir, excelDir, excelProfileDir, jsonOutDir, jsonAllDir,
+                    excelProfileOutDir, excelAnchorDir, excelAnchorOutDir, exceSteelDir, exceSteelDirOut);
+
+                Console.WriteLine();
+                // После выполнения блоков сразу возвращаемся к выбору
+            }
+
+            Console.WriteLine("Программа завершена.");
+        }
+
+        private void ExecuteBlocks(Block blocks, string projectDir, string excelDir, string excelProfileDir,
+            string jsonOutDir, string jsonAllDir, string excelProfileOutDir, string excelAnchorDir,
+            string excelAnchorOutDir, string exceSteelDir, string exceSteelDirOut)
+        {
             // Блок 1: CreateJson - создание JSON из Excel
             if (blocks.HasFlag(Block.CreateJson))
             {
                 Console.WriteLine("=== Блок 1: Создание JSON из Excel (без профилей) ===");
                 ClearJsonOut(jsonOutDir);
 
-                foreach (var input in GetInputFiles(RunModeParser.GetInputArgsForCreateJson(args), excelDir))
+                foreach (var input in GetInputFiles(RunModeParser.GetInputArgsForCreateJson(Array.Empty<string>()), excelDir))
                     ConvertOne(input, jsonOutDir);
 
                 Console.WriteLine("Блок 1 завершён.");
@@ -198,10 +258,60 @@ namespace ConvertData.Application
                     Path.Combine(exceSteelDirOut, "MarkSteel.json"));
                 Console.WriteLine("Блок 8 завершён.");
             }
+        }
 
-            Console.WriteLine();
-            Console.WriteLine("Все указанные блоки завершены.");
-            Console.ReadKey();
+        private Block InteractiveBlockSelection()
+        {
+            Console.Write("Ваш выбор: ");
+
+            var input = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(input))
+                return Block.None;
+
+            if (input.Equals("all", StringComparison.OrdinalIgnoreCase))
+                return Block.All;
+
+            var blocks = Block.None;
+            var parts = input.Split(',', ';', ' ')
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrEmpty(s));
+
+            foreach (var part in parts)
+            {
+                if (int.TryParse(part, out int number))
+                {
+                    var block = NumberToBlock(number);
+                    if (block != Block.None)
+                        blocks |= block;
+                }
+                else if (Enum.TryParse<Block>(part, true, out var namedBlock))
+                {
+                    blocks |= namedBlock;
+                }
+            }
+
+            Console.WriteLine($"Выбраны блоки: {blocks}");
+            return blocks;
+        }
+
+        private Block NumberToBlock(int number)
+        {
+            return number switch
+            {
+                1 => Block.CreateJson,
+                2 => Block.ApplyProfiles,
+                3 => Block.MergeAndEnrich,
+                4 => Block.ExportProfiles,
+                5 => Block.Deduplication,
+                6 => Block.CopyToData,
+                7 => Block.AnchorExport,
+                8 => Block.SteelExport,
+                9 => Block.Conversion,
+                10 => Block.Processing,
+                11 => Block.Anchors,
+                12 => Block.All,
+                _ => Block.None
+            };
         }
 
         private static void ClearJsonOut(string jsonOutDir)
