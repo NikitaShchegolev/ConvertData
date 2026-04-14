@@ -17,6 +17,7 @@ namespace ConvertData.Application
         private readonly ProfileLookupLoader _profileLookupLoader = new();
         private readonly JsonProfilePatcher _profilePatcher = new();
         private readonly ProfileExcelToJsonExporter _profileExcelExporter = new();
+        private readonly SteelExcelToJsonExporter _anchorExcelExporter = new();
 
         public void Run(string[] args)
         {
@@ -33,11 +34,17 @@ namespace ConvertData.Application
             var jsonOutDir = Path.Combine(projectDir, "JSON_OUT");
             var jsonAllDir = Path.Combine(projectDir, "JSON_All");
             var excelProfileOutDir = Path.Combine(projectDir, "EXCEL_Profile_OUT");
+            var excelAnchorDir = Path.Combine(projectDir, "EXCEL_Anchor");
+            var excelAnchorOutDir = Path.Combine(projectDir, "EXCEL_Anchor_OUT");
+            var exceSteelDir = Path.Combine(projectDir, "EXCEL_MARK_STEEL");
+            var exceSteelDirOut = Path.Combine(projectDir, "EXCEL_MARK_STEEL_OUT");
             Directory.CreateDirectory(jsonOutDir);
 
-            var mode = RunModeParser.GetMode(args);
+            var stages = RunModeParser.GetStages(args);
+            Console.WriteLine($"Выполняемые этапы: {stages}");
 
-            if (mode == RunMode.All || mode == RunMode.CreateJson)
+            // Этап 1: Создание JSON из Excel (без профилей)
+            if (stages.HasFlag(Stage.CreateJsonFromExcel))
             {
                 Console.WriteLine("=== Этап 1: Создание JSON из Excel (без профилей) ===");
                 ClearJsonOut(jsonOutDir);
@@ -45,10 +52,20 @@ namespace ConvertData.Application
                 foreach (var input in GetInputFiles(RunModeParser.GetInputArgsForCreateJson(args), excelDir))
                     ConvertOne(input, jsonOutDir);
 
-                Console.WriteLine("Этап 1 завершён.");                
+                Console.WriteLine("Этап 1 завершён.");
+            }
+            else if (stages.HasFlag(Stage.ApplyProfiles) || stages.HasFlag(Stage.MergeJson))
+            {
+                // Если пропущен этап 1, но нужны последующие, проверяем наличие JSON файлов
+                if (!Directory.Exists(jsonOutDir) || !Directory.EnumerateFiles(jsonOutDir, "*.json").Any())
+                {
+                    Console.WriteLine("ВНИМАНИЕ: Этап 1 пропущен, но в папке JSON_OUT нет JSON файлов.");
+                    Console.WriteLine("Для выполнения последующих этапов нужны JSON файлы.");
+                }
             }
 
-            if (mode == RunMode.All || mode == RunMode.ApplyProfiles)
+            // Этап 2: Применение справочника профилей
+            if (stages.HasFlag(Stage.ApplyProfiles))
             {
                 Console.WriteLine();
                 Console.WriteLine("=== Этап 2: Применение справочника профилей (Beam_H, Beam_B, Beam_s, Beam_t) ===");
@@ -63,83 +80,147 @@ namespace ConvertData.Application
                 Console.WriteLine("Шаг 1.5 завершён.");
             }
 
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 3: Объединение всех JSON в один файл ===");
-            var merged = new JsonMerger().MergeAll(jsonOutDir);
-            Console.WriteLine("Этап 3 завершён.");
+            // Этап 3: Объединение всех JSON в один файл
+            if (stages.HasFlag(Stage.MergeJson))
+            {
+                Console.WriteLine();
+                Console.WriteLine("=== Этап 3: Объединение всех JSON в один файл ===");
+                var merged = new JsonMerger().MergeAll(jsonOutDir);
+                Console.WriteLine("Этап 3 завершён.");
+
+                // Этап 4: Обогащение неполных записей
+                if (stages.HasFlag(Stage.EnrichRecords))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 3.5: Обогащение неполных записей (Geometry, Bolts, Welds) ===");
+                    var enrichedCount = new JsonRecordEnricher().Enrich(merged);
+                    Console.WriteLine($"Этап 3.5 завершён. Обогащено записей: {enrichedCount}");
+                }
+
+                var allJsonPath = Path.Combine(jsonAllDir, "all.json");
+                JsonMerger.SaveToFile(merged, allJsonPath);
+                Console.WriteLine($"  Записано {merged.Count} записей => {allJsonPath}");
+
+                var allNotDuplicateJsonPath = Path.Combine(jsonAllDir, "all_NotDuplicate.json");
+
+                // Этап 5: Создание списков profile.txt и CONNECTION_CODE.txt
+                if (stages.HasFlag(Stage.ExportProfileAndConnectionCodeTxt))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 4: Создание списков profile.txt и CONNECTION_CODE.txt ===");
+                    new ProfileAndConnectionCodeExporter().Export(allJsonPath, excelProfileOutDir);
+                    Console.WriteLine("Этап 4 завершён.");
+                }
+
+                // Этап 6: Создание ProfileBeam.json и CONNECTION_CODE.json
+                if (stages.HasFlag(Stage.ExportProfileAndConnectionCodeJson))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 5: Создание ProfileBeam.json и CONNECTION_CODE.json ===");
+                    new TextListToJsonExporter().ExportProfileJson(
+                        Path.Combine(excelProfileOutDir, "profile.txt"),
+                        Path.Combine(excelProfileOutDir, "ProfileBeam.json"));
+                    new TextListToJsonExporter().ExportConnectionCodeJson(
+                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE.txt"),
+                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE.json"));
+                    Console.WriteLine("Этап 5 завершён.");
+                }
+
+                // Этап 7: Проверка all.json на дубликаты CONNECTION_CODE
+                if (stages.HasFlag(Stage.CheckDuplicates))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 6: Проверка all.json на дубликаты CONNECTION_CODE ===");
+                    var duplicates = new ConnectionCodeDuplicateChecker().FindDuplicates(
+                        allJsonPath,
+                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_duplicates.txt"));
+                    Console.WriteLine($"Этап 6 завершён. Найдено дубликатов: {duplicates.Count}");
+                }
+
+                // Этап 8: Создание all_NotDuplicate.json с заменой дубликатов
+                if (stages.HasFlag(Stage.CreateDeduplicatedJson))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 7: Создание all_NotDuplicate.json с заменой дубликатов ===");
+                    var changedCodes = new ConnectionCodeDeduplicator().CreateDeduplicatedJson(
+                        allJsonPath,
+                        allNotDuplicateJsonPath,
+                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_replacements.txt"));
+                    Console.WriteLine($"Этап 7 завершён. Заменено CONNECTION_CODE: {changedCodes}");
+                }
+
+                // Этап 9: Создание CONNECTION_CODE_new.json и CONNECTION_CODE_new.txt
+                if (stages.HasFlag(Stage.ExportNewConnectionCodes))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 8: Создание CONNECTION_CODE_new.json и CONNECTION_CODE_new.txt из all_NotDuplicate.json ===");
+                    var exporter = new ProfileAndConnectionCodeExporter();
+                    exporter.ExportConnectionCodesOnly(
+                        allNotDuplicateJsonPath,
+                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.json"));
+                    var remainingDuplicates = exporter.ExportConnectionCodesTxt(
+                        allNotDuplicateJsonPath,
+                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.txt"));
+                    if (remainingDuplicates > 0)
+                        Console.WriteLine($"  ВНИМАНИЕ: в all_NotDuplicate.json осталось дубликатов CONNECTION_CODE: {remainingDuplicates}");
+                    else
+                        Console.WriteLine("  Проверка: дубликатов CONNECTION_CODE нет.");
+                    Console.WriteLine("Этап 8 завершён.");
+                }
+
+                // Этап 10: Создание NameConnections.json
+                if (stages.HasFlag(Stage.ExportNameConnections))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 9: Создание NameConnections.json из all_NotDuplicate.json ===");
+                    new NameConnectionsExporter().Export(
+                        allNotDuplicateJsonPath,
+                        Path.Combine(excelProfileOutDir, "NameConnections.json"));
+                    Console.WriteLine("Этап 9 завершён.");
+                }
+
+                // Этап 11: Копирование all_NotDuplicate.json в ConvertData.Data\JSON\
+                if (stages.HasFlag(Stage.CopyToDataProject))
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("=== Этап 10: Копирование all_NotDuplicate.json в ConvertData.Data\\JSON\\ ===");
+                    var dataJsonDir = Path.Combine(projectDir, "..", "ConvertData.Data", "JSON");
+                    dataJsonDir = Path.GetFullPath(dataJsonDir);
+                    Directory.CreateDirectory(dataJsonDir);
+                    var destPath = Path.Combine(dataJsonDir, "all_NotDuplicate.json");
+                    File.Copy(allNotDuplicateJsonPath, destPath, overwrite: true);
+                    Console.WriteLine($"  Скопировано: {allNotDuplicateJsonPath} -> {destPath}");
+                    Console.WriteLine("Этап 10 завершён.");
+                }
+            }
+
+            // Этап 12: Экспорт анкеров из Anchor.xlsx в JSON
+            if (stages.HasFlag(Stage.ExportAnchors))
+            {
+                Console.WriteLine();
+                Console.WriteLine("=== Этап 11: Экспорт анкеров из Anchor.xlsx в JSON ===");
+                Directory.CreateDirectory(excelAnchorOutDir);
+                _anchorExcelExporter.Export(
+                    excelAnchorDir,
+                    Path.Combine(excelAnchorOutDir, "Anchor.json"));
+                Console.WriteLine("Этап 11 завершён.");
+            }
+
+            // Этап 13: Экспорт анкеров из MarkSteel.xlsx в JSON
+            if (stages.HasFlag(Stage.ExportMarkSteel))
+            {
+                Console.WriteLine();
+                Console.WriteLine("=== Этап 12: Экспорт анкеров из MarkSteel.xlsx в JSON ===");
+                Directory.CreateDirectory(exceSteelDirOut);
+                _anchorExcelExporter.Export(
+                    exceSteelDir,
+                    Path.Combine(exceSteelDirOut, "MarkSteel.json"));
+                Console.WriteLine("Этап 12 завершён.");
+            }
 
             Console.WriteLine();
-            Console.WriteLine("=== Этап 3.5: Обогащение неполных записей (Geometry, Bolts, Welds) ===");
-            var enrichedCount = new JsonRecordEnricher().Enrich(merged);
-            Console.WriteLine($"Этап 3.5 завершён. Обогащено записей: {enrichedCount}");
-
-            var allJsonPath = Path.Combine(jsonAllDir, "all.json");
-            JsonMerger.SaveToFile(merged, allJsonPath);
-            Console.WriteLine($"  Записано {merged.Count} записей => {allJsonPath}");
-
-            var allNotDuplicateJsonPath = Path.Combine(jsonAllDir, "all_NotDuplicate.json");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 4: Создание списков profile.txt и CONNECTION_CODE.txt ===");
-            new ProfileAndConnectionCodeExporter().Export(allJsonPath, excelProfileOutDir);
-            Console.WriteLine("Этап 4 завершён.");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 5: Создание ProfileBeam.json и CONNECTION_CODE.json ===");
-            new TextListToJsonExporter().ExportProfileJson(
-                Path.Combine(excelProfileOutDir, "profile.txt"),
-                Path.Combine(excelProfileOutDir, "ProfileBeam.json"));
-            new TextListToJsonExporter().ExportConnectionCodeJson(
-                Path.Combine(excelProfileOutDir, "CONNECTION_CODE.txt"),
-                Path.Combine(excelProfileOutDir, "CONNECTION_CODE.json"));
-            Console.WriteLine("Этап 5 завершён.");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 6: Проверка all.json на дубликаты CONNECTION_CODE ===");
-            var duplicates = new ConnectionCodeDuplicateChecker().FindDuplicates(
-                allJsonPath,
-                Path.Combine(excelProfileOutDir, "CONNECTION_CODE_duplicates.txt"));
-            Console.WriteLine($"Этап 6 завершён. Найдено дубликатов: {duplicates.Count}");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 7: Создание all_NotDuplicate.json с заменой дубликатов ===");
-            var changedCodes = new ConnectionCodeDeduplicator().CreateDeduplicatedJson(
-                allJsonPath,
-                allNotDuplicateJsonPath,
-                Path.Combine(excelProfileOutDir, "CONNECTION_CODE_replacements.txt"));
-            Console.WriteLine($"Этап 7 завершён. Заменено CONNECTION_CODE: {changedCodes}");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 8: Создание CONNECTION_CODE_new.json и CONNECTION_CODE_new.txt из all_NotDuplicate.json ===");
-            var exporter = new ProfileAndConnectionCodeExporter();
-            exporter.ExportConnectionCodesOnly(
-                allNotDuplicateJsonPath,
-                Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.json"));
-            var remainingDuplicates = exporter.ExportConnectionCodesTxt(
-                allNotDuplicateJsonPath,
-                Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.txt"));
-            if (remainingDuplicates > 0)
-                Console.WriteLine($"  ВНИМАНИЕ: в all_NotDuplicate.json осталось дубликатов CONNECTION_CODE: {remainingDuplicates}");
-            else
-                Console.WriteLine("  Проверка: дубликатов CONNECTION_CODE нет.");
-            Console.WriteLine("Этап 8 завершён.");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 9: Создание NameConnections.json из all_NotDuplicate.json ===");
-            new NameConnectionsExporter().Export(
-                allNotDuplicateJsonPath,
-                Path.Combine(excelProfileOutDir, "NameConnections.json"));
-            Console.WriteLine("Этап 9 завершён.");
-
-            Console.WriteLine();
-            Console.WriteLine("=== Этап 10: Копирование all_NotDuplicate.json в ConvertData.Data\\JSON\\ ===");
-            var dataJsonDir = Path.Combine(projectDir, "..", "ConvertData.Data", "JSON");
-            dataJsonDir = Path.GetFullPath(dataJsonDir);
-            Directory.CreateDirectory(dataJsonDir);
-            var destPath = Path.Combine(dataJsonDir, "all_NotDuplicate.json");
-            File.Copy(allNotDuplicateJsonPath, destPath, overwrite: true);
-            Console.WriteLine($"  Скопировано: {allNotDuplicateJsonPath} -> {destPath}");
-            Console.WriteLine("Этап 10 завершён.");
+            Console.WriteLine("Все указанные этапы завершены.");
+            Console.ReadKey();
         }
 
         private static void ClearJsonOut(string jsonOutDir)
