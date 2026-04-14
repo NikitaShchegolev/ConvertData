@@ -17,7 +17,8 @@ namespace ConvertData.Application
         private readonly ProfileLookupLoader _profileLookupLoader = new();
         private readonly JsonProfilePatcher _profilePatcher = new();
         private readonly ProfileExcelToJsonExporter _profileExcelExporter = new();
-        private readonly SteelExcelToJsonExporter _anchorExcelExporter = new();
+        private readonly AnchorExcelToJsonExporter _anchorExcelExporter = new();
+        private readonly SteelExcelToJsonExporter _steelExcelExporter = new();
 
         public void Run(string[] args)
         {
