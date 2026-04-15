@@ -143,7 +143,7 @@ internal sealed class BoltsExporter
                     // Создаём запись с корневыми полями в нужном порядке
                     var rootFields = new Dictionary<string, object>
                     {
-                        ["CONNECTION_GUID"] = Guid.NewGuid().ToString("B"),
+                        ["CONNECTION_GUID"] = Guid.NewGuid().ToString("D"),
                         ["Category"] = category
                     };
                     entry = new Dictionary<string, object>();
