@@ -52,6 +52,17 @@ internal static class RunModeParser
             return allBlocks & ~skipBlocks;
         }
 
+        // Если есть аргументы, не являющиеся параметрами (не начинаются с --), попробуем интерпретировать как номера блоков
+        var nonParamArgs = args.Where(a => !a.StartsWith("--")).ToArray();
+        if (nonParamArgs.Length > 0)
+        {
+            // Объединяем аргументы через запятую (например, "12" или "7,8")
+            var combined = string.Join(",", nonParamArgs);
+            var blocks = ParseBlocks(combined);
+            if (blocks != Block.None)
+                return blocks;
+        }
+
         // Обратная совместимость: используем старый режим
         var mode = GetMode(args);
         return mode switch
@@ -98,15 +109,25 @@ internal static class RunModeParser
     }
 
     /// <summary>
-    /// Преобразует номер блока (1-3) в значение Block.
+    /// Преобразует номер блока (1-13) в значение Block.
     /// </summary>
     private static Block BlockFromNumber(int number)
     {
         return number switch
         {
-            1 => Block.Conversion,
-            2 => Block.Processing,
-            3 => Block.Anchors,
+            1 => Block.CreateJson,
+            2 => Block.ApplyProfiles,
+            3 => Block.MergeAndEnrich,
+            4 => Block.ExportProfiles,
+            5 => Block.Deduplication,
+            6 => Block.CopyToData,
+            7 => Block.AnchorExport,
+            8 => Block.SteelExport,
+            9 => Block.Conversion,
+            10 => Block.Processing,
+            11 => Block.Anchors,
+            12 => Block.Bolts,
+            13 => Block.All,
             _ => Block.None
         };
     }

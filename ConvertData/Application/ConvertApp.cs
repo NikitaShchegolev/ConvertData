@@ -326,8 +326,8 @@ namespace ConvertData.Application
                 9 => Block.Conversion,
                 10 => Block.Processing,
                 11 => Block.Anchors,
-                12 => Block.Anchors,
-                13 => Block.Bolts,
+                12 => Block.Bolts,
+                13 => Block.All,
                 _ => Block.None
             };
         }

@@ -95,5 +95,5 @@ internal enum Block
     /// <summary>
     /// Все блоки (полный цикл обработки).
     /// </summary>
-    All = Conversion | Processing | Anchors
+    All = Conversion | Processing | Anchors | Bolts
 }
