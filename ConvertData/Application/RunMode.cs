@@ -73,7 +73,7 @@ internal enum Block
     /// <summary>
     /// Экспорт болтов из TableBoltsSP43.xlsx в JSON - этап 13.
     /// </summary>
-    BoltsExport = 129,
+    BoltsExport = 256,
     
     /// <summary>
     /// Все блоки конвертации (CreateJson + ApplyProfiles).
