@@ -47,7 +47,9 @@ namespace ConvertData.Infrastructure
         private static List<Row> ReadXlsxWithEpplus(string path)
         {
             using var package = new ExcelPackage(new FileInfo(path));
-            var ws = package.Workbook.Worksheets.FirstOrDefault();
+            var ws = package.Workbook.Worksheets
+                .FirstOrDefault(x => string.Equals((x.Name ?? "").Trim(), "data", StringComparison.OrdinalIgnoreCase))
+                ?? package.Workbook.Worksheets.FirstOrDefault();
             if (ws == null || ws.Dimension == null)
                 return new List<Row>();
 
@@ -267,7 +269,8 @@ namespace ConvertData.Infrastructure
                 ["kf8"]  = (r, v) => r.kf8 = v,
                 ["kf9"]  = (r, v) => r.kf9 = v,
                 ["kf10"] = (r, v) => r.kf10 = v,
-                ["kfws"] = (r, v) => r.K_fws_base = v
+                ["kfws"] = (r, v) => r.K_fws_base = v,
+                ["Anchor_k_fws_base"] = (r, v) => r.K_fws_base = v
             };
 
         /// <summary>
@@ -287,6 +290,17 @@ namespace ConvertData.Infrastructure
 
             foreach (var pair in StiffGeometryColumnMap)
                 map[pair.Key] = pair.Value;
+
+            map["Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
+            map["Anchor_Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
+            map["Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v);
+            map["Anchor_Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v);
+            map["Lws"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
+            map["Lws_base"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
+            map["Anchor_Lws"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
+            map["tws"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
+            map["Tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
+            map["Anchor_tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
 
             return map;
         }
@@ -333,9 +347,48 @@ namespace ConvertData.Infrastructure
                 ["Тип узла"] =               (r, v) => r.TypeNode = v,
                 ["Вид узла"] =               (r, v) => r.TypeNode = v,
                 ["Lp_base"] =                (r, v) => r.Lp_base = NumericParser.ParseDouble(v),
+                ["Anchor_Lp_base"] =         (r, v) => r.Lp_base = NumericParser.ParseDouble(v),
                 ["Ls_base"] =                (r, v) => r.Ls_base = NumericParser.ParseDouble(v),
+                ["Anchor_Ls_base"] =         (r, v) => r.Ls_base = NumericParser.ParseDouble(v),
                 ["Lws"] =                    (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
-                ["tws"] =                    (r, v) => r.Tws_base = NumericParser.ParseDouble(v)
+                ["Lws_base"] =               (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
+                ["Anchor_Lws"] =             (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
+                ["tws"] =                    (r, v) => r.Tws_base = NumericParser.ParseDouble(v),
+                ["Tws_base"] =               (r, v) => r.Tws_base = NumericParser.ParseDouble(v),
+                ["Anchor_tws_base"] =        (r, v) => r.Tws_base = NumericParser.ParseDouble(v),
+                ["Dws"] =                    (r, v) => r.D_ws_base = NumericParser.ParseDouble(v),
+                ["D_ws_base"] =              (r, v) => r.D_ws_base = NumericParser.ParseDouble(v),
+                ["Anchor_d_ws_base"] =       (r, v) => r.D_ws_base = NumericParser.ParseDouble(v),
+                ["Dp"] =                     (r, v) => r.D_p_base = NumericParser.ParseDouble(v),
+                ["D_p_base"] =               (r, v) => r.D_p_base = NumericParser.ParseDouble(v),
+                ["Anchor_d_p_base"] =        (r, v) => r.D_p_base = NumericParser.ParseDouble(v),
+                ["xh"] =                     (r, v) => r.Xh_base = NumericParser.ParseDouble(v),
+                ["Xh_base"] =                (r, v) => r.Xh_base = NumericParser.ParseDouble(v),
+                ["Anchor_xh_base"] =         (r, v) => r.Xh_base = NumericParser.ParseDouble(v),
+                ["Nh_1_2"] =                 (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
+                ["Nh_base_var1"] =           (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
+                ["Nh1"] =                    (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
+                ["Anchor_nh_base_var1"] =    (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
+                ["Nh_3_4"] =                 (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
+                ["Nh_base_var2"] =           (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
+                ["Nh2"] =                    (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
+                ["Anchor_nh_base_var2"] =    (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
+                ["Анкер1"] =                 (r, v) => r.Anchor_var_1 = v,
+                ["Anchor1"] =                (r, v) => r.Anchor_var_1 = v,
+                ["Anchor_var_1"] =           (r, v) => r.Anchor_var_1 = v,
+                ["Anchor_anchor_var_1"] =    (r, v) => r.Anchor_var_1 = v,
+                ["Анкер2"] =                 (r, v) => r.Anchor_var_2 = v,
+                ["Anchor2"] =                (r, v) => r.Anchor_var_2 = v,
+                ["Anchor_var_2"] =           (r, v) => r.Anchor_var_2 = v,
+                ["Anchor_anchor_var_2"] =    (r, v) => r.Anchor_var_2 = v,
+                ["Анкер3"] =                 (r, v) => r.Anchor_var_3 = v,
+                ["Anchor3"] =                (r, v) => r.Anchor_var_3 = v,
+                ["Anchor_var_3"] =           (r, v) => r.Anchor_var_3 = v,
+                ["Anchor_anchor_var_3"] =    (r, v) => r.Anchor_var_3 = v,
+                ["Анкер4"] =                 (r, v) => r.Anchor_var_4 = v,
+                ["Anchor4"] =                (r, v) => r.Anchor_var_4 = v,
+                ["Anchor_var_4"] =           (r, v) => r.Anchor_var_4 = v,
+                ["Anchor_anchor_var_4"] =    (r, v) => r.Anchor_var_4 = v
             };
             return map;
         }
@@ -375,6 +428,8 @@ namespace ConvertData.Infrastructure
                     continue;
 
                 var sheetName = (ws.Name ?? "").Trim();
+                if (string.Equals(sheetName, "data", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 if (string.Equals(sheetName, "geometry", StringComparison.OrdinalIgnoreCase))
                     MergeSheet(ws, GeometryColumnMap, codeLookup, list);
                 else if (string.Equals(sheetName, "bolts", StringComparison.OrdinalIgnoreCase))

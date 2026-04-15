@@ -21,7 +21,7 @@ internal sealed class Row
     /// <summary>
     /// Вариант расчета, который определяет, какие данные будут использоваться для расчета.
     /// </summary>
-    public int variable { get; set; }
+    public string variable { get; set; } = "";
     #endregion
 
 

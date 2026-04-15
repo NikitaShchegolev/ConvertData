@@ -115,7 +115,7 @@ internal static class RowMapper
             ProfileBeam = profileBeam ?? "",            
             ProfileColumn = profileColumn ?? "",
             Explanations = explanations ?? "",
-            variable = NumericParser.ParseInt(variable),
+            variable = variable ?? "",
             Sj = NumericParser.ParseInt(sj),
             Sjo = NumericParser.ParseInt(sjo),
             Beam_H = NumericParser.ParseDouble(h),
