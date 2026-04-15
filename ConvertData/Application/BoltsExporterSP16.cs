@@ -42,12 +42,12 @@ internal sealed class BoltsExporterSP16
 
     private static readonly Dictionary<string, string> FileCategoryMap = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["TableBoltsSP43.xlsx"] = "Анкерные болты",
+        ["TableBoltsSP16.xlsx"] = "Анкерные болты",
     };
 
     public void Export(string excelAnchorDir, string outputJsonPath)
     {
-        var files = new[] { "TableBoltsSP43.xlsx" };
+        var files = new[] { "TableBoltsSP16.xlsx" };
         var allAnchors = new List<Dictionary<string, object>>();
 
         foreach (var fileName in files)
