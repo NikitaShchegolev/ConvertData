@@ -127,7 +127,8 @@ internal static class RunModeParser
             10 => Block.Processing,
             11 => Block.Anchors,
             12 => Block.Bolts,
-            13 => Block.All,
+            13 => Block.BoltsSP16,
+            14 => Block.All,
             _ => Block.None
         };
     }

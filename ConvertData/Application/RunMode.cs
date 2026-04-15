@@ -78,8 +78,8 @@ internal enum Block
     /// <summary>
     /// Экспорт болтов из TableBoltsSP43.xlsx в JSON - этап 13.
     /// </summary>
-    BoltsSP16Export = 256,
-    
+    BoltsSP16Export= 512,
+
     /// <summary>
     /// Все блоки конвертации (CreateJson + ApplyProfiles).
     /// </summary>
@@ -94,11 +94,18 @@ internal enum Block
     /// Все блоки экспорта анкеров (AnchorExport + SteelExport).
     /// </summary>
     Anchors = AnchorExport | SteelExport,
-    
+    /// <summary>
+    /// Все болты анкеров по SP43 (BoltsExport).
+    /// </summary>
     Bolts = BoltsExport,
+    /// <summary>
+    /// Все болты по СП16 (BoltsSP16Export).
+    /// </summary>
+    /// </summary>
+    BoltsSP16 = BoltsSP16Export,
     
     /// <summary>
     /// Все блоки (полный цикл обработки).
     /// </summary>
-    All = Conversion | Processing | Anchors | Bolts
+    All = Conversion | Processing | Anchors | Bolts | BoltsSP16
 }

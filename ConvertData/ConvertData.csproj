@@ -9,13 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EXCEL_Bolts16_Out\**" />
+    <EmbeddedResource Remove="EXCEL_Bolts16_Out\**" />
+    <None Remove="EXCEL_Bolts16_Out\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EPPlus" Version="7.5.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="EXCEL_Anchor_OUT\" />
-    <Folder Include="EXCEL_Bolts16_Out\" />
+    <Folder Include="EXCEL_BoltsSP16_Out\" />
     <Folder Include="EXCEL_Bolts_Out\" />
     <Folder Include="JSON_OUT\" />
     <Folder Include="JSON_All\" />
@@ -23,7 +29,6 @@
     <Folder Include="EXCEL_MARK_STEEL_OUT\" />
     <Folder Include="EXCEL_Anchor_OUT\" />
     <Folder Include="EXCEL_Bolts_Out\" />
-    <Folder Include="EXCEL_Bolts16_Out\" />
     <Folder Include="EXCEL_MARK_STEEL_OUT\" />
   </ItemGroup>
 
