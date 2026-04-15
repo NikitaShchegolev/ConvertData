@@ -18,6 +18,7 @@ namespace ConvertData.Application
         private readonly JsonProfilePatcher _profilePatcher = new();
         private readonly ProfileExcelToJsonExporter _profileExcelExporter = new();
         private readonly AnchorExcelToJsonExporter _anchorExcelExporter = new();
+        private readonly BoltsExporter _boltsExporter = new();
         private readonly SteelExcelToJsonExporter _steelExcelExporter = new();
 
         public void Run(string[] args)
@@ -35,7 +36,8 @@ namespace ConvertData.Application
             Console.WriteLine("  9. Conversion - блок конвертации (1+2)");
             Console.WriteLine("  10. Processing - блок обработки (3+4+5+6)");
             Console.WriteLine("  11. Anchors - блок анкеров (7+8)");
-            Console.WriteLine("  12. All - все блоки");
+            Console.WriteLine("  12. Болты - болты для анкеровки");
+            Console.WriteLine("  13. All - все блоки");
             Console.WriteLine();            
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _licenseConfigurator.Configure();
@@ -54,6 +56,8 @@ namespace ConvertData.Application
             var excelAnchorOutDir = Path.Combine(projectDir, "EXCEL_Anchor_OUT");
             var exceSteelDir = Path.Combine(projectDir, "EXCEL_MARK_STEEL");
             var exceSteelDirOut = Path.Combine(projectDir, "EXCEL_MARK_STEEL_OUT");
+            var exceBoltsDir = Path.Combine(projectDir, "EXCEL_Bolts");
+            var exceBoltsDirOut = Path.Combine(projectDir, "EXCEL_Bolts_Out");
             Directory.CreateDirectory(jsonOutDir);
 
             // Если есть аргументы командной строки, выполняем один раз и выходим
@@ -65,7 +69,7 @@ namespace ConvertData.Application
                 var blocks = RunModeParser.GetBlocks(args);
                 Console.WriteLine($"Выполняемые блоки: {blocks}");
                 ExecuteBlocks(blocks, projectDir, excelDir, excelProfileDir, jsonOutDir, jsonAllDir,
-                    excelProfileOutDir, excelAnchorDir, excelAnchorOutDir, exceSteelDir, exceSteelDirOut);
+                    excelProfileOutDir, excelAnchorDir, excelAnchorOutDir, exceSteelDir, exceSteelDirOut, exceBoltsDir, exceBoltsDirOut);
                 Console.WriteLine();
                 Console.WriteLine("Все указанные блоки завершены.");
                 Console.WriteLine("Нажмите любую клавишу для выхода...");
@@ -91,7 +95,7 @@ namespace ConvertData.Application
                 }
 
                 ExecuteBlocks(blocks, projectDir, excelDir, excelProfileDir, jsonOutDir, jsonAllDir,
-                    excelProfileOutDir, excelAnchorDir, excelAnchorOutDir, exceSteelDir, exceSteelDirOut);
+                    excelProfileOutDir, excelAnchorDir, excelAnchorOutDir, exceSteelDir, exceSteelDirOut, exceBoltsDir, exceBoltsDirOut);
 
                 Console.WriteLine();
                 // После выполнения блоков сразу возвращаемся к выбору
@@ -102,7 +106,7 @@ namespace ConvertData.Application
 
         private void ExecuteBlocks(Block blocks, string projectDir, string excelDir, string excelProfileDir,
             string jsonOutDir, string jsonAllDir, string excelProfileOutDir, string excelAnchorDir,
-            string excelAnchorOutDir, string exceSteelDir, string exceSteelDirOut)
+            string excelAnchorOutDir, string exceSteelDir,string exceSteelDirOut, string exceBoltsDir, string exceBoltsDirOut)
         {
             // Блок 1: CreateJson - создание JSON из Excel
             if (blocks.HasFlag(Block.CreateJson))
@@ -252,18 +256,30 @@ namespace ConvertData.Application
             if (blocks.HasFlag(Block.SteelExport))
             {
                 Console.WriteLine();
-                Console.WriteLine("=== Блок 8: Экспорт анкеров из MarkSteel.xlsx в JSON ===");
+                Console.WriteLine("=== Блок 8: Экспорт марок стали из MarkSteel.xlsx в JSON ===");
                 Directory.CreateDirectory(exceSteelDirOut);
                 _anchorExcelExporter.Export(
                     exceSteelDir,
                     Path.Combine(exceSteelDirOut, "MarkSteel.json"));
                 Console.WriteLine("Блок 8 завершён.");
             }
+
+            // Блок 9: SteelExport - экспорт анкеров из TableBoltsSP43.xlsx
+            if (blocks.HasFlag(Block.BoltsExport))
+            {
+                Console.WriteLine();
+                Console.WriteLine("=== Блок 9: Экспорт болтов из TableBoltsSP43.xlsx в JSON ===");
+                Directory.CreateDirectory(exceBoltsDirOut);
+                _boltsExporter.Export(
+                    exceBoltsDir,
+                    Path.Combine(exceBoltsDirOut, "TableBoltsSP43.json"));
+                Console.WriteLine("Блок 9 завершён.");
+            }
         }
 
         private Block InteractiveBlockSelection()
         {
-            Console.Write("Ваш выбор: ");
+            Console.Write("Ваш выбор:");
 
             var input = Console.ReadLine()?.Trim();
             if (string.IsNullOrEmpty(input))
@@ -310,7 +326,8 @@ namespace ConvertData.Application
                 9 => Block.Conversion,
                 10 => Block.Processing,
                 11 => Block.Anchors,
-                12 => Block.All,
+                12 => Block.Anchors,
+                13 => Block.Bolts,
                 _ => Block.None
             };
         }

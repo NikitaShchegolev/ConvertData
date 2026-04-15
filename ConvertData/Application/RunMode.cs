@@ -69,6 +69,11 @@ internal enum Block
     /// Экспорт анкеров из MarkSteel.xlsx в JSON - этап 12.
     /// </summary>
     SteelExport = 128,
+
+    /// <summary>
+    /// Экспорт болтов из TableBoltsSP43.xlsx в JSON - этап 13.
+    /// </summary>
+    BoltsExport = 129,
     
     /// <summary>
     /// Все блоки конвертации (CreateJson + ApplyProfiles).
@@ -84,6 +89,8 @@ internal enum Block
     /// Все блоки экспорта анкеров (AnchorExport + SteelExport).
     /// </summary>
     Anchors = AnchorExport | SteelExport,
+    
+    Bolts = BoltsExport,
     
     /// <summary>
     /// Все блоки (полный цикл обработки).
