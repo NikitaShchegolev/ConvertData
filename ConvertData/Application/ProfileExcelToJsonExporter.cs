@@ -19,6 +19,7 @@ internal sealed class ProfileExcelToJsonExporter
     {
         ["H"]     = ["H"],
         ["h"]     = ["H"],
+        ["R_m"]    = ["R_m"],
         ["r1"]    = ["r1"],
         ["r2"]    = ["r2"],
         ["B"]     = ["B"],
@@ -67,7 +68,7 @@ internal sealed class ProfileExcelToJsonExporter
     /// </summary>
     private static readonly string[] AllFields =
     [
-        "H", "B", "t_w", "t_f", "r1", "r2",
+        "H", "B", "t_w", "t_f", "R_m","r1", "r2",
         "A", "P",
         "Iz", "Iy", "Ix","Iw", "Iv", "Iyz","Ik",
         "Wz", "Wy", "Wx", "Wvo",
