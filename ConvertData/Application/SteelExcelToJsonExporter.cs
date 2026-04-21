@@ -11,52 +11,6 @@ namespace ConvertData.Application;
 
 internal sealed class SteelExcelToJsonExporter
 {
-    /// <summary>
-    /// Маппинг: заголовок Excel (case-insensitive) → JSON-поле(я).
-    /// Заголовки Excel могут быть без суффикса _Anchor, с пробелами в конце.
-    /// </summary>
-    private static readonly Dictionary<string, string[]> HeaderMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Steel"] = ["Steel_Mark"],
-        ["Name_Table"] = ["Name_Table"],
-        ["tmin"] = ["tmin"],
-        ["tmax"] = ["tmax"],
-        ["Ryn"] = ["Ryn"],
-        ["Run"] = ["Run"],
-        ["Ry"] = ["Ry"],
-        ["Ru"] = ["Ru"],
-        ["if"] = ["if"],
-    };
-
-    // /// <summary>
-    // /// Упорядоченный список всех числовых полей в JSON (для инициализации нулями).
-    // /// </summary>
-    // private static readonly string[] NumericFields =
-    // [
-    //     "Steel_Mark",
-    //     "Name_Table",
-    //     "tmin",
-    //     "tmax",
-    //     "Ryn",
-    //     "Run",
-    //     "Ry",
-    //     "Ru",
-    //     "if"
-    // ];
-
-    /// <summary>
-    /// Возможные заголовки столбца «Профиль» в Excel (для анкеров это Connect_Name_Anchor или CONNECTION_CODE_Anchor).
-    /// </summary>
-    private static readonly HashSet<string> ProfileHeaders = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "Steel_Mark", "Steel Mark"
-    };
-
-    private static readonly Dictionary<string, string> FileCategoryMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["MarkSteel.xlsx"] = "Марка стали",
-    };
-
     public void Export(string excelSteelDir, string outputJsonPath)
     {
         var files = new[] { "MarkSteel.xlsx" };
@@ -71,10 +25,9 @@ internal sealed class SteelExcelToJsonExporter
                 continue;
             }
 
-            var category = FileCategoryMap.GetValueOrDefault(fileName, "");
-            var steel = ReadExcelFile(filePath, category);
+            var steel = ReadExcelFile(filePath);
             allSteels.AddRange(steel);
-            Console.WriteLine($"  {fileName}: прочитано {steel.Count} анкеров");
+            Console.WriteLine($"  {fileName}: прочитано {steel.Count} записей");
         }
 
         var options = new JsonSerializerOptions
@@ -85,17 +38,13 @@ internal sealed class SteelExcelToJsonExporter
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputJsonPath) ?? ".");
         File.WriteAllText(outputJsonPath, JsonSerializer.Serialize(allSteels, options), Encoding.UTF8);
-        Console.WriteLine($"  Итого записано {allSteels.Count} анкеров → {outputJsonPath}");
+        Console.WriteLine($"  Итого записано {allSteels.Count} записей → {outputJsonPath}");
     }
 
-    private static List<Dictionary<string, object>> ReadExcelFile(string path, string category)
+    private static List<Dictionary<string, object>> ReadExcelFile(string path)
     {
         using var package = new ExcelPackage(new FileInfo(path));
-
-        // Словарь анкеров по имени (для объединения данных со всех листов)
-        var steelMap = new Dictionary<string, Dictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
-        // Порядок анкеров (для сохранения исходного порядка)
-        var steelOrder = new List<string>();
+        var result = new List<Dictionary<string, object>>();
 
         foreach (var ws in package.Workbook.Worksheets)
         {
@@ -107,133 +56,132 @@ internal sealed class SteelExcelToJsonExporter
             int startCol = ws.Dimension.Start.Column;
             int endCol = ws.Dimension.End.Column;
 
-            // --- заголовки ---
+            Console.WriteLine($"  Лист '{ws.Name}': строк {endRow - startRow}");
+
+            // Читаем заголовки
             var headers = new string[endCol - startCol + 1];
             for (int c = startCol; c <= endCol; c++)
                 headers[c - startCol] = (ws.Cells[startRow, c].Text ?? "").Trim();
 
-            // --- столбец «Профиль» ---
-            int profileCol = -1;
-            for (int i = 0; i < headers.Length; i++)
-            {
-                if (ProfileHeaders.Contains(headers[i]))
-                {
-                    profileCol = i;
-                    break;
-                }
-            }
-            if (profileCol < 0)
-                profileCol = 0;
+            // Определяем индексы столбцов по заголовкам
+            int steelCol = -1, nameTableCol = -1, tminCol = -1, tmaxCol = -1;
+            int rynCol = -1, runCol = -1, ryCol = -1, ruCol = -1, caseParamCol = -1;
 
-            // --- маппинг столбцов → JSON-полей ---
-            var colMapping = new List<(int colIndex, string[] jsonFields)>();
             for (int i = 0; i < headers.Length; i++)
             {
-                if (i == profileCol || string.IsNullOrWhiteSpace(headers[i]))
+                var header = headers[i];
+                if (string.IsNullOrWhiteSpace(header))
                     continue;
-                if (HeaderMap.TryGetValue(headers[i], out var fields))
-                    colMapping.Add((i, fields));
+
+                if (header.Equals("Steel", StringComparison.OrdinalIgnoreCase))
+                    steelCol = i;
+                else if (header.Equals("Name_Table", StringComparison.OrdinalIgnoreCase))
+                    nameTableCol = i;
+                else if (header.Equals("tmin", StringComparison.OrdinalIgnoreCase))
+                    tminCol = i;
+                else if (header.Equals("tmax", StringComparison.OrdinalIgnoreCase))
+                    tmaxCol = i;
+                else if (header.Equals("Ryn", StringComparison.OrdinalIgnoreCase))
+                    rynCol = i;
+                else if (header.Equals("Run", StringComparison.OrdinalIgnoreCase))
+                    runCol = i;
+                else if (header.Equals("Ry", StringComparison.OrdinalIgnoreCase))
+                    ryCol = i;
+                else if (header.Equals("Ru", StringComparison.OrdinalIgnoreCase))
+                    ruCol = i;
+                else if (header.Equals("caseParametr_t", StringComparison.OrdinalIgnoreCase) || 
+                         header.Equals("if", StringComparison.OrdinalIgnoreCase))
+                    caseParamCol = i;
             }
 
-            if (colMapping.Count == 0)
+            // Проверяем, что все необходимые столбцы найдены
+            if (steelCol == -1)
+            {
+                Console.WriteLine("  ОШИБКА: не найден столбец 'Steel'");
                 continue;
+            }
 
-            // --- данные ---
+            // Обрабатываем все строки данных
             for (int r = startRow + 1; r <= endRow; r++)
             {
-                var steelName = (ws.Cells[r, startCol + profileCol].Text ?? "").Trim();
-                if (string.IsNullOrWhiteSpace(steelName))
-                    continue;
+                // Читаем значение стали
+                var steelVal = (ws.Cells[r, startCol + steelCol].Text ?? "").Trim();
+                if (string.IsNullOrWhiteSpace(steelVal))
+                    continue; // Пропускаем полностью пустые строки
 
-                if (!steelMap.TryGetValue(steelName, out var entry))
+                // Создаём запись
+                var entry = new Dictionary<string, object>
                 {
-                    // Создаём вложенные объекты согласно новой структуре
-                    var steel = new Dictionary<string, object>();
-                    var geometry = new Dictionary<string, object>();
-                    var tension = new Dictionary<string, object>();
-                    var variable = new Dictionary<string, object>();
+                    ["CONNECTION_GUID"] = Guid.NewGuid().ToString("D")
+                };
 
-                    // Инициализируем все числовые поля нулями
-                    steel["Steel_Mark"] = "";
+                // Создаём вложенные объекты
+                var steel = new Dictionary<string, object>();
+                var geometry = new Dictionary<string, object>();
+                var tension = new Dictionary<string, object>();
+                var variable = new Dictionary<string, object>();
+
+                // Заполняем Steel_Mark
+                steel["Steel_Mark"] = steelVal;
+
+                // Заполняем остальные поля, если столбцы найдены
+                if (nameTableCol != -1)
+                    steel["Name_Table"] = ReadCellValue(ws, r, startCol + nameTableCol);
+                else
                     steel["Name_Table"] = "";
+
+                if (tminCol != -1)
+                    geometry["tmin"] = ReadCellValue(ws, r, startCol + tminCol);
+                else
                     geometry["tmin"] = 0.0;
+
+                if (tmaxCol != -1)
+                    geometry["tmax"] = ReadCellValue(ws, r, startCol + tmaxCol);
+                else
                     geometry["tmax"] = 0.0;
+
+                if (rynCol != -1)
+                    tension["Ryn"] = ReadCellValue(ws, r, startCol + rynCol);
+                else
                     tension["Ryn"] = 0.0;
+
+                if (runCol != -1)
+                    tension["Run"] = ReadCellValue(ws, r, startCol + runCol);
+                else
                     tension["Run"] = 0.0;
+
+                if (ryCol != -1)
+                    tension["Ry"] = ReadCellValue(ws, r, startCol + ryCol);
+                else
                     tension["Ry"] = 0.0;
+
+                if (ruCol != -1)
+                    tension["Ru"] = ReadCellValue(ws, r, startCol + ruCol);
+                else
                     tension["Ru"] = 0.0;
-                    variable["if"] = 0.0;
 
-                    // Создаём запись с корневыми полями
-                    entry = new Dictionary<string, object>
-                    {
-                        ["CONNECTION_GUID"] = Guid.NewGuid().ToString("D"),
-                        ["Steel"] = steel,
-                        ["Geometry"] = geometry,
-                        ["Tension"] = tension,
-                        ["Variable"] = variable
-                    };
-
-                    // Если столбец профиля соответствует полю из HeaderMap, добавляем его значение
-                    var profileHeader = headers[profileCol];
-                    if (HeaderMap.TryGetValue(profileHeader, out var profileFields))
-                    {
-                        var profileVal = ReadCellValue(ws, r, startCol + profileCol);
-                        foreach (var field in profileFields)
-                        {
-                            // Определяем, в какой объект поместить поле
-                            if (field == "Steel_Mark" || field == "Name_Table")
-                                steel[field] = profileVal;
-                            else if (field == "tmin" || field == "tmax")
-                                geometry[field] = profileVal;
-                            else if (field == "Ryn" || field == "Run" || field == "Ry" || field == "Ru")
-                                tension[field] = profileVal;
-                            else if (field == "if")
-                                variable[field] = profileVal;
-                            else
-                                entry[field] = profileVal;
-                        }
-                    }
-
-                    steelMap[steelName] = entry;
-                    steelOrder.Add(steelName);
-                }
-
-                // Получаем ссылки на вложенные объекты
-                var steelDict = (Dictionary<string, object>)entry["Steel"];
-                var geometryDict = (Dictionary<string, object>)entry["Geometry"];
-                var tensionDict = (Dictionary<string, object>)entry["Tension"];
-                var variableDict = (Dictionary<string, object>)entry["Variable"];
-
-                foreach (var (colIndex, jsonFields) in colMapping)
+                if (caseParamCol != -1)
                 {
-                    var val = ReadCellValue(ws, r, startCol + colIndex);
-                    foreach (var field in jsonFields)
-                    {
-                        // Определяем, в какой объект поместить поле
-                        if (field == "Steel_Mark" || field == "Name_Table")
-                            steelDict[field] = val;
-                        else if (field == "tmin" || field == "tmax")
-                            geometryDict[field] = val;
-                        else if (field == "Ryn" || field == "Run" || field == "Ry" || field == "Ru")
-                            tensionDict[field] = val;
-                        else if (field == "if")
-                            variableDict[field] = val;
-                        else
-                            entry[field] = val;
-                    }
+                    var caseVal = ReadCellValue(ws, r, startCol + caseParamCol);
+                    // Преобразуем в строку, если нужно
+                    variable["caseParametr_t"] = caseVal?.ToString() ?? "";
                 }
+                else
+                {
+                    variable["caseParametr_t"] = "";
+                }
+
+                // Добавляем вложенные объекты в запись
+                entry["Steel"] = steel;
+                entry["Geometry"] = geometry;
+                entry["Tension"] = tension;
+                entry["Variable"] = variable;
+
+                result.Add(entry);
             }
         }
 
-        // Преобразуем каждую запись в итоговый формат (убедимся, что Geometry присутствует)
-        var result = new List<Dictionary<string, object>>();
-        foreach (var name in steelOrder)
-        {
-            var entry = steelMap[name];
-            // Если какие-то корневые поля отсутствуют, они уже добавлены
-            result.Add(entry);
-        }
+        Console.WriteLine($"  Итого обработано строк: {result.Count}");
         return result;
     }
 
