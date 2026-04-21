@@ -32,6 +32,7 @@ internal sealed class ProfileExcelToJsonExporter
         ["Iz"]    = ["Iz"],
         ["Iy"]    = ["Iy"],
         ["Ix"]    = ["Ix"],
+        ["Iw"]    = ["Iw"],
         ["Iv"]    = ["Iv"],
         ["Iu"]    = ["Iu"],
         ["Iy=Iz"] = ["Iy", "Iz"],
@@ -48,6 +49,18 @@ internal sealed class ProfileExcelToJsonExporter
         ["iv"]    = ["iv"],
         ["xo"]    = ["xo"],
         ["yo"]    = ["yo"],
+        ["w"]    = ["w"],
+        ["Ik"]    = ["Ik"],
+        ["a"]    = ["a"],
+        ["t_pointContactOnY"]    = ["t_pointContactOnY"],
+        ["t_pointContactOnY2"]    = ["t_pointContactOnY2"],
+        ["Попереч_12_Инструкция"]    = ["Попереч_12_Инструкция"],
+        ["Попереч_13_Инструкция"]    = ["Попереч_13_Инструкция"],
+        ["Попереч_16_Инструкция"]    = ["Попереч_16_Инструкция"],
+        ["Продольное_12_Инструкция_1"]    = ["Продольное_12_Инструкция_1"],
+        ["Продольное_12_Инструкция_2"]    = ["Продольное_12_Инструкция_2"],
+        ["Продольное_12_Инструкция_3"]    = ["Продольное_12_Инструкция_3"],
+        ["R_m"] = ["R_m"],
     };
 
     /// <summary>
@@ -57,12 +70,16 @@ internal sealed class ProfileExcelToJsonExporter
     [
         "H", "B", "t_w", "t_f", "r1", "r2",
         "A", "P",
-        "Iz", "Iy", "Ix", "Iv", "Iyz",
+        "Iz", "Iy", "Ix","Iw", "Iv", "Iyz","Ik",
         "Wz", "Wy", "Wx", "Wvo",
         "Sz", "Sy",
         "iz", "iy",
         "xo", "yo",
-        "iu", "iv"
+        "iu", "iv", "w",
+        "Ik", "a", "t_pointContactOnY", "t_pointContactOnY2", "Попереч_12_Инструкция",
+        "Попереч_13_Инструкция", "Попереч_16_Инструкция",
+        "Продольное_12_Инструкция_1", "Продольное_12_Инструкция_2","Продольное_12_Инструкция_3",
+        "R_m"
     ];
 
     /// <summary>
@@ -96,9 +113,9 @@ internal sealed class ProfileExcelToJsonExporter
             }
 
             var category = FileCategoryMap.GetValueOrDefault(fileName, "");
-            var profiles = ReadExcelFile(filePath, category);
+            var gost = FileCategoryMap.GetValueOrDefault(fileName, "");
+            var profiles = ReadExcelFile(filePath, category, gost);
             allProfiles.AddRange(profiles);
-            Console.WriteLine($"  {fileName}: прочитано {profiles.Count} профилей");
         }
 
         var options = new JsonSerializerOptions
@@ -112,7 +129,7 @@ internal sealed class ProfileExcelToJsonExporter
         Console.WriteLine($"  Итого записано {allProfiles.Count} профилей → {outputJsonPath}");
     }
 
-    private static List<Dictionary<string, object>> ReadExcelFile(string path, string category)
+    private static List<Dictionary<string, object>> ReadExcelFile(string path, string category, string gost)
     {
         using var package = new ExcelPackage(new FileInfo(path));
 
@@ -175,6 +192,7 @@ internal sealed class ProfileExcelToJsonExporter
                     {
                         ["CONNECTION_GUID"] = Guid.NewGuid().ToString("D"),
                         ["Category"] = category,
+                        ["GOST"] = gost,
                         ["Profile"] = profileName
                     };
 
