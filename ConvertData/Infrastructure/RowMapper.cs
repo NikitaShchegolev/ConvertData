@@ -65,7 +65,9 @@ internal static class RowMapper
         string name,
         string code,
         string typeNode,
+        string gost,
         string gostColumnAndBeams,
+        string gostProfile,
         string profileBeam,
         string profileColumn,
         string explanations,
@@ -131,7 +133,9 @@ internal static class RowMapper
             Name = name,
             CONNECTION_CODE = code,
             TypeNode = typeNode ?? "",
+            Gost = gost ?? "",
             GostColumnAndBeams = gostColumnAndBeams ?? "",
+            GostProfile = gostProfile ?? "",
             ProfileBeam = profileBeam ?? "",
             ProfileColumn = profileColumn ?? "",
             Explanations = explanations ?? "",
@@ -201,11 +205,12 @@ internal static class RowMapper
     /// <param name="s">Толщина стенки балки.</param>
     /// <param name="t">Толщина полки балки.</param>
     /// <returns>Объект Row с заполненными геометрическими свойствами балки.</returns>
-    public static Row MapProfileRow(string profile, string h, string b, string s, string t)
+    public static Row MapProfileRow(string profile, string gostProfile, string h, string b, string s, string t)
     {
         return new Row
         {
             ProfileBeam = profile,
+            GostProfile = gostProfile ?? "",
             Beam_H = NumericParser.ParseDouble(h),
             Beam_B = NumericParser.ParseDouble(b),
             Beam_s = NumericParser.ParseDouble(s),

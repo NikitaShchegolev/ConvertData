@@ -89,7 +89,9 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, startCol + map.IdxName),
                         code,
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
+                        GetCell(ws, r, map.IdxGost >= 0 ? startCol + map.IdxGost : null),
                         GetCell(ws, r, map.IdxGostColumnAndBeams >= 0 ? startCol + map.IdxGostColumnAndBeams : null),
+                        GetCell(ws, r, map.IdxGostProfile >= 0 ? startCol + map.IdxGostProfile : null),
                         GetCell(ws, r, startCol + map.IdxProfileBeam),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ?  startCol + map.IdxProfileColumn : null),
                         GetCell(ws, r, map.IdxExplanations >= 0 ?   startCol + map.IdxExplanations : null),
@@ -157,6 +159,7 @@ namespace ConvertData.Infrastructure
 
                     list.Add(RowMapper.MapProfileRow(
                         profile,
+                        GetCell(ws, r, map.IdxGostProfile >= 0 ? startCol + map.IdxGostProfile : null),
                         GetCell(ws, r, map.IdxH >= 0 ? startCol + map.IdxH : null),
                         GetCell(ws, r, map.IdxB >= 0 ? startCol + map.IdxB : null),
                         GetCell(ws, r, map.Idxs >= 0 ? startCol + map.Idxs : null),
@@ -267,6 +270,9 @@ namespace ConvertData.Infrastructure
         {
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);   
             map["GOST"] = (r, v) => r.Gost = v;
+            map["Gost"] = (r, v) => r.Gost = v;
+            map["GostProfile"] = (r, v) => r.GostProfile = v;
+            map["GostColumnAndBeams"] = (r, v) => r.GostColumnAndBeams = v;
             map["H"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -365,6 +371,8 @@ namespace ConvertData.Infrastructure
                 ["GOST_anchor"] = (r, v) => r.GostAnchore = v,
                 ["GOST_anchors"] = (r, v) => r.GostAnchore = v,
                 ["GOST_bolts"] = (r, v) => r.GostBolts = v,
+                ["GostAnchore"] = (r, v) => r.GostAnchore = v,
+                ["GostBolts"] = (r, v) => r.GostBolts = v,
                 ["TypeNode"] =               (r, v) => r.TypeNode = v,
                 ["Тип узла"] =               (r, v) => r.TypeNode = v,
                 ["Вид узла"] =               (r, v) => r.TypeNode = v,
@@ -467,6 +475,7 @@ namespace ConvertData.Infrastructure
             {
                 ["Option"] = (r, v) => r.OptionHoles = NumericParser.ParseInt(v),
                 ["GOST"] = (r, v) => r.GostHoles = v,
+                ["GostHoles"] = (r, v) => r.GostHoles = v,
                 //Радиус отверстия
                 ["F"] = (r, v) => { r.F_holes = NumericParser.ParseInt(v); r.N_Rows = 1; },
                 ["F_holes"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),

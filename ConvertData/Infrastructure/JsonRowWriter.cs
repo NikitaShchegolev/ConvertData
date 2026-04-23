@@ -44,6 +44,13 @@ namespace ConvertData.Infrastructure
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
                 sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
+                sb.AppendLine("    \"Gost\": \"" + JsonEscape(r.Gost) + "\",");
+                sb.AppendLine("    \"GostColumnAndBeams\": \"" + JsonEscape(r.GostColumnAndBeams) + "\",");
+                sb.AppendLine("    \"GostHoles\": \"" + JsonEscape(r.GostHoles) + "\",");
+                sb.AppendLine("    \"GostBolts\": \"" + JsonEscape(r.GostBolts) + "\",");
+                sb.AppendLine("    \"GostAnchore\": \"" + JsonEscape(r.GostAnchore) + "\",");
+                sb.AppendLine("    \"GostWeld\": \"" + JsonEscape(r.GostWeld) + "\",");
+                sb.AppendLine("    \"GostProfile\": \"" + JsonEscape(r.GostProfile) + "\",");
                 sb.AppendLine("    \"variable\": \"" + JsonEscape(r.variable) + "\",");
                 sb.AppendLine("    \"TableBrand\": \"" + JsonEscape(r.TableBrand) + "\",");
                 sb.AppendLine("    \"Explanations\": \"" + JsonEscape(r.Explanations) + "\",");
