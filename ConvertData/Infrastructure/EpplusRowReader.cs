@@ -89,6 +89,7 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, startCol + map.IdxName),
                         code,
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
+                        GetCell(ws, r, map.IdxGostColumnAndBeams >= 0 ? startCol + map.IdxGostColumnAndBeams : null),
                         GetCell(ws, r, startCol + map.IdxProfileBeam),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ?  startCol + map.IdxProfileColumn : null),
                         GetCell(ws, r, map.IdxExplanations >= 0 ?   startCol + map.IdxExplanations : null),
@@ -236,6 +237,7 @@ namespace ConvertData.Infrastructure
         private static readonly Dictionary<string, Action<Row, string>> WeldColumnMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
+                ["GOST_weld"] = (r, v) => r.GostWeld = v,
                 ["kf1"]  = (r, v) => r.kf1 = v,
                 ["kf2"]  = (r, v) => r.kf2 = v,
                 ["kf3"]  = (r, v) => r.kf3 = v,
@@ -264,6 +266,51 @@ namespace ConvertData.Infrastructure
         private static Dictionary<string, Action<Row, string>> BuildGeometryColumnMap()
         {
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);   
+            map["GOST"] = (r, v) => r.Gost = v;
+            map["H"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Flange_H = value;
+                if (r.H_Plate == 0)
+                    r.H_Plate = value;
+            };
+            map["B"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Flange_B = value;
+                if (r.B_Plate == 0)
+                    r.B_Plate = value;
+            };
+            map["tp"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Flange_t = value;
+                if (r.Tp_Plate == 0)
+                    r.Tp_Plate = value;
+            };
+            map["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
+            map["B_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["H_plate"] = (r, v) => r.H_Plate = NumericParser.ParseDouble(v);
+            map["Lws_plate"] = (r, v) => r.Lws_Plate = NumericParser.ParseDouble(v);
+            map["Tp_plate"] = (r, v) => r.Tp_Plate = NumericParser.ParseDouble(v);
+            map["Tr1_plate"] = (r, v) => r.Tr1_Plate = NumericParser.ParseDouble(v);
+            map["Tr2_plate"] = (r, v) => r.Tr2_Plate = NumericParser.ParseDouble(v);
+            map["B_stiff"] = (r, v) => r.B_Stiff = NumericParser.ParseDouble(v);
+            map["H_stiff"] = (r, v) => r.H_Stiff = NumericParser.ParseDouble(v);
+            map["Lws_stiff"] = (r, v) => r.Lws_Stiff = NumericParser.ParseDouble(v);
+            map["Tp_stiff"] = (r, v) => r.Tp_Stiff = NumericParser.ParseDouble(v);
+            map["Tr1_stiff"] = (r, v) => r.Tr1_Stiff = NumericParser.ParseDouble(v);
+            map["Tr2_stiff"] = (r, v) => r.Tr2_Stiff = NumericParser.ParseDouble(v);
+            map["Lst"] = (r, v) =>
+            {
+                if (r.H_Stiff == 0)
+                    r.H_Stiff = NumericParser.ParseDouble(v);
+            };
+            map["tbp"] = (r, v) =>
+            {
+                if (r.Tp_Stiff == 0)
+                    r.Tp_Stiff = NumericParser.ParseDouble(v);
+            };
             map["F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
             map["Anchor_F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
             map["Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
@@ -316,6 +363,7 @@ namespace ConvertData.Infrastructure
             {
                 ["Option"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
                 ["GOST_anchor"] = (r, v) => r.GostAnchore = v,
+                ["GOST_anchors"] = (r, v) => r.GostAnchore = v,
                 ["GOST_bolts"] = (r, v) => r.GostBolts = v,
                 ["TypeNode"] =               (r, v) => r.TypeNode = v,
                 ["Тип узла"] =               (r, v) => r.TypeNode = v,
@@ -418,6 +466,7 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["Option"] = (r, v) => r.OptionHoles = NumericParser.ParseInt(v),
+                ["GOST"] = (r, v) => r.GostHoles = v,
                 //Радиус отверстия
                 ["F"] = (r, v) => { r.F_holes = NumericParser.ParseInt(v); r.N_Rows = 1; },
                 ["F_holes"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),

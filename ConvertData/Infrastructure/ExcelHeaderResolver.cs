@@ -22,6 +22,9 @@ internal sealed class ExcelColumnMap
     /// <summary> Индекс колонки "TypeNode" или "ТипУзла" (тип узла соединения).</summary>
     public int IdxTypeNode { get; set; } = -1;
 
+    /// <summary>Индекс колонки "GOST_Column_Beams".</summary>
+    public int IdxGostColumnAndBeams { get; set; } = -1;
+
     /// <summary>Индекс колонки "variable" (вариант расчета).</summary>
     public int IdxVariable { get; set; } = -1;
     /// <summary>Индекс для пояснений</summary>
@@ -192,6 +195,7 @@ internal static class ExcelHeaderResolver
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
             IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
             IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),            
+            IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GOST_Column_Beams", "Gost_Column_Beams", "GOST Column Beams"]),
             IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, [
                 "Explanations", "Explanation",
                 "Объяснения", "Объяснение",

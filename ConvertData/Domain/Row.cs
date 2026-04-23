@@ -13,6 +13,7 @@ internal sealed class Row
     public string GostBolts { get; set; } = "";
     public string GostAnchore { get; set; } = "";
     public string GostWeld { get; set; } = "";
+    public string GostProfile { get; set; } = "";
     /// <summary>
     /// Пояснения к узловому соединению, которые могут включать в себя описание типа соединения,
     /// </summary>
