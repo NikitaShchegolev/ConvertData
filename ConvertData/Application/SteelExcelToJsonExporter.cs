@@ -68,16 +68,16 @@ internal sealed class SteelExcelToJsonExporter
             int steelCol = -1, nameTableCol = -1, tminCol = -1, tmaxCol = -1;
             int rynCol = -1, runCol = -1, ryCol = -1, ruCol = -1, caseParamCol = -1;
 
-            for (int i = 0; i < headers.Length; i++)
-            {
-                if (ProfileHeaders.Contains(headers[i]))
-                {
-                    profileCol = i;
-                    break;
-                }
-            }
-            if (profileCol < 0)
-                profileCol = 0;
+            //for (int i = 0; i < headers.Length; i++)
+            //{
+            //    if (ProfileHeaders.Contains(headers[i]))
+            //    {
+            //        profileCol = i;
+            //        break;
+            //    }
+            //}
+            //if (profileCol < 0)
+            //    profileCol = 0;
 
             // Проверяем, что все необходимые столбцы найдены
             if (steelCol == -1)

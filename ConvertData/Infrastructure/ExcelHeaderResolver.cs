@@ -10,6 +10,29 @@ namespace ConvertData.Infrastructure;
 /// </summary>
 internal sealed class ExcelColumnMap
 {
+    #region Основное
+    /// <summary>Индекс колонки "Name" (имя соединения).</summary>
+    public int IdxName { get; set; } = -1;
+    /// <summary>Проверяет, является ли таблица основной (содержит Name, Code, Profile).</summary>
+    public bool IsMainTable => IdxName >= 0 && IdxCode >= 0 && IdxProfileBeam >= 0;
+
+    /// <summary>Индекс колонки "CONNECTION_CODE" (код соединения).</summary>
+    public int IdxCode { get; set; } = -1;
+
+    /// <summary> Индекс колонки "TypeNode" или "ТипУзла" (тип узла соединения).</summary>
+    public int IdxTypeNode { get; set; } = -1;
+
+    /// <summary>Индекс колонки "variable" (вариант расчета).</summary>
+    public int IdxVariable { get; set; } = -1;
+    /// <summary>Индекс для пояснений</summary>
+    public int IdxExplanations { get; set; } = -1;
+
+    /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
+    public bool IsProfileTable => IdxProfileBeam >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0; 
+    #endregion
+    #region Балка
+    /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
+    public int IdxProfileBeam { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_H" (высота балки).</summary>
     public int IdxH { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_B" (ширина полки балки).</summary>
@@ -18,16 +41,31 @@ internal sealed class ExcelColumnMap
     public int Idxs { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_t" (толщина полки балки).</summary>
     public int Idxt { get; set; } = -1;
-    /// <summary>Индекс колонки "Name" (имя соединения).</summary>
-    public int IdxName { get; set; } = -1;
-    /// <summary>Индекс колонки "CONNECTION_CODE" (код соединения).</summary>
-    public int IdxCode { get; set; } = -1;
-    /// <summary> Индекс колонки "TypeNode" или "ТипУзла" (тип узла соединения).</summary>
-    public int IdxTypeNode { get; set; } = -1;
-    /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
-    public int IdxProfile { get; set; } = -1;
+    #endregion
+    #region Колонна
+
     /// <summary>Индекс колонки "ProfileColumn" (профиль колонны).</summary>
     public int IdxProfileColumn { get; set; } = -1;
+    #endregion
+    #region Пластины
+    public int IdxB_plate { get; set; } = -1;
+    public int IdxH_plate { get; set; } = -1;
+    public int Idxtp_plate { get; set; } = -1;
+    public int IdxLws_plate { get; set; } = -1;
+    public int Idxtr1_plate { get; set; } = -1;
+    public int Idxtr2_plate { get; set; } = -1;
+    #endregion
+    #region Ребра жесткости
+    public int IdxB_stiff { get; set; } = -1;
+    public int IdxH_stiff { get; set; } = -1;
+    public int Idxtp_stiff { get; set; } = -1;
+    public int IdxLws_stiff { get; set; } = -1;
+    public int Idxtr1_stiff { get; set; } = -1;
+    public int Idxtr2_stiff { get; set; } = -1;
+    #endregion
+    #region Внутренние усилия
+    /// <summary> Усилие отрыва для баз </summary>
+    public int IdF_base { get; set; } = -1;
     /// <summary>Индекс колонки "Nt" (усилие растяжения).</summary>
     public int IdxNt { get; set; } = -1;
     /// <summary>Индекс колонки "Qy" (поперечная сила по Y).</summary>
@@ -42,20 +80,30 @@ internal sealed class ExcelColumnMap
     public int IdxN { get; set; } = -1;
     /// <summary>Индекс колонки "My" (изгибающий момент по Y).</summary>
     public int IdxMy { get; set; } = -1;
-    /// <summary>Индекс колонки "variable" (вариант расчета).</summary>
-    public int IdxVariable { get; set; } = -1;
-    /// <summary>Индекс колонки "Sj" (жесткость Sj).</summary>
-    public int IdxSj { get; set; } = -1;
-    /// <summary>Индекс колонки "Sjo" (жесткость Sjo).</summary>
-    public int IdxSjo { get; set; } = -1;
+    /// <summary>Индекс колонки "My_compression" (изгибающий момент по Y).</summary>
+    public int IdxMy_compression { get; set; } = -1;
+    /// <summary>Индекс колонки "My_tension" (изгибающий момент по Y).</summary>
+    public int IdxMy_tension { get; set; } = -1;
     /// <summary>Индекс колонки "Mneg" (обратный момент).</summary>
     public int IdxMneg { get; set; } = -1;
     /// <summary>Индекс колонки "Mz" (изгибающий момент по Z).</summary>
     public int IdxMz { get; set; } = -1;
+    /// <summary>Индекс колонки "Mz_compression" (изгибающий момент по Z).</summary>
+    public int IdxMz_compression { get; set; } = -1;
+    /// <summary>Индекс колонки "Mz_tension" (изгибающий момент по Z).</summary>
+    public int IdxMz_tension { get; set; } = -1;
     /// <summary>Индекс колонки "Mx" (изгибающий момент по X).</summary>
     public int IdxMx { get; set; } = -1;
     /// <summary>Индекс колонки "Mw" (крутящий момент Mw).</summary>
-    public int IdxMw { get; set; } = -1;
+    public int IdxMw { get; set; } = -1; 
+    #endregion
+    #region Жесткость
+    /// <summary>Индекс колонки "Sj" (жесткость Sj).</summary>
+    public int IdxSj { get; set; } = -1;
+    /// <summary>Индекс колонки "Sjo" (жесткость Sjo).</summary>
+    public int IdxSjo { get; set; } = -1;
+    #endregion
+    #region Поправочные коэффициенты
     /// <summary>Индекс колонки "α" или "Alpha" (коэффициент альфа).</summary>
     public int IdxAlpha { get; set; } = -1;
     /// <summary>Индекс колонки "β" или "Beta" (коэффициент бета).</summary>
@@ -67,18 +115,9 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "ε" или "Epsilon" (коэффициент эпсилон).</summary>
     public int IdxEpsilon { get; set; } = -1;
     /// <summary>Индекс колонки "λ" или "Lambda" (коэффициент лямбда).</summary>
-    public int IdxLambda { get; set; } = -1;
-    /// <summary>Индекс для пояснений</summary>
-    public int IdxExplanations { get; set; } = -1;
-    /// <summary>Проверяет, является ли таблица основной (содержит Name, Code, Profile).</summary>
-    public bool IsMainTable => IdxName >= 0 && IdxCode >= 0 && IdxProfile >= 0;
-    /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
-    public bool IsProfileTable => IdxProfile >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0;
-
-
-    #region Анкера
-    /// <summary> Усилие отрыва </summary>
-    public int IdF_base { get; set; } = -1;
+    public int IdxLambda { get; set; } = -1; 
+    #endregion
+    #region Геометрия анкеров
     /// <summary> Длина стороны шайбы под анкер </summary>
     public int IdLws_base { get; set; } = -1;
     /// <summary> Ширина колодца под упор </summary>
@@ -91,14 +130,19 @@ internal sealed class ExcelColumnMap
     public int IdD_ws_base { get; set; } = -1;
     /// <summary> Диаметр отверстия под анкер </summary>
     public int IdD_p_base { get; set; } = -1;
-    /// <summary> Расстояние между монтажными отверстиями </summary>
+    /// <summary> Растояние между отверстиями </summary>
     public int IdXh_base { get; set; } = -1;
-    /// <summary> Катет сварного шва крепления базы </summary>
+    /// <summary> Расстояние между монтажными отверстиями </summary>
     public int IdK_fws_base { get; set; } = -1;
-    /// <summary> Количество отверстий для базы варианта 1</summary>
+    #endregion
+    #region Количество отверстий под анкера
+
+    /// <summary> Количество отверстий для базы под анкера варианта 1</summary>
     public int IdNh_base_var1 { get; set; } = -1;
-    /// <summary> Количество отверстий для базы варианта 2</summary>
-    public int IdNh_base_var2 { get; set; } = -1;
+    /// <summary> Количество отверстий для базы под анкера варианта 2</summary>
+    public int IdNh_base_var2 { get; set; } = -1; 
+    #endregion
+    #region Тип принимаемого анкера
     /// <summary> Наимернование соединения вариант 1</summary>
     public int IdAnchor_var_1 { get; set; } = -1;
     /// <summary> Наимернование соединения вариант 2</summary>
@@ -106,7 +150,7 @@ internal sealed class ExcelColumnMap
     /// <summary> Наимернование соединения вариант 3</summary>
     public int IdAnchor_var_3 { get; set; } = -1;
     /// <summary> Наимернование соединения вариант 4</summary>
-    public int IdAnchor_var_4 { get; set; } = -1;
+    public int IdAnchor_var_4 { get; set; } = -1; 
     #endregion
 }
 
@@ -158,7 +202,7 @@ internal static class ExcelHeaderResolver
                 "Комментарий", "Комментарии",
                 "Прим."
             ]),            
-            IdxProfile = idxProfile,
+            IdxProfileBeam = idxProfile,
             IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
             IdxQy = HeaderUtils.IndexOfHeaderAny(header, ["Qy"]),
@@ -167,6 +211,8 @@ internal static class ExcelHeaderResolver
             IdxNc = HeaderUtils.IndexOfHeader(header, "Nc"),
             IdxN = HeaderUtils.IndexOfHeader(header, "N"),
             IdxMy = HeaderUtils.IndexOfHeaderAny(header, ["My"]),
+            IdxMy_compression = HeaderUtils.IndexOfHeaderAny(header, ["My_ compresion"]),
+            IdxMy_tension = HeaderUtils.IndexOfHeaderAny(header, ["My_ tension"]),
             IdxVariable = HeaderUtils.IndexOfHeaderAny(header, ["variable", "Variable"]),
             IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
             IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
@@ -182,6 +228,12 @@ internal static class ExcelHeaderResolver
             IdD_ws_base = HeaderUtils.IndexOfHeaderAny(header, ["D_ws_base", "Dws", "D_ws", "d_ws_base"]),
             IdD_p_base = HeaderUtils.IndexOfHeaderAny(header, ["D_p_base", "Dp", "D_p", "d_p_base"]),
             IdXh_base = HeaderUtils.IndexOfHeaderAny(header, ["Xh_base", "xh", "Xh", "xh_base"]),
+            IdxB_plate = HeaderUtils.IndexOfHeaderAny(header, ["B_plate"]),
+            IdxH_plate = HeaderUtils.IndexOfHeaderAny(header, ["H_plate"]),
+            IdxLws_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lws_plate"]),
+            Idxtp_plate = HeaderUtils.IndexOfHeaderAny(header, ["tp_plate"]),
+            Idxtr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr1_plate"]),
+            Idxtr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr2_plate"]),
             IdK_fws_base = HeaderUtils.IndexOfHeaderAny(header, ["K_fws_base", "kfws", "K_fws", "kfws_base"]),
             IdNh_base_var1 = HeaderUtils.IndexOfHeaderAny(header, ["Nh_base_var1", "Nh_1_2", "Nh1", "Nh_var1"]),
             IdNh_base_var2 = HeaderUtils.IndexOfHeaderAny(header, ["Nh_base_var2", "Nh_3_4", "Nh2", "Nh_var2"]),
@@ -262,16 +314,16 @@ internal static class ExcelHeaderResolver
         if (map.IsMainTable || map.IsProfileTable)
             return;
 
-        if (map.IdxProfile >= 0)
+        if (map.IdxProfileBeam >= 0)
         {
-            if (map.IdxH < 0) map.IdxH = map.IdxProfile + 1;
-            if (map.IdxB < 0) map.IdxB = map.IdxProfile + 2;
-            if (map.Idxs < 0) map.Idxs = map.IdxProfile + 3;
-            if (map.Idxt < 0) map.Idxt = map.IdxProfile + 4;
+            if (map.IdxH < 0) map.IdxH = map.IdxProfileBeam + 1;
+            if (map.IdxB < 0) map.IdxB = map.IdxProfileBeam + 2;
+            if (map.Idxs < 0) map.Idxs = map.IdxProfileBeam + 3;
+            if (map.Idxt < 0) map.Idxt = map.IdxProfileBeam + 4;
         }
         else
         {
-            map.IdxProfile = 0;
+            map.IdxProfileBeam = 0;
             map.IdxH = 1;
             map.IdxB = 2;
             map.Idxs = 3;

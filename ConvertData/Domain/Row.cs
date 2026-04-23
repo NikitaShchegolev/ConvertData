@@ -7,6 +7,12 @@ internal sealed class Row
     /// </summary>
     public string Name { get; set; } = "";
     public string TypeNode { get; set; } = "";
+    public string Gost { get; set; } = "";
+    public string GostColumnAndBeams { get; set; } = "";
+    public string GostHoles { get; set; } = "";
+    public string GostBolts { get; set; } = "";
+    public string GostAnchore { get; set; } = "";
+    public string GostWeld { get; set; } = "";
     /// <summary>
     /// Пояснения к узловому соединению, которые могут включать в себя описание типа соединения,
     /// </summary>
@@ -23,7 +29,6 @@ internal sealed class Row
     /// </summary>
     public string variable { get; set; } = "";
     #endregion
-
 
     // Geometry
     #region Beam - геометрические характеристики балки
@@ -180,21 +185,23 @@ internal sealed class Row
     /// <summary>
     /// "Column": Координата центра тяжести балки в направления y
     /// </summary>
-    public double Column_yo { get; set; }    
+    public double Column_yo { get; set; }
     #endregion
-    #region Plate
-    /// <summary>
-    /// "Plate": Длина пластины
-    /// </summary>
-    public double Plate_H { get; set; }
-    /// <summary>
-    /// "Plate": Ширина пластины
-    /// </summary>
-    public double Plate_B { get; set; }
-    /// <summary>
-    /// "Plate": толщна пластины
-    /// </summary>
-    public double Plate_t { get; set; }
+    #region Пластины
+    public double B_Plate { get; set; }
+    public double H_Plate { get; set; }
+    public double Lws_Plate { get; set; }
+    public double Tp_Plate { get; set; }
+    public double Tr1_Plate { get; set; }
+    public double Tr2_Plate { get; set; }
+    #endregion
+    #region Ребра жесткости
+    public double B_Stiff { get; set; }
+    public double H_Stiff { get; set; }
+    public double Lws_Stiff { get; set; }
+    public double Tp_Stiff { get; set; }
+    public double Tr1_Stiff { get; set; }
+    public double Tr2_Stiff { get; set; }
     #endregion
     #region Flange
     /// <summary>
@@ -214,41 +221,7 @@ internal sealed class Row
     /// </summary>
     public double Flange_t { get; set; }
     #endregion
-    #region Stiff
-    /// <summary>
-    /// "Stiff": Расстояние от верха полки колонны до края пластины для фланца, который крепится к полке колонны
-    /// </summary>
-    public double Stiff_tbp { get; set; }
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_tg { get; set; }
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_tf { get; set; }
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_Lh { get; set; }
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_Hh { get; set; }
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_tr1 { get; set; }
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_tr2 { get; set; }
 
-    /// <summary>
-    /// "Stiff": 
-    /// </summary>
-    public double Stiff_twp { get; set; }
-    #endregion
 
     //Bolts
 
@@ -337,6 +310,59 @@ internal sealed class Row
 
     #endregion
 
+    //Holes
+
+    #region Holes
+    
+    /// <summary>
+    /// "Holes": Версия использования болтов
+    /// </summary>
+    public double OptionHoles { get; set; } = 0;
+
+    /// <summary>
+    /// "Holes": Марка опорного столика
+    /// </summary>
+    public string TableBrandHoles { get; set; } = "";
+    /// <summary>
+    /// "Holes": Диаметр болта
+    /// </summary>
+    public int F_holes { get; set; }
+    /// <summary>
+    /// Количество используемых болтов 1-4
+    /// </summary>
+    public int Nh_Holes_1_4 { get; set; }
+
+    /// Количество используемых болтов 1-8
+    public int Nh_Holes_5_8 { get; set; }
+    
+    /// <summary>
+    /// "Holes": Координата X первого ряда болтов
+    /// </summary>
+    public double Dws_holes { get; set; }
+    /// <summary>
+    /// "Holes": Координата X второго ряда болтов
+    /// </summary>
+    public double Dp_holes { get; set; }
+    public double Anchor_xh_holes { get; set; }
+
+
+
+    public int nh_Holes_1_4 { get; set; }
+
+    /// Количество используемых болтов 1-8
+    public int nh_Holes_5_8 { get; set; }
+
+    /// <summary>
+    /// "Holes": Координата X первого ряда болтов
+    /// </summary>
+    public double nws_holes { get; set; }
+    /// <summary>
+    /// "Holes": Координата X второго ряда болтов
+    /// </summary>
+    public double dp_holes { get; set; }
+    public double anchor_xh_holes { get; set; }
+
+    #endregion
 
     //Welds - Минимальные катеты сварных швов
 
@@ -431,6 +457,14 @@ internal sealed class Row
     /// </summary>
     public int My { get; set; }
     /// <summary>
+    /// "InternalForces" - My, изгибающий сжимающий момент в направлении y
+    /// </summary>
+    public int My_compression { get; set; }
+    /// <summary>
+    /// "InternalForces" - My_tension, изгибающий растягивающий момент в направлении y
+    /// </summary>
+    public int My_tension { get; set; }
+    /// <summary>
     /// "InternalForces" - Mneg - обратный момент
     /// </summary>
     public double Mneg { get; set; }
@@ -438,6 +472,14 @@ internal sealed class Row
     /// "InternalForces" - Mz, изгибающий момент в направлении z
     /// </summary>
     public double Mz { get; set; }
+    /// <summary>
+    /// "InternalForces" - Mz_compression, изгибающий момент в направлении z
+    /// </summary>
+    public double Mz_compression { get; set; }
+    /// <summary>
+    /// "InternalForces" - Mz_tension, изгибающий момент в направлении z
+    /// </summary>
+    public double Mz_tension { get; set; }
     /// <summary>
     /// "InternalForces" - Mx, изгибающий момент в направлении x
     /// </summary>
@@ -509,7 +551,7 @@ internal sealed class Row
     /// <summary> Наимернование соединения вариант 3</summary>
     public string Anchor_var_3 { get; set; } = "";
     /// <summary> Наимернование соединения вариант 4</summary>
-    public string Anchor_var_4 { get; set; } = ""; 
-    #endregion
+    public string Anchor_var_4 { get; set; } = "";
+    #endregion   
 
 }

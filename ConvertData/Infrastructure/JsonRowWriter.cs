@@ -73,6 +73,11 @@ namespace ConvertData.Infrastructure
                 // Welds
                 WriteWelds(sb, r);
                 sb.AppendLine();
+
+                // Holes
+                WriteHoles(sb, r);
+                sb.AppendLine();
+
                 // Anchor
                 WriteAnchor(sb, r);
                 sb.AppendLine();
@@ -80,6 +85,7 @@ namespace ConvertData.Infrastructure
                 // InternalForces
                 WriteInternalForces(sb, r);
                 sb.AppendLine();
+
 
                 // Coefficients
                 sb.AppendLine("    \"Coefficients\": {");
@@ -129,12 +135,12 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("      \"Column\": {");
             sb.AppendLine("        \"ProfileColumn\": \"" + JsonEscape(r.ProfileColumn) + "\",");
-            sb.AppendLine("        \"Column_H\": " + Dbl(r.Column_H) + ",");
-            sb.AppendLine("        \"Column_B\": " + Dbl(r.Column_B) + ",");
-            sb.AppendLine("        \"Column_s\": " + Dbl(r.Column_s) + ",");
-            sb.AppendLine("        \"Column_t\": " + Dbl(r.Column_t) + ",");
-            sb.AppendLine("        \"Column_A\": " + Dbl(r.Column_A) + ",");
-            sb.AppendLine("        \"Column_P\": " + Dbl(r.Column_P) + ",");
+            sb.AppendLine("        \"Column_H\": " +  Dbl(r.Column_H) + ",");
+            sb.AppendLine("        \"Column_B\": " +  Dbl(r.Column_B) + ",");
+            sb.AppendLine("        \"Column_s\": " +  Dbl(r.Column_s) + ",");
+            sb.AppendLine("        \"Column_t\": " +  Dbl(r.Column_t) + ",");
+            sb.AppendLine("        \"Column_A\": " +  Dbl(r.Column_A) + ",");
+            sb.AppendLine("        \"Column_P\": " +  Dbl(r.Column_P) + ",");
             sb.AppendLine("        \"Column_Iz\": " + Dbl(r.Column_Iz) + ",");
             sb.AppendLine("        \"Column_Iy\": " + Dbl(r.Column_Iy) + ",");
             sb.AppendLine("        \"Column_Ix\": " + Dbl(r.Column_Ix) + ",");
@@ -153,18 +159,21 @@ namespace ConvertData.Infrastructure
         private static void WritePlate(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Plate\": {");
-            sb.AppendLine("        \"Plate_H\": " + Dbl(r.Plate_H) + ",");
-            sb.AppendLine("        \"Plate_B\": " + Dbl(r.Plate_B) + ",");
-            sb.AppendLine("        \"Plate_t\": " + Dbl(r.Plate_t));
+            sb.AppendLine("        \"H_Plate\": " + Dbl(r.  H_Plate )    + ",");
+            sb.AppendLine("        \"B_Plate\": " + Dbl(r.  B_Plate)     + ",");
+            sb.AppendLine("        \"Lws_Plate\": " + Dbl(r.Lws_Plate) + ",");
+            sb.AppendLine("        \"tp_Plate\": " + Dbl(r.Tp_Plate)   + ",");
+            sb.AppendLine("        \"Plate_tr1\": " + Dbl(r.Tr1_Plate) + ",");
+            sb.AppendLine("        \"Plate_tr2\": " + Dbl(r.Tr2_Plate));
             sb.AppendLine("      },");
         }
 
         private static void WriteFlange(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Flange\": {");
-            sb.AppendLine("        \"Flange_Lb\": " + Dbl(r.Flange_Lb) + ",");
-            sb.AppendLine("        \"Flange_H\": " + Dbl(r.Flange_H) + ",");
-            sb.AppendLine("        \"Flange_B\": " + Dbl(r.Flange_B) + ",");
+            sb.AppendLine("        \"Flange_Lb\": " +Dbl(r.Flange_Lb) + ",");
+            sb.AppendLine("        \"Flange_H\": " + Dbl(r.Flange_H)  + ",");
+            sb.AppendLine("        \"Flange_B\": " + Dbl(r.Flange_B)  + ",");
             sb.AppendLine("        \"Flange_t\": " + Dbl(r.Flange_t));
             sb.AppendLine("      },");
         }
@@ -172,14 +181,12 @@ namespace ConvertData.Infrastructure
         private static void WriteStiff(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Stiff\": {");
-            sb.AppendLine("        \"Stiff_tbp\": " + Dbl(r.Stiff_tbp) + ",");
-            sb.AppendLine("        \"Stiff_tg\": " + Dbl(r.Stiff_tg) + ",");
-            sb.AppendLine("        \"Stiff_tf\": " + Dbl(r.Stiff_tf) + ",");
-            sb.AppendLine("        \"Stiff_Lh\": " + Dbl(r.Stiff_Lh) + ",");
-            sb.AppendLine("        \"Stiff_Hh\": " + Dbl(r.Stiff_Hh) + ",");
-            sb.AppendLine("        \"Stiff_tr1\": " + Dbl(r.Stiff_tr1) + ",");
-            sb.AppendLine("        \"Stiff_tr2\": " + Dbl(r.Stiff_tr2) + ",");
-            sb.AppendLine("        \"Stiff_twp\": " + Dbl(r.Stiff_twp));
+            sb.AppendLine("        \"H\": " + Dbl(r.H_Stiff)     + ",");
+            sb.AppendLine("        \"B\": " + Dbl(r.B_Stiff)     + ",");
+            sb.AppendLine("        \"Lws\": " + Dbl(r.Lws_Stiff) + ",");
+            sb.AppendLine("        \"tp\": " + Dbl(r.Tp_Stiff)   + ",");
+            sb.AppendLine("        \"tr1\": " + Dbl(r.Tr1_Stiff) + ",");
+            sb.AppendLine("        \"tr2\": " + Dbl(r.Tr2_Stiff));
             sb.AppendLine("      }");
         }
 
@@ -221,8 +228,20 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("          \"Bolt10_p9\": " + Dbl(r.p9) + ",");
             sb.AppendLine("          \"Bolt11_p10\": " + Dbl(r.p10));
             sb.AppendLine("        },");
+        }        
+        private static void WriteHoles(StringBuilder sb, Row r)
+        {
+            sb.AppendLine("      \"Holes\": {");
+            sb.AppendLine("        \"DiameterHolesForBolts\": " + Dbl(r.Lws_base) + ",");
+            sb.AppendLine("        \"Dws_holes\": " + Dbl(r.Dws_holes) + ",");
+            sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");
+            sb.AppendLine("        \"CountHoles\": {");        
+            sb.AppendLine("         \"Nh_holes_1_4\": " + r.Nh_Holes_1_4 + ",");
+            sb.AppendLine("         \"Nh_holes_1_8\": " + r.Nh_Holes_5_8);
+            sb.AppendLine("        },");
+            sb.AppendLine("        \"xh\": " + Dbl(r.Xh_base));
+            sb.AppendLine("      },");
         }
-
         private static void WriteAnchor(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Anchor\": {");
@@ -312,19 +331,23 @@ namespace ConvertData.Infrastructure
         private static void WriteInternalForces(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"InternalForces\": {");
-            sb.AppendLine("      \"N\": " + r.N + ",");
-            sb.AppendLine("      \"Nt\": " + r.Nt + ",");
-            sb.AppendLine("      \"Nc\": " + r.Nc + ",");
-            sb.AppendLine("      \"My\": " + r.My + ",");
-            sb.AppendLine("      \"Mz\": " + Dbl(r.Mz) + ",");
-            sb.AppendLine("      \"Mx\": " + Dbl(r.Mx) + ",");
-            sb.AppendLine("      \"Mw\": " + Dbl(r.Mw) + ",");
-            sb.AppendLine("      \"Mneg\": " + Dbl(r.Mneg) + ",");
-            sb.AppendLine("      \"T\": " + r.T + ",");
-            sb.AppendLine("      \"Qy\": " + r.Qy + ",");
-            sb.AppendLine("      \"Qz\": " + r.Qz + ",");
-            sb.AppendLine("      \"Qx\": " + r.Qx + ",");
-            sb.AppendLine("      \"Anchor_F_base\": " + Dbl(r.F_base));
+            sb.AppendLine("      \"N\": " +              Dbl(r.N) +              ",");
+            sb.AppendLine("      \"Nt\": " +             Dbl(r.Nt) +             ",");
+            sb.AppendLine("      \"Nc\": " +             Dbl(r.Nc) +             ",");
+            sb.AppendLine("      \"My\": " +             Dbl(r.My) +             ",");
+            sb.AppendLine("      \"My_compression\": " + Dbl(r.My_compression) + ",");
+            sb.AppendLine("      \"My_tension\": " +     Dbl(r.My_tension) +     ",");
+            sb.AppendLine("      \"Mz\": " +             Dbl(r.Mz) +             ",");
+            sb.AppendLine("      \"Mz_tension\": " +     Dbl(r.Mz_tension) +     ",");
+            sb.AppendLine("      \"Mz_compression\": " + Dbl(r.Mz_compression) + ",");
+            sb.AppendLine("      \"Mx\": " +             Dbl(r.Mx) +             ",");
+            sb.AppendLine("      \"Mw\": " +             Dbl(r.Mw) +             ",");
+            sb.AppendLine("      \"Mneg\": " +           Dbl(r.Mneg) +           ",");
+            sb.AppendLine("      \"T\": " +              Dbl(r.T) +              ",");
+            sb.AppendLine("      \"Qy\": " +             Dbl(r.Qy) +             ",");
+            sb.AppendLine("      \"Qz\": " +             Dbl(r.Qz) +             ",");
+            sb.AppendLine("      \"Qx\": " +             Dbl(r.Qx) +             ",");
+            sb.AppendLine("      \"Anchor_F_base\": " +  Dbl(r.F_base));
             sb.AppendLine("    },");
         }
         /// <summary>
