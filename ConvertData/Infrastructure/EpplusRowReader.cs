@@ -274,7 +274,18 @@ namespace ConvertData.Infrastructure
             map["tws"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
             map["Tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
             map["Anchor_tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
-
+            map["B_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["H_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Lws_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Tp_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Tr1_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Tr2_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["B_stiff"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["H_stiff"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Lws_stiff"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Tp_stiff"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Tr1_stiff"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
+            map["Tr2_stiff"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
             return map;
         }
 
@@ -364,19 +375,7 @@ namespace ConvertData.Infrastructure
                 ["Nh1"] =                    (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
                 ["Nh_3_4"] =                 (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
                 ["Nh_base_var2"] =           (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-                ["Nh2"] =                    (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-                ["B_plate"] =                (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["H_plate"] =                (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Lws_plate"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tp_plate"] =               (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr1_plate"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr2_plate"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["B_stiff"] =                (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["H_stiff"] =                (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Lws_stiff"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tp_stiff"] =               (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr1_stiff"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr2_stiff"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v)
+                ["Nh2"] =                    (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v)                
             };                                                          
             return map;
         }
