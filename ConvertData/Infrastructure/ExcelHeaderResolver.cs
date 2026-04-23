@@ -28,6 +28,18 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "GOST_Column_Beams".</summary>
     public int IdxGostColumnAndBeams { get; set; } = -1;
 
+    /// <summary>Индекс колонки "GostHoles".</summary>
+    public int IdxGostHoles { get; set; } = -1;
+
+    /// <summary>Индекс колонки "GostBolts".</summary>
+    public int IdxGostBolts { get; set; } = -1;
+
+    /// <summary>Индекс колонки "GostAnchore".</summary>
+    public int IdxGostAnchore { get; set; } = -1;
+
+    /// <summary>Индекс колонки "GostWeld".</summary>
+    public int IdxGostWeld { get; set; } = -1;
+
     /// <summary>Индекс колонки "GostProfile".</summary>
     public int IdxGostProfile { get; set; } = -1;
 
@@ -203,6 +215,10 @@ internal static class ExcelHeaderResolver
             IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),
             IdxGost = HeaderUtils.IndexOfHeaderAny(header, ["Gost", "GOST"]),
             IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GostColumnAndBeams", "GOST_Column_Beams", "Gost_Column_Beams", "GOST Column Beams"]),
+            IdxGostHoles = HeaderUtils.IndexOfHeaderAny(header, ["GostHoles", "GOST_holes"]),
+            IdxGostBolts = HeaderUtils.IndexOfHeaderAny(header, ["GostBolts", "GOST_bolts"]),
+            IdxGostAnchore = HeaderUtils.IndexOfHeaderAny(header, ["GostAnchore", "GOST_anchor", "GOST_anchors"]),
+            IdxGostWeld = HeaderUtils.IndexOfHeaderAny(header, ["GostWeld", "GOST_weld"]),
             IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostProfile", "GOST_Profile", "Gost_Profile", "GOST Profile"]),
             IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, [
                 "Explanations", "Explanation",

@@ -91,6 +91,10 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
                         GetCell(ws, r, map.IdxGost >= 0 ? startCol + map.IdxGost : null),
                         GetCell(ws, r, map.IdxGostColumnAndBeams >= 0 ? startCol + map.IdxGostColumnAndBeams : null),
+                        GetCell(ws, r, map.IdxGostHoles >= 0 ? startCol + map.IdxGostHoles : null),
+                        GetCell(ws, r, map.IdxGostBolts >= 0 ? startCol + map.IdxGostBolts : null),
+                        GetCell(ws, r, map.IdxGostAnchore >= 0 ? startCol + map.IdxGostAnchore : null),
+                        GetCell(ws, r, map.IdxGostWeld >= 0 ? startCol + map.IdxGostWeld : null),
                         GetCell(ws, r, map.IdxGostProfile >= 0 ? startCol + map.IdxGostProfile : null),
                         GetCell(ws, r, startCol + map.IdxProfileBeam),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ?  startCol + map.IdxProfileColumn : null),
@@ -241,6 +245,7 @@ namespace ConvertData.Infrastructure
             new(StringComparer.OrdinalIgnoreCase)
             {
                 ["GOST_weld"] = (r, v) => r.GostWeld = v,
+                ["GostWeld"] = (r, v) => r.GostWeld = v,
                 ["kf1"]  = (r, v) => r.kf1 = v,
                 ["kf2"]  = (r, v) => r.kf2 = v,
                 ["kf3"]  = (r, v) => r.kf3 = v,
