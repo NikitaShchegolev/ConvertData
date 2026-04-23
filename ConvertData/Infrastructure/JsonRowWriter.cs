@@ -232,14 +232,14 @@ namespace ConvertData.Infrastructure
         private static void WriteHoles(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Holes\": {");
-            sb.AppendLine("        \"DiameterHolesForBolts\": " + Dbl(r.Lws_base) + ",");
+            sb.AppendLine("        \"DiameterHolesForBolts\": " + r.F_holes + ",");
             sb.AppendLine("        \"Dws_holes\": " + Dbl(r.Dws_holes) + ",");
             sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");
             sb.AppendLine("        \"CountHoles\": {");        
             sb.AppendLine("         \"Nh_holes_1_4\": " + r.Nh_Holes_1_4 + ",");
             sb.AppendLine("         \"Nh_holes_1_8\": " + r.Nh_Holes_5_8);
             sb.AppendLine("        },");
-            sb.AppendLine("        \"xh\": " + Dbl(r.Xh_base));
+            sb.AppendLine("        \"xh\": " + Dbl(r.Anchor_xh_holes));
             sb.AppendLine("      },");
         }
         private static void WriteAnchor(StringBuilder sb, Row r)
@@ -347,7 +347,7 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("      \"Qy\": " +             Dbl(r.Qy) +             ",");
             sb.AppendLine("      \"Qz\": " +             Dbl(r.Qz) +             ",");
             sb.AppendLine("      \"Qx\": " +             Dbl(r.Qx) +             ",");
-            sb.AppendLine("      \"Anchor_F_base\": " +  Dbl(r.F_base));
+            sb.AppendLine("      \"F_base\": " +         Dbl(r.F_base));
             sb.AppendLine("    },");
         }
         /// <summary>

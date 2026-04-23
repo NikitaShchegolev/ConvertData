@@ -131,7 +131,7 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxLws_stiff >= 0 ?      startCol + map.IdxLws_stiff : null),
                         GetCell(ws, r, map.Idxtp_stiff >= 0 ?       startCol + map.Idxtp_stiff  : null),
                         GetCell(ws, r, map.Idxtr1_stiff >= 0 ?      startCol + map.Idxtr1_stiff : null),
-                        GetCell(ws, r, map.Idxtr1_stiff >= 0 ?      startCol + map.Idxtr1_stiff : null),
+                        GetCell(ws, r, map.Idxtr2_stiff >= 0 ?      startCol + map.Idxtr2_stiff : null),
                         GetCell(ws, r, map.IdF_base >= 0 ?          startCol + map.IdF_base : null),
                         GetCell(ws, r, map.IdLws_base >= 0 ?        startCol + map.IdLws_base : null),
                         GetCell(ws, r, map.IdLp_base >= 0 ?         startCol + map.IdLp_base : null),
@@ -264,6 +264,8 @@ namespace ConvertData.Infrastructure
         private static Dictionary<string, Action<Row, string>> BuildGeometryColumnMap()
         {
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);   
+            map["F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
+            map["Anchor_F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
             map["Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
             map["Anchor_Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
             map["Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v);
@@ -274,6 +276,31 @@ namespace ConvertData.Infrastructure
             map["tws"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
             map["Tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
             map["Anchor_tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
+            map["Dws"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
+            map["D_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
+            map["Anchor_d_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
+            map["Dp"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
+            map["D_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
+            map["Anchor_d_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
+            map["xh"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
+            map["Xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
+            map["Anchor_xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
+            map["Nh_1_2"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
+            map["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
+            map["Nh1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
+            map["Anchor_nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
+            map["Nh_3_4"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
+            map["Nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
+            map["Nh2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
+            map["Anchor_nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
+            map["Anchor_var_1"] = (r, v) => r.Anchor_var_1 = v;
+            map["Anchor_var_2"] = (r, v) => r.Anchor_var_2 = v;
+            map["Anchor_var_3"] = (r, v) => r.Anchor_var_3 = v;
+            map["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v;
+            map["Anchor_anchor_var_1"] = (r, v) => r.Anchor_var_1 = v;
+            map["Anchor_anchor_var_2"] = (r, v) => r.Anchor_var_2 = v;
+            map["Anchor_anchor_var_3"] = (r, v) => r.Anchor_var_3 = v;
+            map["Anchor_anchor_var_4"] = (r, v) => r.Anchor_var_4 = v;
 
             return map;
         }
@@ -338,7 +365,7 @@ namespace ConvertData.Infrastructure
                 ["Anchor_Lws"] =             (r, v) => r.Lws_base =     NumericParser.ParseDouble(v),
                 ["Anchor_d_p_base"] =        (r, v) => r.D_p_base =     NumericParser.ParseDouble(v),
                 ["Anchor_xh_base"] =         (r, v) => r.Xh_base =      NumericParser.ParseDouble(v),
-                ["Anchor_xh_holes"] =        (r, v) => r.Xh_base =      NumericParser.ParseDouble(v),
+                ["Anchor_xh_holes"] =        (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
                 ["Anchor_nh_base_var1"] =    (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
                 ["Anchor_nh_base_var2"] =    (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
                 ["Anchor_anchor_var_1"] =    (r, v) => r.Anchor_var_1 = v,
@@ -366,17 +393,17 @@ namespace ConvertData.Infrastructure
                 ["Nh_base_var2"] =           (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
                 ["Nh2"] =                    (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
                 ["B_plate"] =                (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["H_plate"] =                (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Lws_plate"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tp_plate"] =               (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr1_plate"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr2_plate"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["B_stiff"] =                (r, v) => r.B_Plate =       NumericParser.ParseDouble(v),
-                ["H_stiff"] =                (r, v) => r.B_Plate =       NumericParser.ParseDouble(v),
-                ["Lws_stiff"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tp_stiff"] =               (r, v) => r.B_Plate =       NumericParser.ParseDouble(v),
-                ["Tr1_stiff"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v),
-                ["Tr2_stiff"] =              (r, v) => r.B_Plate =      NumericParser.ParseDouble(v)
+                ["H_plate"] =                (r, v) => r.H_Plate =      NumericParser.ParseDouble(v),
+                ["Lws_plate"] =              (r, v) => r.Lws_Plate =    NumericParser.ParseDouble(v),
+                ["Tp_plate"] =               (r, v) => r.Tp_Plate =     NumericParser.ParseDouble(v),
+                ["Tr1_plate"] =              (r, v) => r.Tr1_Plate =    NumericParser.ParseDouble(v),
+                ["Tr2_plate"] =              (r, v) => r.Tr2_Plate =    NumericParser.ParseDouble(v),
+                ["B_stiff"] =                (r, v) => r.B_Stiff =      NumericParser.ParseDouble(v),
+                ["H_stiff"] =                (r, v) => r.H_Stiff =      NumericParser.ParseDouble(v),
+                ["Lws_stiff"] =              (r, v) => r.Lws_Stiff =    NumericParser.ParseDouble(v),
+                ["Tp_stiff"] =               (r, v) => r.Tp_Stiff =     NumericParser.ParseDouble(v),
+                ["Tr1_stiff"] =              (r, v) => r.Tr1_Stiff =    NumericParser.ParseDouble(v),
+                ["Tr2_stiff"] =              (r, v) => r.Tr2_Stiff =    NumericParser.ParseDouble(v)
             };                                                          
             return map;
         }
@@ -393,9 +420,11 @@ namespace ConvertData.Infrastructure
                 ["Option"] = (r, v) => r.OptionHoles = NumericParser.ParseInt(v),
                 //Радиус отверстия
                 ["F"] = (r, v) => { r.F_holes = NumericParser.ParseInt(v); r.N_Rows = 1; },
+                ["F_holes"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),
+                ["DiameterHolesForBolts"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),
                 //Марка опорного столика
                 ["Марка опорного столика"] = (r, v) => r.TableBrandHoles = v,
-                ["Маркаопорногостолика"] = (r, v) => r.TableBrand = v,
+                ["Маркаопорногостолика"] = (r, v) => r.TableBrandHoles = v,
                 ["марка"] = (r, v) => r.TableBrandHoles = v,
                 ["Марка"] = (r, v) => r.TableBrandHoles = v,
                 //Гост для анкеров
@@ -408,8 +437,10 @@ namespace ConvertData.Infrastructure
                 ["Nh_holes_1_4"] = (r, v) => r.Nh_Holes_1_4 = NumericParser.ParseInt(v),
                 //Количество отверстий от 1 до 8
                 ["Nh_holes_5_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v),
+                ["Nh_holes_1_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v),
                 //Расстояние между отверстиями
                 ["Anchor_xh_holes"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
+                ["xh"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
 
             };
             return map;
@@ -482,9 +513,11 @@ namespace ConvertData.Infrastructure
             int startCol = ws.Dimension.Start.Column;
             int endCol = ws.Dimension.End.Column;
 
+            int headerRow = FindSheetHeaderRow(ws, startRow, Math.Min(endRow, startRow + 30), startCol, endCol, propertyMap);
+
             var headers = new List<string>();
             for (int c = startCol; c <= endCol; c++)
-                headers.Add(HeaderUtils.NormalizeHeader((ws.Cells[startRow, c].Text ?? "").Trim()));
+                headers.Add(HeaderUtils.NormalizeHeader((ws.Cells[headerRow, c].Text ?? "").Trim()));
 
             int keyCol = -1;
             for (int i = 0; i < headers.Count; i++)
@@ -512,21 +545,24 @@ namespace ConvertData.Infrastructure
             if (colMappings.Count == 0)
                 return;
 
-            for (int r = startRow + 1; r <= endRow; r++)
+            for (int r = headerRow + 1; r <= endRow; r++)
             {
                 Row? target = null;
 
-                // Стратегия 1: Индексный поиск (строки обычно совпадают по порядку)
-                int idx = r - startRow - 1;
-                if (idx >= 0 && idx < list.Count)
-                    target = list[idx];
-
-                // Стратегия 2: Поиск по CONNECTION_CODE (если есть колонка с кодом)
-                if (target == null && keyCol >= 0)
+                string? key = null;
+                if (keyCol >= 0)
                 {
-                    var key = (ws.Cells[r, startCol + keyCol].Text ?? "").Trim();
+                    key = (ws.Cells[r, startCol + keyCol].Text ?? "").Trim();
                     if (!string.IsNullOrWhiteSpace(key))
                         codeLookup.TryGetValue(key, out target);
+                }
+
+                // Стратегия 2: Индексный поиск (строки обычно совпадают по порядку)
+                if (target == null)
+                {
+                    int idx = r - headerRow - 1;
+                    if (idx >= 0 && idx < list.Count)
+                        target = list[idx];
                 }
 
                 // Стратегия 3: Если обе стратегии не сработали, но данные есть, 
@@ -569,6 +605,30 @@ namespace ConvertData.Infrastructure
                         setter(target, text);
                 }
             }
+        }
+
+        private static int FindSheetHeaderRow(
+            ExcelWorksheet ws,
+            int fromRow,
+            int toRow,
+            int startCol,
+            int endCol,
+            IReadOnlyDictionary<string, Action<Row, string>> propertyMap)
+        {
+            for (int r = fromRow; r <= toRow; r++)
+            {
+                var tokens = new List<string>();
+                for (int c = startCol; c <= endCol; c++)
+                    tokens.Add(HeaderUtils.NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
+
+                bool hasKey = HeaderUtils.IndexOfHeaderAny(tokens, KeyColumnHeaders) >= 0;
+                int mappedCount = tokens.Count(t => !string.IsNullOrWhiteSpace(t) && propertyMap.ContainsKey(t));
+
+                if (mappedCount >= 2 || (hasKey && mappedCount >= 1))
+                    return r;
+            }
+
+            return fromRow;
         }
         #endregion
     }
