@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="EXCEL_Anchor_OUT\" />
+    <Folder Include="EXCEL_Profile_OUT\" />
     <Folder Include="JSON_OUT\" />
     <Folder Include="JSON_All\" />
     <Folder Include="EXCEL_MARK_STEEL_OUT\" />
