@@ -70,30 +70,14 @@ internal sealed class SteelExcelToJsonExporter
 
             for (int i = 0; i < headers.Length; i++)
             {
-                var header = headers[i];
-                if (string.IsNullOrWhiteSpace(header))
-                    continue;
-
-                if (header.Equals("Steel_", StringComparison.OrdinalIgnoreCase))
-                    steelCol = i;
-                else if (header.Equals("Name_Table", StringComparison.OrdinalIgnoreCase))
-                    nameTableCol = i;
-                else if (header.Equals("tmin", StringComparison.OrdinalIgnoreCase))
-                    tminCol = i;
-                else if (header.Equals("tmax", StringComparison.OrdinalIgnoreCase))
-                    tmaxCol = i;
-                else if (header.Equals("Ryn", StringComparison.OrdinalIgnoreCase))
-                    rynCol = i;
-                else if (header.Equals("Run", StringComparison.OrdinalIgnoreCase))
-                    runCol = i;
-                else if (header.Equals("Ry", StringComparison.OrdinalIgnoreCase))
-                    ryCol = i;
-                else if (header.Equals("Ru", StringComparison.OrdinalIgnoreCase))
-                    ruCol = i;
-                else if (header.Equals("caseParametr_t", StringComparison.OrdinalIgnoreCase) ||
-                         header.Equals("if", StringComparison.OrdinalIgnoreCase))
-                    caseParamCol = i;
+                if (ProfileHeaders.Contains(headers[i]))
+                {
+                    profileCol = i;
+                    break;
+                }
             }
+            if (profileCol < 0)
+                profileCol = 0;
 
             // Проверяем, что все необходимые столбцы найдены
             if (steelCol == -1)
