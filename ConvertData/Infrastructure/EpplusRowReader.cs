@@ -147,6 +147,10 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdD_ws_base >= 0 ?       startCol + map.IdD_ws_base : null),
                         GetCell(ws, r, map.IdD_p_base >= 0 ?        startCol + map.IdD_p_base : null),
                         GetCell(ws, r, map.IdXh_base >= 0 ?         startCol + map.IdXh_base : null),
+                        GetCell(ws, r, map.IdxH_base >= 0 ?         startCol + map.IdxH_base : null),
+                        GetCell(ws, r, map.IdxB_base >= 0 ?         startCol + map.IdxB_base : null),
+                        GetCell(ws, r, map.IdxS_base >= 0 ?         startCol + map.IdxS_base : null),
+                        GetCell(ws, r, map.IdxT_base >= 0 ?         startCol + map.IdxT_base : null),
                         GetCell(ws, r, map.IdNh_base_var1 >= 0 ?    startCol + map.IdNh_base_var1 : null),
                         GetCell(ws, r, map.IdNh_base_var2 >= 0 ?    startCol + map.IdNh_base_var2 : null),
                         GetCell(ws, r, map.IdAnchor_var_1 >= 0 ?    startCol + map.IdAnchor_var_1 : null),
@@ -276,38 +280,76 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);   
             map["GOST"] = (r, v) => r.Gost = v;
             map["Gost"] = (r, v) => r.Gost = v;
-            map["GostProfile"] = (r, v) => r.GostProfile = v;
-            map["GostColumnAndBeams"] = (r, v) => r.GostColumnAndBeams = v;
-            map["H"] = (r, v) =>
+            map["GostColumn"] = (r, v) => r.GostColumn = v;
+            map["GostBeams"] = (r, v) => r.GostBeams = v;
+            //Фланец
+            map["H_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
                 r.Flange_H = value;
                 if (r.H_Plate == 0)
                     r.H_Plate = value;
             };
-            map["B"] = (r, v) =>
+            map["B_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
                 r.Flange_B = value;
                 if (r.B_Plate == 0)
                     r.B_Plate = value;
             };
-            map["tp"] = (r, v) =>
+            map["Tp_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
                 r.Flange_t = value;
                 if (r.Tp_Plate == 0)
                     r.Tp_Plate = value;
             };
-            map["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
+            map["Lb_flange"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
+            //Пластина
             map["B_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
             map["H_plate"] = (r, v) => r.H_Plate = NumericParser.ParseDouble(v);
             map["Lws_plate"] = (r, v) => r.Lws_Plate = NumericParser.ParseDouble(v);
             map["Tp_plate"] = (r, v) => r.Tp_Plate = NumericParser.ParseDouble(v);
             map["Tr1_plate"] = (r, v) => r.Tr1_Plate = NumericParser.ParseDouble(v);
             map["Tr2_plate"] = (r, v) => r.Tr2_Plate = NumericParser.ParseDouble(v);
+            //Ребра жесткости
             map["B_stiff"] = (r, v) => r.B_Stiff = NumericParser.ParseDouble(v);
             map["H_stiff"] = (r, v) => r.H_Stiff = NumericParser.ParseDouble(v);
+            map["Tg_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Tg_Stiff = value;
+                if (r.Tg_Stiff == 0)
+                    r.Tg_Stiff = value;
+            };
+            map["Lg_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Lg_Stiff = value;
+                if (r.Lg_Stiff == 0)
+                    r.Lg_Stiff = value;
+            };
+            map["Tf_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Tf_Stiff = value;
+                if (r.Tf_Stiff == 0)
+                    r.Tf_Stiff = value;
+            };
+            map["Lh_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Lh_Stiff = value;
+                if (r.Lh_Stiff == 0)
+                    r.Lh_Stiff = value;
+            };
+            map["Hh_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Hh_Stiff = value;
+                if (r.Hh_Stiff == 0)
+                    r.Hh_Stiff = value;
+            };
             map["Lws_stiff"] = (r, v) => r.Lws_Stiff = NumericParser.ParseDouble(v);
             map["Tp_stiff"] = (r, v) => r.Tp_Stiff = NumericParser.ParseDouble(v);
             map["Tr1_stiff"] = (r, v) => r.Tr1_Stiff = NumericParser.ParseDouble(v);

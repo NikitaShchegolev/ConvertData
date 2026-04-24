@@ -45,12 +45,6 @@ namespace ConvertData.Infrastructure
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
                 sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
                 sb.AppendLine("    \"Gost\": \"" + JsonEscape(r.Gost) + "\",");
-                sb.AppendLine("    \"GostColumnAndBeams\": \"" + JsonEscape(r.GostColumnAndBeams) + "\",");
-                sb.AppendLine("    \"GostHoles\": \"" + JsonEscape(r.GostHoles) + "\",");
-                sb.AppendLine("    \"GostBolts\": \"" + JsonEscape(r.GostBolts) + "\",");
-                sb.AppendLine("    \"GostAnchore\": \"" + JsonEscape(r.GostAnchore) + "\",");
-                sb.AppendLine("    \"GostWeld\": \"" + JsonEscape(r.GostWeld) + "\",");
-                sb.AppendLine("    \"GostProfile\": \"" + JsonEscape(r.GostProfile) + "\",");
                 sb.AppendLine("    \"variable\": \"" + JsonEscape(r.variable) + "\",");
                 sb.AppendLine("    \"TableBrand\": \"" + JsonEscape(r.TableBrand) + "\",");
                 sb.AppendLine("    \"Explanations\": \"" + JsonEscape(r.Explanations) + "\",");
@@ -117,6 +111,7 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("      \"Beam\": {");
             sb.AppendLine("        \"ProfileBeam\": \"" + JsonEscape(r.ProfileBeam) + "\",");
+            sb.AppendLine("        \"GostBeams\": \"" + JsonEscape(r.GostBeams) + "\",");
             sb.AppendLine("        \"Beam_H\": " + Dbl(r.Beam_H) + ",");
             sb.AppendLine("        \"Beam_B\": " + Dbl(r.Beam_B) + ",");
             sb.AppendLine("        \"Beam_s\": " + Dbl(r.Beam_s) + ",");
@@ -142,6 +137,7 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("      \"Column\": {");
             sb.AppendLine("        \"ProfileColumn\": \"" + JsonEscape(r.ProfileColumn) + "\",");
+            sb.AppendLine("        \"GostColumn\": \"" + JsonEscape(r.GostColumn) + "\",");
             sb.AppendLine("        \"Column_H\": " +  Dbl(r.Column_H) + ",");
             sb.AppendLine("        \"Column_B\": " +  Dbl(r.Column_B) + ",");
             sb.AppendLine("        \"Column_s\": " +  Dbl(r.Column_s) + ",");
@@ -200,6 +196,7 @@ namespace ConvertData.Infrastructure
         private static void WriteBolts(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"Bolts\": {");
+            sb.AppendLine("      \"GostBolts\": \"" + JsonEscape(r.GostBolts) + "\",");
             sb.AppendLine("      \"Option\": {");
             sb.AppendLine("        \"version\": " + r.OptionBolts);
             sb.AppendLine("      },");
@@ -239,6 +236,7 @@ namespace ConvertData.Infrastructure
         private static void WriteHoles(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Holes\": {");
+            sb.AppendLine("        \"GostHoles\": \"" + JsonEscape(r.GostHoles) + "\",");
             sb.AppendLine("        \"DiameterHolesForBolts\": " + r.F_holes + ",");
             sb.AppendLine("        \"Dws_holes\": " + Dbl(r.Dws_holes) + ",");
             sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");
@@ -252,6 +250,7 @@ namespace ConvertData.Infrastructure
         private static void WriteAnchor(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Anchor\": {");
+            sb.AppendLine("        \"GostAnchore\": \"" + JsonEscape(r.GostAnchore) + "\",");
             sb.AppendLine("        \"Anchor_Lws\": " +          Dbl(r.Lws_base) + ",");
             sb.AppendLine("        \"Anchor_Lp_base\": " +      Dbl(r.Lp_base) + ",");
             sb.AppendLine("        \"Anchor_Ls_base\": " +      Dbl(r.Ls_base) + ",");
@@ -289,15 +288,16 @@ namespace ConvertData.Infrastructure
         private static void WriteWelds(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"Welds\": {");
-            sb.AppendLine("      \"kf1\": " +               WeldValue(r.kf1) + ",");
-            sb.AppendLine("      \"kf2\": " +               WeldValue(r.kf2) + ",");
-            sb.AppendLine("      \"kf3\": " +               WeldValue(r.kf3) + ",");
-            sb.AppendLine("      \"kf4\": " +               WeldValue(r.kf4) + ",");
-            sb.AppendLine("      \"kf5\": " +               WeldValue(r.kf5) + ",");
-            sb.AppendLine("      \"kf6\": " +               WeldValue(r.kf6) + ",");
-            sb.AppendLine("      \"kf7\": " +               WeldValue(r.kf7) + ",");
-            sb.AppendLine("      \"kf8\": " +               WeldValue(r.kf8) + ",");
-            sb.AppendLine("      \"kf9\": " +               WeldValue(r.kf9) + ",");
+            sb.AppendLine("      \"GostWeld\": \"" + JsonEscape(r.GostWeld)   + "\",");
+            sb.AppendLine("      \"kf1\": " +               WeldValue(r.kf1)  + ",");
+            sb.AppendLine("      \"kf2\": " +               WeldValue(r.kf2)  + ",");
+            sb.AppendLine("      \"kf3\": " +               WeldValue(r.kf3)  + ",");
+            sb.AppendLine("      \"kf4\": " +               WeldValue(r.kf4)  + ",");
+            sb.AppendLine("      \"kf5\": " +               WeldValue(r.kf5)  + ",");
+            sb.AppendLine("      \"kf6\": " +               WeldValue(r.kf6)  + ",");
+            sb.AppendLine("      \"kf7\": " +               WeldValue(r.kf7)  + ",");
+            sb.AppendLine("      \"kf8\": " +               WeldValue(r.kf8)  + ",");
+            sb.AppendLine("      \"kf9\": " +               WeldValue(r.kf9)  + ",");
             sb.AppendLine("      \"kf10\": " +              WeldValue(r.kf10) + ",");
             sb.AppendLine("      \"Anchor_k_fws_base\": " + WeldValue(r.K_fws_base));
             sb.AppendLine("    },");

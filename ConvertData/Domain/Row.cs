@@ -2,18 +2,19 @@
 
 internal sealed class Row
 {
+    #region Общие данные узлов
     /// <summary>
     /// Имя группы узлового соединения
     /// </summary>
     public string Name { get; set; } = "";
     public string TypeNode { get; set; } = "";
     public string Gost { get; set; } = "";
-    public string GostColumnAndBeams { get; set; } = "";
+    public string GostColumn { get; set; } = "";
+    public string GostBeams { get; set; } = "";
     public string GostHoles { get; set; } = "";
     public string GostBolts { get; set; } = "";
     public string GostAnchore { get; set; } = "";
     public string GostWeld { get; set; } = "";
-    public string GostProfile { get; set; } = "";
     /// <summary>
     /// Пояснения к узловому соединению, которые могут включать в себя описание типа соединения,
     /// </summary>
@@ -23,7 +24,8 @@ internal sealed class Row
     /// Этот код может быть использован для определения геометрических 
     /// характеристик балки и колонны, а также для расчета жесткости и внутренних сил в соединении.
     /// </summary>
-    public string CONNECTION_CODE { get; set; } = "";
+    public string CONNECTION_CODE { get; set; } = ""; 
+    #endregion
     #region Вариант расчета
     /// <summary>
     /// Вариант расчета, который определяет, какие данные будут использоваться для расчета.
@@ -203,6 +205,11 @@ internal sealed class Row
     public double Tp_Stiff { get; set; }
     public double Tr1_Stiff { get; set; }
     public double Tr2_Stiff { get; set; }
+    public double Tg_Stiff { get; set; }
+    public double Lg_Stiff { get; set; }
+    public double Tf_Stiff { get; set; }
+    public double Lh_Stiff { get; set; }
+    public double Hh_Stiff { get; set; }
     #endregion
     #region Flange
     /// <summary>
@@ -222,7 +229,16 @@ internal sealed class Row
     /// </summary>
     public double Flange_t { get; set; }
     #endregion
-
+    #region Базы
+    public double H_base { get; set; }
+    public double S_base { get; set; }
+    public double B_base { get; set; }
+    public double T_base { get; set; }
+    public double Lp_base { get; set; }
+    public double Ls_base { get; set; }
+    public double Lws_base { get; set; }
+    public double Tws_base { get; set; }
+    #endregion
 
     //Bolts
 
@@ -526,14 +542,7 @@ internal sealed class Row
     #region Анкера
     /// <summary> Усилие отрыва </summary>
     public double F_base { get; set; }
-    /// <summary> Длина стороны шайбы под анкер </summary>
-    public double Lws_base { get; set; }
-    /// <summary> Ширина колодца под упор </summary>
-    public double Lp_base { get; set; }
-    /// <summary> Ширина противосдвигового упора в плоскости наибольшей жесткости</summary>
-    public double Ls_base { get; set; }
-    /// <summary> Толщина шайбы под анкер </summary>
-    public double Tws_base { get; set; }
+    
     /// <summary> Диаметр отверстия в шайбе под анкер </summary>
     public double D_ws_base { get; set; }
     /// <summary> Диаметр отверстия под анкер </summary>
@@ -553,6 +562,5 @@ internal sealed class Row
     public string Anchor_var_3 { get; set; } = "";
     /// <summary> Наимернование соединения вариант 4</summary>
     public string Anchor_var_4 { get; set; } = "";
-    #endregion   
-
+    #endregion
 }

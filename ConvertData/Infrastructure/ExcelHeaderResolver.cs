@@ -40,7 +40,7 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "GostWeld".</summary>
     public int IdxGostWeld { get; set; } = -1;
 
-    /// <summary>Индекс колонки "GostProfile".</summary>
+    /// <summary>Индекс колонки "GostColumn".</summary>
     public int IdxGostProfile { get; set; } = -1;
 
     /// <summary>Индекс колонки "variable" (вариант расчета).</summary>
@@ -76,6 +76,12 @@ internal sealed class ExcelColumnMap
     public int Idxtr1_plate { get; set; } = -1;
     public int Idxtr2_plate { get; set; } = -1;
     #endregion
+    #region Базы
+    public int IdxH_base { get; set; } = -1;
+    public int IdxB_base { get; set; } = -1;
+    public int IdxS_base { get; set; } = -1;
+    public int IdxT_base { get; set; } = -1;
+    #endregion
     #region Ребра жесткости
     public int IdxB_stiff { get; set; } = -1;
     public int IdxH_stiff { get; set; } = -1;
@@ -83,6 +89,17 @@ internal sealed class ExcelColumnMap
     public int IdxLws_stiff { get; set; } = -1;
     public int Idxtr1_stiff { get; set; } = -1;
     public int Idxtr2_stiff { get; set; } = -1;
+    public int IdxTg_Stiff { get; set; } = -1;
+    public int IdxLg_Stiff { get; set; } = -1;
+    public int IdxTf_Stiff { get; set; } = -1;
+    public int IdxLh_Stiff { get; set; } = -1;
+    public int IdxHh_Stiff { get; set; } = -1;
+    #endregion
+    #region Фланец
+    public int IdxTp_Flange  { get; set; } = -1;
+    public int IdxB_Flange   { get; set; } = -1;
+    public int IdxH_Flange   { get; set; } = -1;
+    public int IdxLb_Flange  { get; set; } = -1;
     #endregion
     #region Внутренние усилия
     /// <summary> Усилие отрыва для баз </summary>
@@ -145,14 +162,15 @@ internal sealed class ExcelColumnMap
     public int IdLp_base { get; set; } = -1;
     /// <summary> Ширина противосдвигового упора в плоскости наибольшей жесткости</summary>
     public int IdLs_base { get; set; } = -1;
+    /// <summary> Длина противосдвигового упора в плоскости наибольшей жесткости</summary>
+    public int IdXh_base { get; set; } = -1;
     /// <summary> Толщина шайбы под анкер </summary>
     public int IdTws_base { get; set; } = -1;
     /// <summary> Диаметр отверстия в шайбе под анкер </summary>
     public int IdD_ws_base { get; set; } = -1;
     /// <summary> Диаметр отверстия под анкер </summary>
     public int IdD_p_base { get; set; } = -1;
-    /// <summary> Растояние между отверстиями </summary>
-    public int IdXh_base { get; set; } = -1;
+    
     /// <summary> Расстояние между монтажными отверстиями </summary>
     public int IdK_fws_base { get; set; } = -1;
     #endregion
@@ -203,35 +221,25 @@ internal static class ExcelHeaderResolver
         {
             idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
         }
-
+        //IdxProfileBeam = idxProfile, - не знаю для чего!
         var map = new ExcelColumnMap
         {
-            IdxH = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),
-            IdxB = HeaderUtils.IndexOfHeaderAny(header, ["Beam_B"]),
-            Idxs = HeaderUtils.IndexOfHeaderAny(header, ["Beam_s"]),
-            Idxt = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
+            //Общие данные об узле
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
             IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
             IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),
             IdxGost = HeaderUtils.IndexOfHeaderAny(header, ["Gost", "GOST"]),
-            IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GostColumnAndBeams", "GOST_Column_Beams", "Gost_Column_Beams", "GOST Column Beams"]),
+            IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GostBeams", "GOST_Column_Beams", "Gost_Column_Beams", "GOST Column Beams"]),
             IdxGostHoles = HeaderUtils.IndexOfHeaderAny(header, ["GostHoles", "GOST_holes"]),
             IdxGostBolts = HeaderUtils.IndexOfHeaderAny(header, ["GostBolts", "GOST_bolts"]),
             IdxGostAnchore = HeaderUtils.IndexOfHeaderAny(header, ["GostAnchore", "GOST_anchor", "GOST_anchors"]),
             IdxGostWeld = HeaderUtils.IndexOfHeaderAny(header, ["GostWeld", "GOST_weld"]),
-            IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostProfile", "GOST_Profile", "Gost_Profile", "GOST Profile"]),
-            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, [
-                "Explanations", "Explanation",
-                "Объяснения", "Объяснение",
-                "Пояснения", "Пояснение",
-                "Дополнения", "Дополнение",
-                "Примечания", "Примечание",
-                "Описание", "Описания",
-                "Комментарий", "Комментарии",
-                "Прим."
-            ]),            
-            IdxProfileBeam = idxProfile,
-            IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
+            IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostColumn", "GOST_Profile", "Gost_Profile", "GOST Profile"]),
+            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, [ "Explanations"]),
+            
+
+            //Внутренние усилия
+            IdF_base = HeaderUtils.IndexOfHeaderAny(header, ["F_base", "Fbase", "F_base_anchor"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
             IdxQy = HeaderUtils.IndexOfHeaderAny(header, ["Qy"]),
             IdxQz = HeaderUtils.IndexOfHeaderAny(header, ["Qz"]),
@@ -241,16 +249,18 @@ internal static class ExcelHeaderResolver
             IdxMy = HeaderUtils.IndexOfHeaderAny(header, ["My"]),
             IdxMy_compression = HeaderUtils.IndexOfHeaderAny(header, ["My_compression", "My_compresion", "My_ compresion", "My compression"]),
             IdxMy_tension = HeaderUtils.IndexOfHeaderAny(header, ["My_tension", "My_ tension", "My tension"]),
-            IdxVariable = HeaderUtils.IndexOfHeaderAny(header, ["variable", "Variable"]),
-            IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
-            IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
-            IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
             IdxMz = HeaderUtils.IndexOfHeaderAny(header, ["Mz"]),
             IdxMz_compression = HeaderUtils.IndexOfHeaderAny(header, ["Mz_compression", "Mz_compresion", "Mz_ compresion", "Mz compression"]),
             IdxMz_tension = HeaderUtils.IndexOfHeaderAny(header, ["Mz_tension", "Mz_ tension", "Mz tension"]),
+            IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
             IdxMx = HeaderUtils.IndexOfHeader(header, "Mx"),
             IdxMw = HeaderUtils.IndexOfHeader(header, "Mw"),
-            IdF_base = HeaderUtils.IndexOfHeaderAny(header, ["F_base", "Fbase", "F_base_anchor"]),
+            IdxVariable = HeaderUtils.IndexOfHeaderAny(header, ["variable", "Variable"]),
+            //Жесткость
+            IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
+            IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
+
+
             IdLws_base = HeaderUtils.IndexOfHeaderAny(header, ["Lws_base", "Lws", "L_ws"]),
             IdLp_base = HeaderUtils.IndexOfHeaderAny(header, ["Lp_base", "Lp", "Lpbase"]),
             IdLs_base = HeaderUtils.IndexOfHeaderAny(header, ["Ls_base", "Ls", "Lsbase"]),
@@ -258,25 +268,49 @@ internal static class ExcelHeaderResolver
             IdD_ws_base = HeaderUtils.IndexOfHeaderAny(header, ["D_ws_base", "Dws", "D_ws", "d_ws_base"]),
             IdD_p_base = HeaderUtils.IndexOfHeaderAny(header, ["D_p_base", "Dp", "D_p", "d_p_base"]),
             IdXh_base = HeaderUtils.IndexOfHeaderAny(header, ["Xh_base", "xh", "Xh", "xh_base"]),
+            IdK_fws_base = HeaderUtils.IndexOfHeaderAny(header, ["K_fws_base"]),
+            IdNh_base_var2 = HeaderUtils.IndexOfHeaderAny(header, ["Nh_base_var2"]),
+            IdxH_base = HeaderUtils.IndexOfHeaderAny(header, ["H_base"]),
+            IdxB_base = HeaderUtils.IndexOfHeaderAny(header, ["H_base"]),
+            IdxS_base = HeaderUtils.IndexOfHeaderAny(header, ["S_base"]),
+            IdxT_base = HeaderUtils.IndexOfHeaderAny(header, ["T_base"]),
+
             IdxB_plate = HeaderUtils.IndexOfHeaderAny(header, ["B_plate", "Plate_B"]),
             IdxH_plate = HeaderUtils.IndexOfHeaderAny(header, ["H_plate", "Plate_H"]),
             IdxLws_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lws_plate", "Plate_Lws"]),
             Idxtp_plate = HeaderUtils.IndexOfHeaderAny(header, ["tp_plate", "Tp_plate", "Plate_t", "Plate_tp"]),
             Idxtr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr1_plate", "Tr1_plate", "Plate_tr1"]),
             Idxtr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr2_plate", "Tr2_plate", "Plate_tr2"]),
-            IdxB_stiff = HeaderUtils.IndexOfHeaderAny(header, ["B_stiff", "Stiff_B"]),
+
+            IdxB_stiff = HeaderUtils.IndexOfHeaderAny(header, ["B_flange", "Stiff_B"]),
             IdxH_stiff = HeaderUtils.IndexOfHeaderAny(header, ["H_stiff", "Stiff_H"]),
             IdxLws_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lws_stiff", "Stiff_Lws"]),
             Idxtp_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tp_stiff", "Tp_stiff", "Stiff_tp"]),
             Idxtr1_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tr1_stiff", "Tr1_stiff", "Stiff_tr1"]),
             Idxtr2_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tr2_stiff", "Tr2_stiff", "Stiff_tr2"]),
-            IdK_fws_base = HeaderUtils.IndexOfHeaderAny(header, ["K_fws_base", "kfws", "K_fws", "kfws_base"]),
-            IdNh_base_var1 = HeaderUtils.IndexOfHeaderAny(header, ["Nh_base_var1", "Nh_1_2", "Nh1", "Nh_var1"]),
-            IdNh_base_var2 = HeaderUtils.IndexOfHeaderAny(header, ["Nh_base_var2", "Nh_3_4", "Nh2", "Nh_var2"]),
-            IdAnchor_var_1 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_1", "Анкер1", "Anchor1"]),
-            IdAnchor_var_2 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_2", "Анкер2", "Anchor2"]),
-            IdAnchor_var_3 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_3", "Анкер3", "Anchor3"]),
-            IdAnchor_var_4 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_4", "Анкер4", "Anchor4"]),
+            IdxTg_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tg_stiff"]),
+            IdxLg_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lg_stiff"]),
+            IdxTf_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tf_stiff"]),
+            IdxLh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lh_stiff"]),
+            IdxHh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Hh_stiff"]),
+
+            IdxTp_Flange = HeaderUtils.IndexOfHeaderAny(header, ["Tp_flange"]),
+            IdxB_Flange = HeaderUtils.IndexOfHeaderAny(header, ["B_flange"]),
+            IdxH_Flange = HeaderUtils.IndexOfHeaderAny(header, ["H_flange"]),
+            IdxLb_Flange = HeaderUtils.IndexOfHeaderAny(header, ["Lb_flange"]),
+
+            
+            IdxProfileBeam = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "ProfileBeams"]),
+            IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
+            IdxH = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),
+            IdxB = HeaderUtils.IndexOfHeaderAny(header, ["Beam_B"]),
+            Idxs = HeaderUtils.IndexOfHeaderAny(header, ["Beam_s"]),
+            Idxt = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
+
+            IdAnchor_var_1 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_1"]),
+            IdAnchor_var_2 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_2"]),
+            IdAnchor_var_3 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_3"]),
+            IdAnchor_var_4 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_4"]),
         };
 
         map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");

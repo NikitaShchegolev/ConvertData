@@ -17,9 +17,10 @@ internal sealed class BoltsExporter
     /// </summary>
     private static readonly Dictionary<string, string[]> HeaderMap = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["d"] = ["d_SP43"],
-        ["Ab"] = ["Ab_SP43"],
-        ["Abn"] = ["Abn_SP43"]
+        ["GOST_bolts"] = ["GOST_bolts"],
+        ["d_SP43"] = ["d_SP43"],
+        ["Ab_SP43"] = ["Ab_SP43"],
+        ["Abn_SP43"] = ["Abn_SP43"]
     };
 
     /// <summary>
