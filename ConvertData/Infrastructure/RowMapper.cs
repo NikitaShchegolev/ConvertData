@@ -60,6 +60,8 @@ internal static class RowMapper
     /// <param name= "anchor_var_2">Вариант анкера.</param>
     /// <param name= "anchor_var_3">Вариант анкера.</param>
     /// <param name= "anchor_var_4">Вариант анкера.</param>
+    /// <param name= "lp_shearKey">Противосдвиговой упор.</param>
+    /// <param name= "lp_shearKey">Противосдвиговой упор.</param>
     /// <returns>Объект Row с заполненными свойствами.</returns>
     public static Row MapMainRow(
         string name,
@@ -132,7 +134,9 @@ internal static class RowMapper
         string anchor_var_1,
         string anchor_var_2,
         string anchor_var_3,
-        string anchor_var_4
+        string anchor_var_4,
+        string lp_shearKey,
+        string ls_shearKey
 
         )
     {
@@ -208,7 +212,9 @@ internal static class RowMapper
             Anchor_var_1 = anchor_var_1,
             Anchor_var_2 = anchor_var_2,
             Anchor_var_3 = anchor_var_3,
-            Anchor_var_4 = anchor_var_4
+            Anchor_var_4 = anchor_var_4,
+            Lp_ShearKey = NumericParser.ParseDouble(lp_shearKey),
+            Ls_ShearKey = NumericParser.ParseDouble(ls_shearKey)
         };
     }
 

@@ -563,4 +563,9 @@ internal sealed class Row
     /// <summary> Наимернование соединения вариант 4</summary>
     public string Anchor_var_4 { get; set; } = "";
     #endregion
+
+    #region Противосдвиговой упор
+    public double Lp_ShearKey { get; set; }
+    public double Ls_ShearKey { get; set; }
+    #endregion
 }

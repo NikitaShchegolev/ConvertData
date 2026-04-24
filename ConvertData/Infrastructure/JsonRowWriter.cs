@@ -83,6 +83,10 @@ namespace ConvertData.Infrastructure
                 WriteAnchor(sb, r);
                 sb.AppendLine();
 
+                // Anchor
+                WriteShearKey(sb, r);
+                sb.AppendLine();
+
                 // InternalForces
                 WriteInternalForces(sb, r);
                 sb.AppendLine();
@@ -106,6 +110,7 @@ namespace ConvertData.Infrastructure
 
             File.WriteAllText(outputPath, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
+
 
         private static void WriteBeam(StringBuilder sb, Row r)
         {
@@ -265,6 +270,13 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Anchor_anchor_var_2\": \"" + JsonEscape(r.Anchor_var_2) + "\",");
             sb.AppendLine("        \"Anchor_anchor_var_3\": \"" + JsonEscape(r.Anchor_var_3) + "\",");
             sb.AppendLine("        \"Anchor_anchor_var_4\": \"" + JsonEscape(r.Anchor_var_4) + "\"");
+            sb.AppendLine("      },");
+        }
+        private void WriteShearKey(StringBuilder sb, Row r)
+        {
+            sb.AppendLine("      \"ShearKey\": {");
+            sb.AppendLine("        \"Lp_shearKey\": " + Dbl(r.Lp_ShearKey) + ",");
+            sb.AppendLine("        \"Ls_shearKey\": " + Dbl(r.Ls_ShearKey));
             sb.AppendLine("      },");
         }
         private static void WriteBoltX(StringBuilder sb, Row r)

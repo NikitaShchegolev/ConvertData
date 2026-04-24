@@ -71,10 +71,12 @@ internal sealed class ExcelColumnMap
     #region Пластины
     public int IdxB_plate { get; set; } = -1;
     public int IdxH_plate { get; set; } = -1;
-    public int Idxtp_plate { get; set; } = -1;
+    public int IdxTp_plate { get; set; } = -1;
+    public int IdxTws_plate { get; set; } = -1;
     public int IdxLws_plate { get; set; } = -1;
-    public int Idxtr1_plate { get; set; } = -1;
-    public int Idxtr2_plate { get; set; } = -1;
+    public int IdxLst_plate { get; set; } = -1;
+    public int IdxTr1_plate { get; set; } = -1;
+    public int IdxTr2_plate { get; set; } = -1;
     #endregion
     #region Базы
     public int IdxH_base { get; set; } = -1;
@@ -135,6 +137,10 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "Mw" (крутящий момент Mw).</summary>
     public int IdxMw { get; set; } = -1; 
     #endregion
+
+
+
+
     #region Жесткость
     /// <summary>Индекс колонки "Sj" (жесткость Sj).</summary>
     public int IdxSj { get; set; } = -1;
@@ -189,7 +195,11 @@ internal sealed class ExcelColumnMap
     /// <summary> Наимернование соединения вариант 3</summary>
     public int IdAnchor_var_3 { get; set; } = -1;
     /// <summary> Наимернование соединения вариант 4</summary>
-    public int IdAnchor_var_4 { get; set; } = -1; 
+    public int IdAnchor_var_4 { get; set; } = -1;
+    #endregion
+    #region Противосдвиговой упор/ShearKey
+    public int IdxLp_shearKey { get; set; } = -1;
+    public int IdxLs_shearKey { get; set; } = -1;
     #endregion
 }
 
@@ -278,9 +288,9 @@ internal static class ExcelHeaderResolver
             IdxB_plate = HeaderUtils.IndexOfHeaderAny(header, ["B_plate", "Plate_B"]),
             IdxH_plate = HeaderUtils.IndexOfHeaderAny(header, ["H_plate", "Plate_H"]),
             IdxLws_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lws_plate", "Plate_Lws"]),
-            Idxtp_plate = HeaderUtils.IndexOfHeaderAny(header, ["tp_plate", "Tp_plate", "Plate_t", "Plate_tp"]),
-            Idxtr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr1_plate", "Tr1_plate", "Plate_tr1"]),
-            Idxtr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr2_plate", "Tr2_plate", "Plate_tr2"]),
+            IdxTp_plate = HeaderUtils.IndexOfHeaderAny(header, ["tp_plate", "Tp_plate", "Plate_t", "Plate_tp"]),
+            IdxTr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr1_plate", "Tr1_plate", "Plate_tr1"]),
+            IdxTr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr2_plate", "Tr2_plate", "Plate_tr2"]),
 
             IdxB_stiff = HeaderUtils.IndexOfHeaderAny(header, ["B_flange", "Stiff_B"]),
             IdxH_stiff = HeaderUtils.IndexOfHeaderAny(header, ["H_stiff", "Stiff_H"]),
@@ -311,6 +321,9 @@ internal static class ExcelHeaderResolver
             IdAnchor_var_2 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_2"]),
             IdAnchor_var_3 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_3"]),
             IdAnchor_var_4 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_4"]),
+
+            IdxLp_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Lp_shearKey"]),
+            IdxLs_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Ls_shearKey"])
         };
 
         map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");

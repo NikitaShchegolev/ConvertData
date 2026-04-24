@@ -130,9 +130,9 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxB_plate   >= 0 ?      startCol + map.IdxB_plate : null),
                         GetCell(ws, r, map.IdxH_plate   >= 0 ?      startCol + map.IdxH_plate   : null),
                         GetCell(ws, r, map.IdxLws_plate >= 0 ?      startCol + map.IdxLws_plate : null),
-                        GetCell(ws, r, map.Idxtp_plate  >= 0 ?      startCol + map.Idxtp_plate  : null),
-                        GetCell(ws, r, map.Idxtr1_plate >= 0 ?      startCol + map.Idxtr1_plate : null),
-                        GetCell(ws, r, map.Idxtr2_plate >= 0 ?      startCol + map.Idxtr2_plate : null),
+                        GetCell(ws, r, map.IdxTp_plate  >= 0 ?      startCol + map.IdxTp_plate  : null),
+                        GetCell(ws, r, map.IdxTr1_plate >= 0 ?      startCol + map.IdxTr1_plate : null),
+                        GetCell(ws, r, map.IdxTr2_plate >= 0 ?      startCol + map.IdxTr2_plate : null),
                         GetCell(ws, r, map.IdxB_stiff >= 0 ?        startCol + map.IdxB_stiff : null),
                         GetCell(ws, r, map.IdxH_stiff >= 0 ?        startCol + map.IdxH_stiff : null),
                         GetCell(ws, r, map.IdxLws_stiff >= 0 ?      startCol + map.IdxLws_stiff : null),
@@ -156,8 +156,10 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdAnchor_var_1 >= 0 ?    startCol + map.IdAnchor_var_1 : null),
                         GetCell(ws, r, map.IdAnchor_var_2 >= 0 ?    startCol + map.IdAnchor_var_2 : null),
                         GetCell(ws, r, map.IdAnchor_var_3 >= 0 ?    startCol + map.IdAnchor_var_3 : null),
-                        GetCell(ws, r, map.IdAnchor_var_4 >= 0 ?    startCol + map.IdAnchor_var_4 : null)
-                        ));
+                        GetCell(ws, r, map.IdAnchor_var_4 >= 0 ?    startCol + map.IdAnchor_var_4 : null),
+                        GetCell(ws, r, map.IdxLp_shearKey >= 0 ?    startCol + map.IdxLp_shearKey : null),
+                        GetCell(ws, r, map.IdxLs_shearKey >= 0 ?    startCol + map.IdxLs_shearKey : null)
+                        ));                
                 }
                 else
                 {
