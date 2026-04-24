@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-
 using OfficeOpenXml;
 
 namespace ConvertData.Application;
@@ -68,16 +67,32 @@ internal sealed class SteelExcelToJsonExporter
             int steelCol = -1, nameTableCol = -1, tminCol = -1, tmaxCol = -1;
             int rynCol = -1, runCol = -1, ryCol = -1, ruCol = -1, caseParamCol = -1;
 
-            //for (int i = 0; i < headers.Length; i++)
-            //{
-            //    if (ProfileHeaders.Contains(headers[i]))
-            //    {
-            //        profileCol = i;
-            //        break;
-            //    }
-            //}
-            //if (profileCol < 0)
-            //    profileCol = 0;
+            for (int i = 0; i < headers.Length; i++)
+            {
+                var header = headers[i];
+                if (string.IsNullOrWhiteSpace(header))
+                    continue;
+
+                if (header.Equals("Steel", StringComparison.OrdinalIgnoreCase))
+                    steelCol = i;
+                else if (header.Equals("Name_Table", StringComparison.OrdinalIgnoreCase))
+                    nameTableCol = i;
+                else if (header.Equals("tmin", StringComparison.OrdinalIgnoreCase))
+                    tminCol = i;
+                else if (header.Equals("tmax", StringComparison.OrdinalIgnoreCase))
+                    tmaxCol = i;
+                else if (header.Equals("Ryn", StringComparison.OrdinalIgnoreCase))
+                    rynCol = i;
+                else if (header.Equals("Run", StringComparison.OrdinalIgnoreCase))
+                    runCol = i;
+                else if (header.Equals("Ry", StringComparison.OrdinalIgnoreCase))
+                    ryCol = i;
+                else if (header.Equals("Ru", StringComparison.OrdinalIgnoreCase))
+                    ruCol = i;
+                else if (header.Equals("caseParametr_t", StringComparison.OrdinalIgnoreCase) || 
+                         header.Equals("if", StringComparison.OrdinalIgnoreCase))
+                    caseParamCol = i;
+            }
 
             // Проверяем, что все необходимые столбцы найдены
             if (steelCol == -1)

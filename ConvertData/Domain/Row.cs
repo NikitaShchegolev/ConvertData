@@ -24,7 +24,7 @@ internal sealed class Row
     /// Этот код может быть использован для определения геометрических 
     /// характеристик балки и колонны, а также для расчета жесткости и внутренних сил в соединении.
     /// </summary>
-    public string CONNECTION_CODE { get; set; } = ""; 
+    public string CONNECTION_CODE { get; set; } = "";
     #endregion
     #region Вариант расчета
     /// <summary>
@@ -247,7 +247,7 @@ internal sealed class Row
     /// "Bolts": Список коордниат для одного болта
     /// </summary>
     public List<CoordinatesBolts> CoordinatesBolts { get; set; } = new List<CoordinatesBolts>();
-    
+
     /// <summary>
     /// "Bolts": Диаметр болта
     /// </summary>
@@ -330,7 +330,7 @@ internal sealed class Row
     //Holes
 
     #region Holes
-    
+
     /// <summary>
     /// "Holes": Версия использования болтов
     /// </summary>
@@ -351,7 +351,7 @@ internal sealed class Row
 
     /// Количество используемых болтов 1-8
     public int Nh_Holes_5_8 { get; set; }
-    
+
     /// <summary>
     /// "Holes": Координата X первого ряда болтов
     /// </summary>
@@ -542,7 +542,7 @@ internal sealed class Row
     #region Анкера
     /// <summary> Усилие отрыва </summary>
     public double F_base { get; set; }
-    
+
     /// <summary> Диаметр отверстия в шайбе под анкер </summary>
     public double D_ws_base { get; set; }
     /// <summary> Диаметр отверстия под анкер </summary>
@@ -553,7 +553,7 @@ internal sealed class Row
     /// <summary> Количество отверстий для базы варианта 1</summary>
     public double Nh_base_var1 { get; set; }
     /// <summary> Количество отверстий для базы варианта 2</summary>
-    public double Nh_base_var2 { get; set; } 
+    public double Nh_base_var2 { get; set; }
     /// <summary> Наимернование соединения вариант 1</summary>
     public string Anchor_var_1 { get; set; } = "";
     /// <summary> Наимернование соединения вариант 2</summary>

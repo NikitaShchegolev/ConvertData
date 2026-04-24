@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using ConvertData.Infrastructure.Parsing;
 
 namespace ConvertData.Infrastructure;
@@ -49,7 +50,7 @@ internal sealed class ExcelColumnMap
     public int IdxExplanations { get; set; } = -1;
 
     /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
-    public bool IsProfileTable => IdxProfileBeam >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0; 
+    public bool IsProfileTable => IdxProfileBeam >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0;
     #endregion
     #region Балка
     /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
@@ -98,10 +99,10 @@ internal sealed class ExcelColumnMap
     public int IdxHh_Stiff { get; set; } = -1;
     #endregion
     #region Фланец
-    public int IdxTp_Flange  { get; set; } = -1;
-    public int IdxB_Flange   { get; set; } = -1;
-    public int IdxH_Flange   { get; set; } = -1;
-    public int IdxLb_Flange  { get; set; } = -1;
+    public int IdxTp_Flange { get; set; } = -1;
+    public int IdxB_Flange { get; set; } = -1;
+    public int IdxH_Flange { get; set; } = -1;
+    public int IdxLb_Flange { get; set; } = -1;
     #endregion
     #region Внутренние усилия
     /// <summary> Усилие отрыва для баз </summary>
@@ -135,7 +136,7 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "Mx" (изгибающий момент по X).</summary>
     public int IdxMx { get; set; } = -1;
     /// <summary>Индекс колонки "Mw" (крутящий момент Mw).</summary>
-    public int IdxMw { get; set; } = -1; 
+    public int IdxMw { get; set; } = -1;
     #endregion
 
 
@@ -159,7 +160,7 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "ε" или "Epsilon" (коэффициент эпсилон).</summary>
     public int IdxEpsilon { get; set; } = -1;
     /// <summary>Индекс колонки "λ" или "Lambda" (коэффициент лямбда).</summary>
-    public int IdxLambda { get; set; } = -1; 
+    public int IdxLambda { get; set; } = -1;
     #endregion
     #region Геометрия анкеров
     /// <summary> Длина стороны шайбы под анкер </summary>
@@ -176,7 +177,7 @@ internal sealed class ExcelColumnMap
     public int IdD_ws_base { get; set; } = -1;
     /// <summary> Диаметр отверстия под анкер </summary>
     public int IdD_p_base { get; set; } = -1;
-    
+
     /// <summary> Расстояние между монтажными отверстиями </summary>
     public int IdK_fws_base { get; set; } = -1;
     #endregion
@@ -185,7 +186,7 @@ internal sealed class ExcelColumnMap
     /// <summary> Количество отверстий для базы под анкера варианта 1</summary>
     public int IdNh_base_var1 { get; set; } = -1;
     /// <summary> Количество отверстий для базы под анкера варианта 2</summary>
-    public int IdNh_base_var2 { get; set; } = -1; 
+    public int IdNh_base_var2 { get; set; } = -1;
     #endregion
     #region Тип принимаемого анкера
     /// <summary> Наимернование соединения вариант 1</summary>
@@ -245,8 +246,8 @@ internal static class ExcelHeaderResolver
             IdxGostAnchore = HeaderUtils.IndexOfHeaderAny(header, ["GostAnchore", "GOST_anchor", "GOST_anchors"]),
             IdxGostWeld = HeaderUtils.IndexOfHeaderAny(header, ["GostWeld", "GOST_weld"]),
             IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostColumn", "GOST_Profile", "Gost_Profile", "GOST Profile"]),
-            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, [ "Explanations"]),
-            
+            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, ["Explanations"]),
+
 
             //Внутренние усилия
             IdF_base = HeaderUtils.IndexOfHeaderAny(header, ["F_base", "Fbase", "F_base_anchor"]),
@@ -309,7 +310,7 @@ internal static class ExcelHeaderResolver
             IdxH_Flange = HeaderUtils.IndexOfHeaderAny(header, ["H_flange"]),
             IdxLb_Flange = HeaderUtils.IndexOfHeaderAny(header, ["Lb_flange"]),
 
-            
+
             IdxProfileBeam = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "ProfileBeams"]),
             IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "Profile_Column", "ПрофильКолонны"]),
             IdxH = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),

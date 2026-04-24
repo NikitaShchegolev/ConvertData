@@ -1,0 +1,406 @@
+classDiagram 
+	
+	class NameConnectionsExporter  {
+		+Export(string jsonAllFilePath, string outputJsonPath) void
+	}
+	class ILicenseConfigurator  {
+		-Configure() void
+	}
+	class ProfileExcelToJsonExporter  {
+		-Dictionary~string&#44&#32string[]~ HeaderMap 
+		-string[] AllFields 
+		-HashSet~string~ ProfileHeaders 
+		-Dictionary~string&#44&#32string~ FileCategoryMap 
+		+Export(string excelProfileDir, string outputJsonPath) void
+		-ReadExcelFile(string path, string category) List~Dictionary~string&#44&#32object~~
+		-ReadDouble(ExcelWorksheet ws, int row, int col) double
+	}
+	class TextListToJsonExporter  {
+		+ExportProfileJson(string inputProfileTxtPath, string outputProfileJsonPath) void
+		+ExportConnectionCodeJson(string inputConnectionCodeTxtPath, string outputConnectionCodeJsonPath) void
+		-ReadDistinctNonEmptyLines(string path) List~string~
+		-WriteJson(string path, T value) void
+	}
+	class ConnectionCodeItem  {
+		+ CONNECTION_GUID : Guid
+		+ CONNECTION_CODE : string
+	}
+	class RowReaderFactory  {
+		+Create(string path) IRowReader
+	}
+	class PathResolver  {
+		+GetProjectDir(string startDir) string?
+		+HasExcelExtension(string path) bool
+	}
+	class ProfileItem  {
+		+ CONNECTION_GUID : Guid
+		+ Profile : string
+	}
+	class NameItem  {
+		+ NAME_GUID : Guid
+		+ Name : string
+	}
+	class EpplusRowReader  {
+		-string[] KeyColumnHeaders 
+		-Dictionary~string&#44&#32Action~Row&#44&#32string~~ PlateGeometryColumnMap 
+		-Dictionary~string&#44&#32Action~Row&#44&#32string~~ FlangeGeometryColumnMap 
+		-Dictionary~string&#44&#32Action~Row&#44&#32string~~ StiffGeometryColumnMap 
+		-Dictionary~string&#44&#32Action~Row&#44&#32string~~ GeometryColumnMap 
+		-Dictionary~string&#44&#32Action~Row&#44&#32string~~ WeldColumnMap 
+		-Dictionary~string&#44&#32Action~Row&#44&#32string~~ BoltsColumnMap 
+		+Read(string path) List~Row~
+		-ReadXlsxWithEpplus(string path) List~Row~
+		-GetCell(ExcelWorksheet ws, int row, int? col) string
+		-FindHeaderRow(ExcelWorksheet ws, int fromRow, int toRow, int startCol, int endCol) int
+		-BuildGeometryColumnMap() Dictionary~string&#44&#32Action~Row&#44&#32string~~
+		-BuildBoltsColumnMap() Dictionary~string&#44&#32Action~Row&#44&#32string~~
+		-EnsureBolts(Row r, int count) void
+		-MergeAdditionalSheets(ExcelPackage package, ExcelWorksheet mainWs, List~Row~ list) void
+		-MergeSheet(ExcelWorksheet ws, Dictionary~string&#44&#32Action~Row&#44&#32string~~ propertyMap, Dictionary~string&#44&#32Row~ codeLookup, List~Row~ list) void
+	}
+	class AnchorExcelToJsonExporter  {
+		-Dictionary~string&#44&#32string[]~ HeaderMap 
+		-string[] NumericFields 
+		-HashSet~string~ ProfileHeaders 
+		-Dictionary~string&#44&#32string~ FileCategoryMap 
+		+Export(string excelAnchorDir, string outputJsonPath) void
+		-ReadExcelFile(string path, string category) List~Dictionary~string&#44&#32object~~
+		-ReadCellValue(ExcelWorksheet ws, int row, int col) object
+	}
+	class ProfileAndConnectionCodeExporter  {
+		+Export(string jsonAllFilePath, string outDir) void
+		+ExportConnectionCodesOnly(string jsonAllFilePath, string outputJsonPath) void
+		+ExportConnectionCodesTxt(string jsonAllFilePath, string outputTxtPath) int
+		-TryReadJsonArray(string jsonPath, JsonArray arr) bool
+	}
+	class IRowWriter  {
+		-Write(List~Row~ rows, string outputPath) void
+	}
+	class EpplusLicenseConfigurator  {
+		+Configure() void
+	}
+	class CoordinatesBolts  {
+		+ X : int
+		+ Y : int
+		+ Z : int
+	}
+	class ExcelColumnMap  {
+		+ IdxH : int
+		+ IdxB : int
+		+ Idxs : int
+		+ Idxt : int
+		+ IdxName : int
+		+ IdxCode : int
+		+ IdxTypeNode : int
+		+ IdxProfile : int
+		+ IdxProfileColumn : int
+		+ IdxNt : int
+		+ IdxQy : int
+		+ IdxQz : int
+		+ IdxT : int
+		+ IdxNc : int
+		+ IdxN : int
+		+ IdxMy : int
+		+ IdxVariable : int
+		+ IdxSj : int
+		+ IdxSjo : int
+		+ IdxMneg : int
+		+ IdxMz : int
+		+ IdxMx : int
+		+ IdxMw : int
+		+ IdxAlpha : int
+		+ IdxBeta : int
+		+ IdxGamma : int
+		+ IdxDelta : int
+		+ IdxEpsilon : int
+		+ IdxLambda : int
+		+ IdxExplanations : int
+		+ IsMainTable : bool
+		+ IsProfileTable : bool
+		+ IdF_base : int
+		+ IdLws_base : int
+		+ IdLp_base : int
+		+ IdLs_base : int
+		+ IdTws_base : int
+		+ IdD_ws_base : int
+		+ IdD_p_base : int
+		+ IdXh_base : int
+		+ IdK_fws_base : int
+		+ IdNh_base_var1 : int
+		+ IdNh_base_var2 : int
+		+ IdAnchor_var_1 : int
+		+ IdAnchor_var_2 : int
+		+ IdAnchor_var_3 : int
+		+ IdAnchor_var_4 : int
+	}
+	class ExcelHeaderResolver  {
+		+ ProfileColumnOverride : string?
+		+Resolve(List~string~ header) ExcelColumnMap
+		-ResolveGreekFallback(List~string~ header, ExcelColumnMap map) void
+		+ApplyProfileFallback(ExcelColumnMap map, List~string~ header) void
+	}
+	class IPathResolver  {
+		-GetProjectDir(string startDir) string?
+	}
+	class ExcelFileSignature  {
+		+Detect(string path) ExcelFileFormat
+	}
+	class JsonMerger  {
+		+MergeAll(string jsonDir) JsonArray
+		+SaveToFile(JsonArray array, string path) void
+	}
+	class IRowReaderFactory  {
+		-Create(string path) IRowReader
+	}
+	class RunModeParser  {
+		+GetMode(string[] args) RunMode
+		+GetBlocks(string[] args) Block
+		-ParseBlocks(string blocksStr) Block
+		-BlockFromNumber(int number) Block
+		-GetParameterValue(string[] args, string paramName) string?
+		+GetInputArgsForCreateJson(string[] args) string[]
+		+GetProfileColumn(string[] args) string?
+	}
+	class HeaderUtils  {
+		+NormalizeHeader(string h) string
+		+IndexOfHeader(List~string~ header, string name) int
+		+IndexOfHeaderAny(List~string~ header, IEnumerable~string~ names) int
+	}
+	class IRowReader  {
+		-Read(string path) List~Row~
+	}
+	class RowMapper  {
+		+MapMainRow(string name, string code, string typeNode, string profileBeam, string profileColumn, string explanations, string h, string b, string s, string tGeom, string nt, string q, string qz, string t, string nc, string n, string my, string variable, string sj, string sjo, string mneg, string mz, string mx, string mw, string alpha, string beta, string gamma, string delta, string epsilon, string lambda, string f_base, string lws_base, string lp_base, string ls_base, string tws_base, string d_ws_base, string d_p_base, string xh_base, string nh_base_var1, string nh_base_var2, string anchor_var_1, string anchor_var_2, string anchor_var_3, string anchor_var_4) Row
+		+MapProfileRow(string profile, string h, string b, string s, string t) Row
+	}
+	class SteelExcelToJsonExporter  {
+		+Export(string excelSteelDir, string outputJsonPath) void
+		-ReadExcelFile(string path) List~Dictionary~string&#44&#32object~~
+		-ReadCellValue(ExcelWorksheet ws, int row, int col) object
+	}
+	class ConnectionCodeDuplicateChecker  {
+		+FindDuplicates(string allJsonPath, string? duplicatesTxtPath) List~string~
+	}
+	class Row  {
+		+ Name : string
+		+ TypeNode : string
+		+ Explanations : string
+		+ CONNECTION_CODE : string
+		+ variable : string
+		+ ProfileBeam : string
+		+ Beam_H : double
+		+ Beam_B : double
+		+ Beam_s : double
+		+ Beam_t : double
+		+ Beam_A : double
+		+ Beam_P : double
+		+ Beam_Iz : double
+		+ Beam_Iy : double
+		+ Beam_Ix : double
+		+ Beam_Wz : double
+		+ Beam_Wy : double
+		+ Beam_Wx : double
+		+ Beam_Sz : double
+		+ Beam_Sy : double
+		+ Beam_iz : double
+		+ Beam_iy : double
+		+ Beam_xo : double
+		+ Beam_yo : double
+		+ ProfileColumn : string
+		+ Column_H : double
+		+ Column_B : double
+		+ Column_s : double
+		+ Column_t : double
+		+ Column_A : double
+		+ Column_P : double
+		+ Column_Iz : double
+		+ Column_Iy : double
+		+ Column_Ix : double
+		+ Column_Wz : double
+		+ Column_Wy : double
+		+ Column_Wx : double
+		+ Column_Sz : double
+		+ Column_Sy : double
+		+ Column_iz : double
+		+ Column_iy : double
+		+ Column_xo : double
+		+ Column_yo : double
+		+ Plate_H : double
+		+ Plate_B : double
+		+ Plate_t : double
+		+ Flange_Lb : double
+		+ Flange_H : double
+		+ Flange_B : double
+		+ Flange_t : double
+		+ Stiff_tbp : double
+		+ Stiff_tg : double
+		+ Stiff_tf : double
+		+ Stiff_Lh : double
+		+ Stiff_Hh : double
+		+ Stiff_tr1 : double
+		+ Stiff_tr2 : double
+		+ Stiff_twp : double
+		+ CoordinatesBolts : List~CoordinatesBolts~
+		+ F : int
+		+ Bolts_Nb : int
+		+ N_Rows : int
+		+ OptionBolts : double
+		+ TableBrand : string
+		+ e1 : int
+		+ d1 : int
+		+ d2 : int
+		+ p1 : double
+		+ p2 : double
+		+ p3 : double
+		+ p4 : double
+		+ p5 : double
+		+ p6 : double
+		+ p7 : double
+		+ p8 : double
+		+ p9 : double
+		+ p10 : double
+		+ kf1 : string
+		+ kf2 : string
+		+ kf3 : string
+		+ kf4 : string
+		+ kf5 : string
+		+ kf6 : string
+		+ kf7 : string
+		+ kf8 : string
+		+ kf9 : string
+		+ kf10 : string
+		+ K_fws_base : string
+		+ Sj : int
+		+ Sjo : int
+		+ Nt : int
+		+ Nc : int
+		+ N : int
+		+ Qz : int
+		+ Qy : int
+		+ Qx : int
+		+ My : int
+		+ Mneg : double
+		+ Mz : double
+		+ Mx : double
+		+ Mw : double
+		+ T : int
+		+ Alpha : double
+		+ Beta : double
+		+ Gamma : double
+		+ Delta : double
+		+ Epsilon : double
+		+ Lambda : double
+		+ F_base : double
+		+ Lws_base : double
+		+ Lp_base : double
+		+ Ls_base : double
+		+ Tws_base : double
+		+ D_ws_base : double
+		+ D_p_base : double
+		+ Xh_base : double
+		+ Nh_base_var1 : double
+		+ Nh_base_var2 : double
+		+ Anchor_var_1 : string
+		+ Anchor_var_2 : string
+		+ Anchor_var_3 : string
+		+ Anchor_var_4 : string
+	}
+	class JsonRowWriter  {
+		-string[] BoltYKeys 
+		-string[] BoltXKeys 
+		+Write(List~Row~ rows, string outputPath) void
+		-WriteBeam(StringBuilder sb, Row r) void
+		-WriteColumn(StringBuilder sb, Row r) void
+		-WritePlate(StringBuilder sb, Row r) void
+		-WriteFlange(StringBuilder sb, Row r) void
+		-WriteStiff(StringBuilder sb, Row r) void
+		-WriteBolts(StringBuilder sb, Row r) void
+		-WriteBoltY(StringBuilder sb, Row r) void
+		-WriteAnchor(StringBuilder sb, Row r) void
+		-WriteBoltX(StringBuilder sb, Row r) void
+		-WriteBoltZ(StringBuilder sb, Row r) void
+		-WriteWelds(StringBuilder sb, Row r) void
+		-WeldValue(string v) string
+		-IsNumericValue(string source, double parsed) bool
+		-WriteInternalForces(StringBuilder sb, Row r) void
+		-Dbl(double v) string
+		-JsonEscape(string s) string
+	}
+	class JsonRecordEnricher  {
+		-string[] GeometrySubSections 
+		+Enrich(JsonArray arr) int
+		-EnrichRecord(JsonObject template, JsonObject target) void
+		-CopyStringIfEmpty(JsonObject template, JsonObject target, string key) void
+		-DeepCopyNode(JsonObject source, JsonObject target, string key) void
+		-ScoreCompleteness(JsonObject? obj) int
+		-CountNonZeroValues(JsonObject? obj) int
+		-GetNumericValue(JsonNode? node) double
+	}
+	class ExcelXlsConverter  {
+		+ConvertXlsToXlsxViaExcel(string xlsPath, string xlsxPath) void
+	}
+	class ConvertApp  {
+		-IRowWriter _writer 
+		-IRowReaderFactory _readerFactory 
+		-IPathResolver _pathResolver 
+		-ILicenseConfigurator _licenseConfigurator 
+		-ProfileLookupLoader _profileLookupLoader 
+		-JsonProfilePatcher _profilePatcher 
+		-ProfileExcelToJsonExporter _profileExcelExporter 
+		-AnchorExcelToJsonExporter _anchorExcelExporter 
+		-BoltsExporter _boltsExporter 
+		-BoltsExporterSP16 _boltsSP16Exporter 
+		-SteelExcelToJsonExporter _steelExcelExporter 
+		+Run(string[] args) void
+		-ExecuteBlocks(Block blocks, string projectDir, string excelDir, string excelProfileDir, string jsonOutDir, string jsonAllDir, string excelProfileOutDir, string excelAnchorDir, string excelAnchorOutDir, string exceSteelDir, string exceSteelDirOut, string exceBoltsDir, string exceBoltsDirOut, string exceBoltsSP16Dir, string exceBoltsSP16DirOut) void
+		-InteractiveBlockSelection() Block
+		-NumberToBlock(int number) Block
+		-ClearJsonOut(string jsonOutDir) void
+		-GetInputFiles(string[] args, string excelDir) IEnumerable~string~
+		-ConvertOne(string inputPath, string jsonOutDir) void
+		-ApplyProfilesToJson(string jsonOutDir, string excelProfileDir) void
+	}
+	class BoltsExporterSP16  {
+		-Dictionary~string&#44&#32string[]~ HeaderMap 
+		-string[] NumericFields 
+		-HashSet~string~ ProfileHeaders 
+		-Dictionary~string&#44&#32string~ FileCategoryMap 
+		+Export(string excelAnchorDir, string outputJsonPath) void
+		-ReadExcelFile(string path, string category) List~Dictionary~string&#44&#32object~~
+		-ReadCellValue(ExcelWorksheet ws, int row, int col) object
+	}
+	class NumericParser  {
+		-CultureInfo RuCulture 
+		+ParseDouble(string? s) double
+		+ParseInt(string? s) int
+	}
+	class BoltsExporter  {
+		-Dictionary~string&#44&#32string[]~ HeaderMap 
+		-string[] NumericFields 
+		-HashSet~string~ ProfileHeaders 
+		-Dictionary~string&#44&#32string~ FileCategoryMap 
+		+Export(string excelAnchorDir, string outputJsonPath) void
+		-ReadExcelFile(string path, string category) List~Dictionary~string&#44&#32object~~
+		-ReadCellValue(ExcelWorksheet ws, int row, int col) object
+	}
+	class ConnectionCodeDeduplicator  {
+		+CreateDeduplicatedJson(string allJsonPath, string outputJsonPath, string? replacementsTxtPath) int
+	}
+	class JsonProfilePatcher  {
+		+ApplyProfilesToJson(string jsonOutDir, Dictionary~string&#44&#32ProfileGeometry~ profileLookup) void
+		+SelfCheckProfile(Dictionary~string&#44&#32ProfileGeometry~ profileLookup) void
+		+NormalizeProfileKey(string? s) string
+		+TryResolveProfile(Dictionary~string&#44&#32ProfileGeometry~ profileLookup, string normalizedProfile, ProfileGeometry geometry) bool
+		-PatchJsonFile(string jsonPath, Dictionary~string&#44&#32ProfileGeometry~ profileLookup) void
+		-TryReadJsonArray(string jsonPath, JsonNode? root, JsonArray arr) bool
+	}
+	class ProfileLookupLoader  {
+		+Load(string excelProfileDir) Dictionary~string&#44&#32ProfileGeometry~
+	}
+	
+	RowReaderFactory --|> IRowReaderFactory
+	PathResolver --|> IPathResolver
+	EpplusRowReader --|> IRowReader
+	EpplusLicenseConfigurator --|> ILicenseConfigurator
+	JsonRowWriter --|> IRowWriter
+	

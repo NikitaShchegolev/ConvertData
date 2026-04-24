@@ -85,7 +85,7 @@ internal sealed class JsonRecordEnricher
     private static void EnrichRecord(JsonObject template, JsonObject target)
     {
         var tGeom = template["Geometry"] as JsonObject;
-        var oGeom = target  ["Geometry"] as JsonObject;
+        var oGeom = target["Geometry"] as JsonObject;
         if (tGeom != null && oGeom != null)
         {
             foreach (var section in GeometrySubSections)
