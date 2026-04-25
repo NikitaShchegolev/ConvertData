@@ -65,6 +65,7 @@ namespace ConvertData.Infrastructure
                 WritePlate(sb, r);
                 WriteFlange(sb, r);
                 WriteStiff(sb, r);
+                WriteBase(sb, r);
                 sb.AppendLine("    },");
                 sb.AppendLine();
 
@@ -132,8 +133,8 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Beam_Wx\": " + Dbl(r.Beam_Wx) + ",");
             sb.AppendLine("        \"Beam_Sz\": " + Dbl(r.Beam_Sz) + ",");
             sb.AppendLine("        \"Beam_Sy\": " + Dbl(r.Beam_Sy) + ",");
-            sb.AppendLine("        \"Beam_iz\": " + Dbl(r.Beam_iz) + ",");
-            sb.AppendLine("        \"Beam_iy\": " + Dbl(r.Beam_iy) + ",");
+            sb.AppendLine("        \"Beam_i_z\": " + Dbl(r.Beam_iz) + ",");
+            sb.AppendLine("        \"Beam_i_y\": " + Dbl(r.Beam_iy) + ",");
             sb.AppendLine("        \"Beam_xo\": " + Dbl(r.Beam_xo) + ",");
             sb.AppendLine("        \"Beam_yo\": " + Dbl(r.Beam_yo));
             sb.AppendLine("      },");
@@ -158,8 +159,8 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Column_Wx\": " + Dbl(r.Column_Wx) + ",");
             sb.AppendLine("        \"Column_Sz\": " + Dbl(r.Column_Sz) + ",");
             sb.AppendLine("        \"Column_Sy\": " + Dbl(r.Column_Sy) + ",");
-            sb.AppendLine("        \"Column_iz\": " + Dbl(r.Column_iz) + ",");
-            sb.AppendLine("        \"Column_iy\": " + Dbl(r.Column_iy) + ",");
+            sb.AppendLine("        \"Column_i_z\": " + Dbl(r.Column_iz) + ",");
+            sb.AppendLine("        \"Column_i_y\": " + Dbl(r.Column_iy) + ",");
             sb.AppendLine("        \"Column_xo\": " + Dbl(r.Column_xo) + ",");
             sb.AppendLine("        \"Column_yo\": " + Dbl(r.Column_yo));
             sb.AppendLine("      },");
@@ -195,7 +196,26 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Lws\": " + Dbl(r.Lws_Stiff) + ",");
             sb.AppendLine("        \"tp\": " + Dbl(r.Tp_Stiff) + ",");
             sb.AppendLine("        \"tr1\": " + Dbl(r.Tr1_Stiff) + ",");
-            sb.AppendLine("        \"tr2\": " + Dbl(r.Tr2_Stiff));
+            sb.AppendLine("        \"tr2\": " + Dbl(r.Tr2_Stiff) + ",");
+            sb.AppendLine("        \"Tg_Stiff\": " + Dbl(r.Tg_Stiff) + ",");
+            sb.AppendLine("        \"Lg_Stiff\": " + Dbl(r.Lg_Stiff) + ",");
+            sb.AppendLine("        \"Tf_Stiff\": " + Dbl(r.Tf_Stiff) + ",");
+            sb.AppendLine("        \"Lh_Stiff\": " + Dbl(r.Lh_Stiff) + ",");
+            sb.AppendLine("        \"Hh_Stiff\": " + Dbl(r.Hh_Stiff));
+            sb.AppendLine("      },");
+        }
+
+        private static void WriteBase(StringBuilder sb, Row r)
+        {
+            sb.AppendLine("      \"Base\": {");
+            sb.AppendLine("        \"H_base\": " + Dbl(r.H_base) + ",");
+            sb.AppendLine("        \"S_base\": " + Dbl(r.S_base) + ",");
+            sb.AppendLine("        \"B_base\": " + Dbl(r.B_base) + ",");
+            sb.AppendLine("        \"T_base\": " + Dbl(r.T_base) + ",");
+            sb.AppendLine("        \"Lp_base\": " + Dbl(r.Lp_base) + ",");
+            sb.AppendLine("        \"Ls_base\": " + Dbl(r.Ls_base) + ",");
+            sb.AppendLine("        \"Lws_base\": " + Dbl(r.Lws_base) + ",");
+            sb.AppendLine("        \"Tws_base\": " + Dbl(r.Tws_base));
             sb.AppendLine("      }");
         }
 
@@ -243,6 +263,8 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("      \"Holes\": {");
             sb.AppendLine("        \"GostHoles\": \"" + JsonEscape(r.GostHoles) + "\",");
+            sb.AppendLine("        \"OptionHoles\": " + Dbl(r.OptionHoles) + ",");
+            sb.AppendLine("        \"TableBrandHoles\": \"" + JsonEscape(r.TableBrandHoles) + "\",");
             sb.AppendLine("        \"DiameterHolesForBolts\": " + r.F_holes + ",");
             sb.AppendLine("        \"Dws_holes\": " + Dbl(r.Dws_holes) + ",");
             sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");
@@ -250,7 +272,14 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("         \"Nh_holes_1_4\": " + r.Nh_Holes_1_4 + ",");
             sb.AppendLine("         \"Nh_holes_1_8\": " + r.Nh_Holes_5_8);
             sb.AppendLine("        },");
-            sb.AppendLine("        \"xh\": " + Dbl(r.Anchor_xh_holes));
+            sb.AppendLine("        \"xh\": " + Dbl(r.Anchor_xh_holes) + ",");
+            sb.AppendLine("        \"Legacy\": {");
+            sb.AppendLine("          \"nh_Holes_1_4_legacy\": " + r.nh_Holes_1_4 + ",");
+            sb.AppendLine("          \"nh_Holes_5_8_legacy\": " + r.nh_Holes_5_8 + ",");
+            sb.AppendLine("          \"nws_holes\": " + Dbl(r.nws_holes) + ",");
+            sb.AppendLine("          \"dp_holes_legacy\": " + Dbl(r.dp_holes) + ",");
+            sb.AppendLine("          \"anchor_xh_holes_legacy\": " + Dbl(r.anchor_xh_holes));
+            sb.AppendLine("        }");
             sb.AppendLine("      },");
         }
         private static void WriteAnchor(StringBuilder sb, Row r)
@@ -283,8 +312,8 @@ namespace ConvertData.Infrastructure
         private static void WriteBoltX(StringBuilder sb, Row r)
         {
             sb.AppendLine("        \"X\": {");
-            int d1 = r.CoordinatesBolts.Count > 0 ? r.CoordinatesBolts[0].X : 0;
-            int d2 = r.CoordinatesBolts.Count > 1 ? r.CoordinatesBolts[1].X : 0;
+            int d1 = r.d1 != 0 ? r.d1 : (r.CoordinatesBolts.Count > 0 ? r.CoordinatesBolts[0].X : 0);
+            int d2 = r.d2 != 0 ? r.d2 : (r.CoordinatesBolts.Count > 1 ? r.CoordinatesBolts[1].X : 0);
             sb.AppendLine("          \"d1\": " + d1 + ",");
             sb.AppendLine("          \"d2\": " + d2);
             sb.AppendLine("        },");
