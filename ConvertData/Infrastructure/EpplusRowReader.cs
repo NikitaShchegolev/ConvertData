@@ -97,6 +97,7 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxGostAnchore >= 0 ? startCol + map.IdxGostAnchore : null),
                         GetCell(ws, r, map.IdxGostWeld >= 0 ? startCol + map.IdxGostWeld : null),
                         GetCell(ws, r, map.IdxGostProfile >= 0 ? startCol + map.IdxGostProfile : null),
+                        GetCell(ws, r, map.IdxTableBrand >= 0 ? startCol + map.IdxTableBrand : null),
                         GetCell(ws, r, startCol + map.IdxProfileBeam),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ? startCol + map.IdxProfileColumn : null),
                         GetCell(ws, r, map.IdxExplanations >= 0 ? startCol + map.IdxExplanations : null),
@@ -285,13 +286,29 @@ namespace ConvertData.Infrastructure
             map["Gost"] = (r, v) => r.Gost = v;
             map["GostColumn"] = (r, v) => r.GostColumn = v;
             map["GostBeams"] = (r, v) => r.GostBeams = v;
+            map["Марка опорного столика"] = (r, v) => r.TableBrand = v;
+            map["Маркаопорногостолика"] = (r, v) => r.TableBrand = v;
             //Фланец
+            map["H"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Flange_H = value;
+                if (r.H_Plate == 0)
+                    r.H_Plate = value;
+            };
             map["H_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
                 r.Flange_H = value;
                 if (r.H_Plate == 0)
                     r.H_Plate = value;
+            };
+            map["B"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Flange_B = value;
+                if (r.B_Plate == 0)
+                    r.B_Plate = value;
             };
             map["B_flange"] = (r, v) =>
             {
@@ -300,6 +317,13 @@ namespace ConvertData.Infrastructure
                 if (r.B_Plate == 0)
                     r.B_Plate = value;
             };
+            map["tp"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Flange_t = value;
+                if (r.Tp_Plate == 0)
+                    r.Tp_Plate = value;
+            };
             map["Tp_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -307,6 +331,7 @@ namespace ConvertData.Infrastructure
                 if (r.Tp_Plate == 0)
                     r.Tp_Plate = value;
             };
+            map["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
             map["Lb_flange"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
             //Пластина
             map["B_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
@@ -318,6 +343,7 @@ namespace ConvertData.Infrastructure
             //Ребра жесткости
             map["B_stiff"] = (r, v) => r.B_Stiff = NumericParser.ParseDouble(v);
             map["H_stiff"] = (r, v) => r.H_Stiff = NumericParser.ParseDouble(v);
+            map["Hh"] = (r, v) => r.Hh_Stiff = NumericParser.ParseDouble(v);
             map["Tg_stiff"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -325,6 +351,7 @@ namespace ConvertData.Infrastructure
                 if (r.Tg_Stiff == 0)
                     r.Tg_Stiff = value;
             };
+            map["tg"] = (r, v) => r.Tg_Stiff = NumericParser.ParseDouble(v);
             map["Lg_stiff"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -332,6 +359,7 @@ namespace ConvertData.Infrastructure
                 if (r.Lg_Stiff == 0)
                     r.Lg_Stiff = value;
             };
+            map["Lg"] = (r, v) => r.Lg_Stiff = NumericParser.ParseDouble(v);
             map["Tf_stiff"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -339,6 +367,7 @@ namespace ConvertData.Infrastructure
                 if (r.Tf_Stiff == 0)
                     r.Tf_Stiff = value;
             };
+            map["tf"] = (r, v) => r.Tf_Stiff = NumericParser.ParseDouble(v);
             map["Lh_stiff"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -346,6 +375,7 @@ namespace ConvertData.Infrastructure
                 if (r.Lh_Stiff == 0)
                     r.Lh_Stiff = value;
             };
+            map["Lh"] = (r, v) => r.Lh_Stiff = NumericParser.ParseDouble(v);
             map["Hh_stiff"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -357,6 +387,20 @@ namespace ConvertData.Infrastructure
             map["Tp_stiff"] = (r, v) => r.Tp_Stiff = NumericParser.ParseDouble(v);
             map["Tr1_stiff"] = (r, v) => r.Tr1_Stiff = NumericParser.ParseDouble(v);
             map["Tr2_stiff"] = (r, v) => r.Tr2_Stiff = NumericParser.ParseDouble(v);
+            map["tr1"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Tr1_Stiff = value;
+                if (r.Tr1_Plate == 0)
+                    r.Tr1_Plate = value;
+            };
+            map["tr2"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Tr2_Stiff = value;
+                if (r.Tr2_Plate == 0)
+                    r.Tr2_Plate = value;
+            };
             map["Lst"] = (r, v) =>
             {
                 if (r.H_Stiff == 0)
@@ -364,8 +408,8 @@ namespace ConvertData.Infrastructure
             };
             map["tbp"] = (r, v) =>
             {
-                if (r.Tp_Stiff == 0)
-                    r.Tp_Stiff = NumericParser.ParseDouble(v);
+                var value = NumericParser.ParseDouble(v);
+                r.Tp_Stiff = value;
             };
             map["F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
             map["Anchor_F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
