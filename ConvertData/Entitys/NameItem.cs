@@ -11,7 +11,7 @@ internal sealed class NameItem
     /// <summary>
     /// Уникальный идентификатор имени (GUID).
     /// </summary>
-    public Guid NAME_GUID { get; set; }
+    public Guid GUID_NODE { get; set; }
     /// <summary>
     /// Имя группы узлового соединения.
     /// </summary>

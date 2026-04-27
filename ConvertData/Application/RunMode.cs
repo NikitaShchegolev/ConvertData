@@ -51,14 +51,9 @@ internal enum Block
     ExportProfiles = 8,
     
     /// <summary>
-    /// Дедупликация: проверка дубликатов, создание all_NotDuplicate.json, экспорт новых кодов - этапы 7-9.
-    /// </summary>
-    Deduplication = 16,
-    
-    /// <summary>
     /// Копирование all_NotDuplicate.json в ConvertData.Data\JSON\ - этап 10.
     /// </summary>
-    CopyToData = 32,
+    CopyToData = 16,
     
     /// <summary>
     /// Экспорт анкеров из Anchor.xlsx в JSON - этап 11.
@@ -86,9 +81,9 @@ internal enum Block
     Conversion = CreateJson | ApplyProfiles,
     
     /// <summary>
-    /// Все блоки обработки (MergeAndEnrich + ExportProfiles + Deduplication + CopyToData).
+    /// Все блоки обработки (MergeAndEnrich + ExportProfiles + CopyToData).
     /// </summary>
-    Processing = MergeAndEnrich | ExportProfiles | Deduplication | CopyToData,
+    Processing = MergeAndEnrich | ExportProfiles | CopyToData,
     
     /// <summary>
     /// Все блоки экспорта анкеров (AnchorExport + SteelExport).

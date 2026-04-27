@@ -43,7 +43,7 @@ internal sealed class NameConnectionsExporter
         var items = names
             .Select(n => new NameItem
             {
-                NAME_GUID = Guid.NewGuid(),
+                GUID_NODE = Guid.NewGuid(),
                 Name = n
             })
             .ToArray();

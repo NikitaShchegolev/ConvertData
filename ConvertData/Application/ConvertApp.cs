@@ -13,7 +13,6 @@ namespace ConvertData.Application
         private readonly IRowReaderFactory _readerFactory = new RowReaderFactory();
         private readonly IPathResolver _pathResolver = new PathResolver();
         private readonly ILicenseConfigurator _licenseConfigurator = new EpplusLicenseConfigurator();
-
         private readonly ProfileLookupLoader _profileLookupLoader = new();
         private readonly JsonProfilePatcher _profilePatcher = new();
         private readonly ProfileExcelToJsonExporter _profileExcelExporter = new();
@@ -30,16 +29,15 @@ namespace ConvertData.Application
             Console.WriteLine("  2. ApplyProfiles - применение справочника профилей");
             Console.WriteLine("  3. MergeAndEnrich - объединение и обогащение");
             Console.WriteLine("  4. ExportProfiles - экспорт профилей и кодов");
-            Console.WriteLine("  5. Deduplication - дедупликация");
-            Console.WriteLine("  6. CopyToData - копирование в Data проект");
-            Console.WriteLine("  7. AnchorExport - экспорт анкеров из Anchor.xlsx");
-            Console.WriteLine("  8. SteelExport - экспорт анкеров из MarkSteel.xlsx");
-            Console.WriteLine("  9. Conversion - блок конвертации (1+2)");
-            Console.WriteLine("  10. Processing - блок обработки (3+4+5+6)");
-            Console.WriteLine("  11. Anchors - блок анкеров (7+8)");
-            Console.WriteLine("  12. Болты - болты для анкеровки");
-            Console.WriteLine("  13. Болты - болты по СП16");
-            Console.WriteLine("  14. All - все блоки");
+            Console.WriteLine("  5. CopyToData - копирование в Data проект");
+            Console.WriteLine("  6. AnchorExport - экспорт анкеров из Anchor.xlsx");
+            Console.WriteLine("  7. SteelExport - экспорт марок стали из MarkSteel.xlsx");
+            Console.WriteLine("  8. Conversion - блок конвертации (1+2)");
+            Console.WriteLine("  9. Processing - блок обработки (3+4+5+6)");
+            Console.WriteLine("  10. Anchors - блок анкеров (7+8)");
+            Console.WriteLine("  11. Болты - болты для анкеровки");
+            Console.WriteLine("  12. Болты - болты по СП16");
+            Console.WriteLine("  13. All - все блоки");
             Console.WriteLine();            
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _licenseConfigurator.Configure();
@@ -188,47 +186,6 @@ namespace ConvertData.Application
                     Console.WriteLine("Блок 4.5 завершён.");
                 }
 
-                // Блок 5: Deduplication - дедупликация
-                if (blocks.HasFlag(Block.Deduplication))
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("=== Блок 5: Проверка all.json на дубликаты CONNECTION_CODE ===");
-                    var duplicates = new ConnectionCodeDuplicateChecker().FindDuplicates(
-                        allJsonPath,
-                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_duplicates.txt"));
-                    Console.WriteLine($"Проверка дубликатов завершена. Найдено дубликатов: {duplicates.Count}");
-
-                    Console.WriteLine();
-                    Console.WriteLine("=== Блок 5.5: Создание all_NotDuplicate.json с заменой дубликатов ===");
-                    var changedCodes = new ConnectionCodeDeduplicator().CreateDeduplicatedJson(
-                        allJsonPath,
-                        allNotDuplicateJsonPath,
-                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_replacements.txt"));
-                    Console.WriteLine($"Дедупликация завершена. Заменено CONNECTION_CODE: {changedCodes}");
-
-                    Console.WriteLine();
-                    Console.WriteLine("=== Блок 5.7: Создание CONNECTION_CODE_new.json и CONNECTION_CODE_new.txt из all_NotDuplicate.json ===");
-                    var exporter = new ProfileAndConnectionCodeExporter();
-                    exporter.ExportConnectionCodesOnly(
-                        allNotDuplicateJsonPath,
-                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.json"));
-                    var remainingDuplicates = exporter.ExportConnectionCodesTxt(
-                        allNotDuplicateJsonPath,
-                        Path.Combine(excelProfileOutDir, "CONNECTION_CODE_new.txt"));
-                    if (remainingDuplicates > 0)
-                        Console.WriteLine($"  ВНИМАНИЕ: в all_NotDuplicate.json осталось дубликатов CONNECTION_CODE: {remainingDuplicates}");
-                    else
-                        Console.WriteLine("  Проверка: дубликатов CONNECTION_CODE нет.");
-                    Console.WriteLine("Блок 5.7 завершён.");
-
-                    Console.WriteLine();
-                    Console.WriteLine("=== Блок 5.9: Создание NameConnections.json из all_NotDuplicate.json ===");
-                    new NameConnectionsExporter().Export(
-                        allNotDuplicateJsonPath,
-                        Path.Combine(excelProfileOutDir, "NameConnections.json"));
-                    Console.WriteLine("Блок 5.9 завершён.");
-                }
-
                 // Блок 6: CopyToData - копирование в Data проект
                 if (blocks.HasFlag(Block.CopyToData))
                 {
@@ -335,16 +292,15 @@ namespace ConvertData.Application
                 2 => Block.ApplyProfiles,
                 3 => Block.MergeAndEnrich,
                 4 => Block.ExportProfiles,
-                5 => Block.Deduplication,
-                6 => Block.CopyToData,
-                7 => Block.AnchorExport,
-                8 => Block.SteelExport,
-                9 => Block.Conversion,
-                10 => Block.Processing,
-                11 => Block.Anchors,
-                12 => Block.Bolts,
-                13 => Block.BoltsSP16,
-                14 => Block.All,
+                5 => Block.CopyToData,
+                6 => Block.AnchorExport,
+                7 => Block.SteelExport,
+                8 => Block.Conversion,
+                9 => Block.Processing,
+                10 => Block.Anchors,
+                11 => Block.Bolts,
+                12 => Block.BoltsSP16,
+                13 => Block.All,
                 _ => Block.None
             };
         }

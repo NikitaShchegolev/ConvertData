@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using ConvertData.Application;
 using ConvertData.Domain;
@@ -13,7 +15,7 @@ namespace ConvertData.Infrastructure
     /// <summary>
     /// Записывает список объектов Row в JSON-файл с форматированием.
     /// </summary>
-    internal sealed class JsonRowWriter : IRowWriter
+    internal sealed class JsonRowWriter : IRowWriter, IAsyncRowWriter
     {
         /// <summary>
         /// Ключи для координат Y болтов (e1, p1-p10).
@@ -29,6 +31,8 @@ namespace ConvertData.Infrastructure
         /// </summary>
         private static readonly string[] BoltXKeys = ["d1", "d2"];
 
+        private readonly ConnectionCodeDuplicateResolver _duplicateResolver = new();
+
         /// <summary>
         /// Записывает список объектов Row в JSON-файл.
         /// </summary>
@@ -36,6 +40,10 @@ namespace ConvertData.Infrastructure
         /// <param name="outputPath">Путь к выходному JSON-файлу.</param>
         public void Write(List<Row> rows, string outputPath)
         {
+            // Обработка дубликатов CONNECTION_CODE
+            var codes = rows.Select(r => r.CONNECTION_CODE).ToList();
+            var processedCodes = _duplicateResolver.Process(codes);
+
             var sb = new StringBuilder();
             sb.AppendLine("[");
             for (int i = 0; i < rows.Count; i++)
@@ -43,7 +51,8 @@ namespace ConvertData.Infrastructure
                 var r = rows[i];
                 sb.AppendLine("  {");
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
-                sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(r.CONNECTION_CODE) + "\",");
+                sb.AppendLine("    \"GUID_NODE\": \"" + Guid.NewGuid().ToString() + "\",");
+                sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(processedCodes[i]) + "\",");
                 sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
                 sb.AppendLine("    \"Gost\": \"" + JsonEscape(r.Gost) + "\",");
                 sb.AppendLine("    \"variable\": \"" + JsonEscape(r.variable) + "\",");
@@ -430,6 +439,99 @@ namespace ConvertData.Infrastructure
                 }
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Асинхронно записывает список объектов Row в JSON-файл с обработкой дубликатов CONNECTION_CODE.
+        /// </summary>
+        /// <param name="rows">Список объектов Row.</param>
+        /// <param name="outputPath">Путь к выходному JSON-файлу.</param>
+        public async Task WriteAsync(List<Row> rows, string outputPath)
+        {
+            // 1. Обработка дубликатов CONNECTION_CODE
+            var codes = rows.Select(r => r.CONNECTION_CODE).ToList();
+            var processedCodes = _duplicateResolver.Process(codes);
+
+            // 2. Формирование JSON с паузой между строками
+            var sb = new StringBuilder();
+            sb.AppendLine("[");
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var r = rows[i];
+                sb.AppendLine("  {");
+                sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
+                sb.AppendLine("    \"GUID_NODE\": \"" + Guid.NewGuid().ToString() + "\",");
+                sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(processedCodes[i]) + "\",");
+                sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
+                sb.AppendLine("    \"Gost\": \"" + JsonEscape(r.Gost) + "\",");
+                sb.AppendLine("    \"variable\": \"" + JsonEscape(r.variable) + "\",");
+                sb.AppendLine("    \"TableBrand\": \"" + JsonEscape(r.TableBrand) + "\",");
+                sb.AppendLine("    \"Explanations\": \"" + JsonEscape(r.Explanations) + "\",");
+                sb.AppendLine();
+
+                // Stiffness
+                sb.AppendLine("    \"Stiffness\": {");
+                sb.AppendLine("      \"Sj\": " + r.Sj + ",");
+                sb.AppendLine("      \"Sjo\": " + r.Sjo);
+                sb.AppendLine("    },");
+                sb.AppendLine();
+
+                // Geometry
+                sb.AppendLine("    \"Geometry\": {");
+                WriteBeam(sb, r);
+                WriteColumn(sb, r);
+                WritePlate(sb, r);
+                WriteFlange(sb, r);
+                WriteStiff(sb, r);
+                WriteBase(sb, r);
+                sb.AppendLine("    },");
+                sb.AppendLine();
+
+                // Bolts
+                WriteBolts(sb, r);
+                sb.AppendLine();
+
+                // Welds
+                WriteWelds(sb, r);
+                sb.AppendLine();
+
+                // Holes
+                WriteHoles(sb, r);
+                sb.AppendLine();
+
+                // Anchor
+                WriteAnchor(sb, r);
+                sb.AppendLine();
+
+                // ShearKey
+                WriteShearKey(sb, r);
+                sb.AppendLine();
+
+                // InternalForces
+                WriteInternalForces(sb, r);
+                sb.AppendLine();
+
+                // Coefficients
+                sb.AppendLine("    \"Coefficients\": {");
+                sb.AppendLine("      \"Alpha\": " + Dbl(r.Alpha) + ",");
+                sb.AppendLine("      \"Beta\": " + Dbl(r.Beta) + ",");
+                sb.AppendLine("      \"Gamma\": " + Dbl(r.Gamma) + ",");
+                sb.AppendLine("      \"Delta\": " + Dbl(r.Delta) + ",");
+                sb.AppendLine("      \"Epsilon\": " + Dbl(r.Epsilon) + ",");
+                sb.AppendLine("      \"Lambda\": " + Dbl(r.Lambda));
+                sb.AppendLine("    }");
+
+                sb.Append("  }");
+                if (i != rows.Count - 1) sb.Append(",");
+                sb.AppendLine();
+
+                // Небольшая пауза между обработкой строк
+                await Task.Delay(10);
+            }
+            sb.AppendLine("]");
+
+            // 4. Асинхронная запись в файл
+            await File.WriteAllTextAsync(outputPath, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
     }
 }
