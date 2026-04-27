@@ -1,0 +1,61 @@
+# Исключаем временные файлы Office
+~$*
+
+# Исключаем бинарные файлы Excel
+*.xlsx
+*.xls
+
+# Исключаем выходные JSON файлы (сгенерированные данные)
+EXCEL_Anchor_OUT/
+EXCEL_Bolts_Out/
+EXCEL_BoltsSP16_Out/
+EXCEL_MARK_STEEL_OUT/
+EXCEL_Profile_OUT/
+JSON_All/
+JSON_OUT/
+
+# Исключаем папки с исходными Excel файлами (если они содержат личные данные)
+EXCEL_Anchor/
+EXCEL_Bolts/
+EXCEL_BoltsSP16/
+EXCEL_MARK_STEEL/
+EXCEL_Profile/
+
+# Исключаем папку с PDF файлами
+KM1/
+
+# Исключаем бинарные файлы сборки
+bin/
+obj/
+*.suo
+*.user
+*.cache
+*.vs/
+
+# Исключаем настройки IDE
+.vscode/
+.idea/
+
+# Исключаем файлы конфигурации с личными данными
+*.config
+appsettings.*.json
+appsettings.*.local.json
+secrets.json
+
+# Исключаем файлы с паролями и ключами
+*password*
+*secret*
+*token*
+*key*
+
+# Исключаем файлы .codeassistant (могут содержать ключи API)
+.codeassistant/
+
+# Исключаем файлы Docker
+Dockerfile
+
+# Исключаем файлы проекта (если нужно, но обычно они нужны)
+# ConvertData.csproj
+
+# Исключаем файлы запуска
+Properties/launchSettings.json
