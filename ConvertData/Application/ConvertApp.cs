@@ -165,7 +165,7 @@ namespace ConvertData.Application
                 Console.WriteLine($"  Записано {merged.Count} записей => {allJsonPath}");
 
                 // Сохраняем allJsonPath для использования в следующих блоках
-                var allNotDuplicateJsonPath = Path.Combine(jsonAllDir, "all_NotDuplicate.json");
+                var allCopyInData = Path.Combine(jsonAllDir, "all.json");
 
                 // Блок 4: ExportProfiles - экспорт профилей и кодов
                 if (blocks.HasFlag(Block.ExportProfiles))
@@ -195,8 +195,8 @@ namespace ConvertData.Application
                     dataJsonDir = Path.GetFullPath(dataJsonDir);
                     Directory.CreateDirectory(dataJsonDir);
                     var destPath = Path.Combine(dataJsonDir, "all.json");
-                    File.Copy(allNotDuplicateJsonPath, destPath, overwrite: true);
-                    Console.WriteLine($"  Скопировано: {allNotDuplicateJsonPath} -> {destPath}");
+                    File.Copy(allCopyInData, destPath, overwrite: true);
+                    Console.WriteLine($"  Скопировано: {allCopyInData} -> {destPath}");
                     Console.WriteLine("Блок 6 завершён.");
                 }
             }
