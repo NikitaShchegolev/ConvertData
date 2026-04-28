@@ -137,7 +137,12 @@ internal static class RowMapper
         string anchor_var_3,
         string anchor_var_4,
         string lp_shearKey,
-        string ls_shearKey
+        string ls_shearKey,
+        string e2_mode_brace,
+        string e3_mode_brace,
+        string n1_mode_brace,
+        string n2_mode_brace
+
 
         )
     {
@@ -216,7 +221,11 @@ internal static class RowMapper
             Anchor_var_3 = anchor_var_3,
             Anchor_var_4 = anchor_var_4,
             Lp_ShearKey = NumericParser.ParseDouble(lp_shearKey),
-            Ls_ShearKey = NumericParser.ParseDouble(ls_shearKey)
+            Ls_ShearKey = NumericParser.ParseDouble(ls_shearKey),
+            E2_Brace = NumericParser.ParseDouble(e2_mode_brace),
+            E3_Brace = NumericParser.ParseDouble(e3_mode_brace),
+            N1_Brace = NumericParser.ParseDouble(n1_mode_brace),
+            N2_Brace = NumericParser.ParseDouble(n2_mode_brace)
         };
     }
 

@@ -362,23 +362,6 @@ internal sealed class Row
     public double Dp_holes { get; set; }
     public double Anchor_xh_holes { get; set; }
 
-
-
-    public int nh_Holes_1_4 { get; set; }
-
-    /// Количество используемых болтов 1-8
-    public int nh_Holes_5_8 { get; set; }
-
-    /// <summary>
-    /// "Holes": Координата X первого ряда болтов
-    /// </summary>
-    public double nws_holes { get; set; }
-    /// <summary>
-    /// "Holes": Координата X второго ряда болтов
-    /// </summary>
-    public double dp_holes { get; set; }
-    public double anchor_xh_holes { get; set; }
-
     #endregion
 
     //Welds - Минимальные катеты сварных швов
@@ -568,4 +551,15 @@ internal sealed class Row
     public double Lp_ShearKey { get; set; }
     public double Ls_ShearKey { get; set; }
     #endregion
+
+    #region Связи
+
+    public double E2_Brace { get; set; }
+    public double E3_Brace { get; set; }
+    public double N1_Brace { get; set; }
+    public double N2_Brace { get; set; }
+
+
+    #endregion
+
 }

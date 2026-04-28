@@ -190,11 +190,11 @@ namespace ConvertData.Application
                 if (blocks.HasFlag(Block.CopyToData))
                 {
                     Console.WriteLine();
-                    Console.WriteLine("=== Блок 6: Копирование all_NotDuplicate.json в ConvertData.Data\\JSON\\ ===");
+                    Console.WriteLine("=== Блок 6: Копирование all.json в ConvertData.Data\\JSON\\ ===");
                     var dataJsonDir = Path.Combine(projectDir, "..", "ConvertData.Data", "JSON");
                     dataJsonDir = Path.GetFullPath(dataJsonDir);
                     Directory.CreateDirectory(dataJsonDir);
-                    var destPath = Path.Combine(dataJsonDir, "all_NotDuplicate.json");
+                    var destPath = Path.Combine(dataJsonDir, "all.json");
                     File.Copy(allNotDuplicateJsonPath, destPath, overwrite: true);
                     Console.WriteLine($"  Скопировано: {allNotDuplicateJsonPath} -> {destPath}");
                     Console.WriteLine("Блок 6 завершён.");

@@ -71,6 +71,21 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "ProfileColumn" (профиль колонны).</summary>
     public int IdxProfileColumn { get; set; } = -1;
     #endregion
+
+    #region Связи
+    /// <summary>Растояние болта до края фасонки</summary>
+    public int Idx_e2_brace { get; set; } = -1;
+    /// <summary>Растояние от ребра до ряда болтов</summary>
+    public int Idx_e3_brace { get; set; } = -1;
+    /// <summary>Колличество болтов в 1 ряду</summary>
+    public int Idx_n1_brace { get; set; } = -1;
+    /// <summary>Колличество болтов в 2 ряду</summary>
+    public int Idx_n2_brace { get; set; } = -1;
+
+
+
+    #endregion
+
     #region Пластины
     public int IdxB_plate { get; set; } = -1;
     public int IdxH_plate { get; set; } = -1;
@@ -141,9 +156,6 @@ internal sealed class ExcelColumnMap
     public int IdxMw { get; set; } = -1;
     #endregion
 
-
-
-
     #region Жесткость
     /// <summary>Индекс колонки "Sj" (жесткость Sj).</summary>
     public int IdxSj { get; set; } = -1;
@@ -190,6 +202,7 @@ internal sealed class ExcelColumnMap
     /// <summary> Количество отверстий для базы под анкера варианта 2</summary>
     public int IdNh_base_var2 { get; set; } = -1;
     #endregion
+
     #region Тип принимаемого анкера
     /// <summary> Наименование соединения вариант 1</summary>
     public int IdAnchor_var_1 { get; set; } = -1;
@@ -200,10 +213,13 @@ internal sealed class ExcelColumnMap
     /// <summary> Наименование соединения вариант 4</summary>
     public int IdAnchor_var_4 { get; set; } = -1;
     #endregion
+
     #region Противосдвиговой упор/ShearKey
     public int IdxLp_shearKey { get; set; } = -1;
     public int IdxLs_shearKey { get; set; } = -1;
     #endregion
+
+
 }
 
 /// <summary>
@@ -327,7 +343,11 @@ internal static class ExcelHeaderResolver
             IdAnchor_var_4 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_4"]),
 
             IdxLp_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Lp_shearKey"]),
-            IdxLs_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Ls_shearKey"])
+            IdxLs_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Ls_shearKey"]),
+            Idx_e2_brace = HeaderUtils.IndexOfHeaderAny(header, ["e2"]),
+            Idx_e3_brace = HeaderUtils.IndexOfHeaderAny(header, ["e3"]),
+            Idx_n1_brace = HeaderUtils.IndexOfHeaderAny(header, ["n1"]),
+            Idx_n2_brace = HeaderUtils.IndexOfHeaderAny(header, ["n2"])
         };
 
         map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");

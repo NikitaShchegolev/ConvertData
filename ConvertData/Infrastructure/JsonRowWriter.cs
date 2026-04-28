@@ -98,6 +98,10 @@ namespace ConvertData.Infrastructure
                 WriteShearKey(sb, r);
                 sb.AppendLine();
 
+                //Brace
+                WriteBrace(sb, r);
+                sb.AppendLine();
+
                 // InternalForces
                 WriteInternalForces(sb, r);
                 sb.AppendLine();
@@ -278,16 +282,9 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Dws_holes\": " + Dbl(r.Dws_holes) + ",");
             sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");
             sb.AppendLine("        \"CountHoles\": {");
-            sb.AppendLine("         \"Nh_holes_1_4\": " + r.Nh_Holes_1_4 + ",");
-            sb.AppendLine("         \"Nh_holes_1_8\": " + r.Nh_Holes_5_8);
-            sb.AppendLine("        },");
-            sb.AppendLine("        \"xh\": " + Dbl(r.Anchor_xh_holes) + ",");
-            sb.AppendLine("        \"Legacy\": {");
-            sb.AppendLine("          \"nh_Holes_1_4_legacy\": " + r.nh_Holes_1_4 + ",");
-            sb.AppendLine("          \"nh_Holes_5_8_legacy\": " + r.nh_Holes_5_8 + ",");
-            sb.AppendLine("          \"nws_holes\": " + Dbl(r.nws_holes) + ",");
-            sb.AppendLine("          \"dp_holes_legacy\": " + Dbl(r.dp_holes) + ",");
-            sb.AppendLine("          \"anchor_xh_holes_legacy\": " + Dbl(r.anchor_xh_holes));
+            sb.AppendLine("          \"Nh_holes_1_4\": " + r.Nh_Holes_1_4 + ",");
+            sb.AppendLine("          \"Nh_holes_1_8\": " + r.Nh_Holes_5_8 + ",");
+            sb.AppendLine("          \"xh\": " + Dbl(r.Anchor_xh_holes));
             sb.AppendLine("        }");
             sb.AppendLine("      },");
         }
@@ -317,6 +314,15 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Lp_shearKey\": " + Dbl(r.Lp_ShearKey) + ",");
             sb.AppendLine("        \"Ls_shearKey\": " + Dbl(r.Ls_ShearKey));
             sb.AppendLine("      },");
+        }
+        private void WriteBrace(StringBuilder sb, Row r)
+        {
+            sb.AppendLine("      \"Brace\": {");
+            sb.AppendLine("        \"e2\": " + Dbl(r.E2_Brace) + ",");
+            sb.AppendLine("        \"e3\": " + Dbl(r.E3_Brace) + ",");
+            sb.AppendLine("        \"n1\": " + Dbl(r.N1_Brace) + ",");
+            sb.AppendLine("        \"n2\": " + Dbl(r.N2_Brace));
+            sb.AppendLine("     },");
         }
         private static void WriteBoltX(StringBuilder sb, Row r)
         {
@@ -505,6 +511,10 @@ namespace ConvertData.Infrastructure
 
                 // ShearKey
                 WriteShearKey(sb, r);
+                sb.AppendLine();
+
+                // Brace
+                WriteBrace(sb, r);
                 sb.AppendLine();
 
                 // InternalForces

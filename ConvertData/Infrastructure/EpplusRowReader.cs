@@ -160,7 +160,11 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdAnchor_var_3 >= 0 ? startCol + map.IdAnchor_var_3 : null),
                         GetCell(ws, r, map.IdAnchor_var_4 >= 0 ? startCol + map.IdAnchor_var_4 : null),
                         GetCell(ws, r, map.IdxLp_shearKey >= 0 ? startCol + map.IdxLp_shearKey : null),
-                        GetCell(ws, r, map.IdxLs_shearKey >= 0 ? startCol + map.IdxLs_shearKey : null)
+                        GetCell(ws, r, map.IdxLs_shearKey >= 0 ? startCol + map.IdxLs_shearKey : null),
+                        GetCell(ws, r, map.Idx_e2_brace >= 0 ? startCol + map.Idx_e2_brace: null),
+                        GetCell(ws, r, map.Idx_e3_brace >= 0 ? startCol + map.Idx_e3_brace: null),
+                        GetCell(ws, r, map.Idx_n1_brace >= 0 ? startCol + map.Idx_n1_brace: null),
+                        GetCell(ws, r, map.Idx_n2_brace >= 0 ? startCol + map.Idx_n2_brace : null)
                         ));
                 }
                 else
