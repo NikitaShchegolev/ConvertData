@@ -190,8 +190,131 @@ internal sealed class Row
     /// </summary>
     public double Column_yo { get; set; }
     #endregion
+    #region Brace - геометрическин характеристики связи
+    /// <summary>
+    /// "Brace": профиль связи
+    /// </summary>
+    public string ProfileBrace { get; set; } = "";
+    public string GostBrace { get; set; } = "";
+    /// <summary>
+    /// "Brace": Высота сечения
+    /// </summary>
+    public double Brace_H { get; set; }
+    /// <summary>
+    /// "Brace": Ширина полки связи
+    /// </summary>
+    public double Brace_B { get; set; }
+    /// <summary>
+    /// "Brace": толщна стенки связи
+    /// </summary>
+    public double Brace_s { get; set; }
+    /// <summary>
+    /// "Brace": толщна полки связи
+    /// </summary>
+    public double Brace_t { get; set; }
+    /// <summary>
+    /// "Brace":
+    /// </summary>
+    public double Brace_A { get; set; }
+    /// <summary>
+    /// "Brace": Вес метра погонного связи
+    /// </summary>
+    public double Brace_P { get; set; }
+    /// <summary>
+    /// "Brace": Момент инерции связи относительно плоскости
+    /// </summary>
+    public double Brace_Iz { get; set; }
+    /// <summary>
+    /// "Brace": Момент инерции связи относительно плоскости
+    /// </summary>
+    public double Brace_Iy { get; set; }
+    /// <summary>
+    /// "Brace": Момент инерции связи относительно плоскости
+    /// </summary>
+    public double Brace_Ix { get; set; }
+    /// <summary>
+    /// "Brace": Момент сопротивления связи относительно центральной оси z
+    /// </summary>
+    public double Brace_Wz { get; set; }
+    /// <summary>
+    /// "Brace": Момент сопротивления связи относительно центральной оси y
+    /// </summary>
+    public double Brace_Wy { get; set; }
+    /// <summary>
+    /// "Brace": Момент сопротивления связи относительно центральной оси x
+    /// </summary>
+    public double Brace_Wx { get; set; }
+    /// <summary>
+    /// "Brace": Статический момент связи относительно центральной оси z
+    /// </summary>
+    public double Brace_Sz { get; set; }
+    /// <summary>
+    /// "Brace": Статический момент связи относительно центральной оси y
+    /// </summary>
+    public double Brace_Sy { get; set; }
+    /// <summary>
+    /// "Brace":
+    /// </summary>
+    public double Brace_iz { get; set; }
+    /// <summary>
+    /// "Brace": Радиус инерции связи относительно центральной оси z
+    /// </summary>
+    public double Brace_iy { get; set; }
+    /// <summary>
+    /// "Brace": Координата центра тяжести связи в направления x
+    /// </summary>
+    public double Brace_xo { get; set; }
+    /// <summary>
+    /// "Brace": Координата центра тяжести связи в направления y
+    /// </summary>
+    public double Brace_yo { get; set; }
+    #endregion
+    #region Ригель
+    public string ProfileRigel { get; set; } = "";
+    public string GostRigel { get; set; } = "";
+    public double Rigel_H { get; set; }
+    public double Rigel_B { get; set; }
+    public double Rigel_s { get; set; }
+    public double Rigel_t { get; set; }
+    public double Rigel_A { get; set; }
+    public double Rigel_P { get; set; }
+    public double Rigel_Iz { get; set; }
+    public double Rigel_Iy { get; set; }
+    public double Rigel_Ix { get; set; }
+    public double Rigel_Wz { get; set; }
+    public double Rigel_Wy { get; set; }
+    public double Rigel_Wx { get; set; }
+    public double Rigel_Sz { get; set; }
+    public double Rigel_Sy { get; set; }
+    public double Rigel_iz { get; set; }
+    public double Rigel_iy { get; set; }
+    public double Rigel_xo { get; set; }
+    public double Rigel_yo { get; set; }
+    #endregion
+    #region Прогон
+    public string ProfileRunThrough { get; set; } = "";
+    public string GostRunThrough { get; set; } = "";
+    public double RunThrough_H { get; set; }
+    public double RunThrough_B { get; set; }
+    public double RunThrough_s { get; set; }
+    public double RunThrough_t { get; set; }
+    public double RunThrough_A { get; set; }
+    public double RunThrough_P { get; set; }
+    public double RunThrough_Iz { get; set; }
+    public double RunThrough_Iy { get; set; }
+    public double RunThrough_Ix { get; set; }
+    public double RunThrough_Wz { get; set; }
+    public double RunThrough_Wy { get; set; }
+    public double RunThrough_Wx { get; set; }
+    public double RunThrough_Sz { get; set; }
+    public double RunThrough_Sy { get; set; }
+    public double RunThrough_iz { get; set; }
+    public double RunThrough_iy { get; set; }
+    public double RunThrough_xo { get; set; }
+    public double RunThrough_yo { get; set; }
+#endregion
     #region Пластины
-    public double B_Plate { get; set; }
+public double B_Plate { get; set; }
     public double H_Plate { get; set; }
     public double Lws_Plate { get; set; }
     public double Tp_Plate { get; set; }

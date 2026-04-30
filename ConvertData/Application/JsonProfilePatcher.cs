@@ -151,6 +151,82 @@ internal sealed class JsonProfilePatcher
                 itemPatched = true;
             }
 
+            // Patch Brace geometry
+            var braceNode = geometryNode["Brace"];
+            var braceKey = NormalizeProfileKey(braceNode?["ProfileBrace"]?.GetValue<string>());
+            if (!string.IsNullOrWhiteSpace(braceKey) && TryResolveProfile(profileLookup, braceKey, out var rg) && braceNode is JsonObject brace)
+            {
+                brace["Brace_H"] = rg.H;
+                brace["Brace_B"] = rg.B;
+                brace["Brace_s"] = rg.t_w;
+                brace["Brace_t"] = rg.t_f;
+                brace["Brace_A"] = rg.A;
+                brace["Brace_P"] = rg.P;
+                brace["Brace_Iz"] = rg.Iz;
+                brace["Brace_Iy"] = rg.Iy;
+                brace["Brace_Ix"] = rg.Ix;
+                brace["Brace_Wz"] = rg.Wz;
+                brace["Brace_Wy"] = rg.Wy;
+                brace["Brace_Wx"] = rg.Wx;
+                brace["Brace_Sz"] = rg.Sz;
+                brace["Brace_Sy"] = rg.Sy;
+                brace["Brace_iz"] = rg.iz;
+                brace["Brace_iy"] = rg.iy;
+                brace["Brace_xo"] = rg.xo;
+                brace["Brace_yo"] = rg.yo;
+                itemPatched = true;
+            }
+            // Patch Rigel geometry
+            var rigelNode = geometryNode["Rigel"];
+            var rigelKey = NormalizeProfileKey(rigelNode?["ProfileRigel"]?.GetValue<string>());
+            if (!string.IsNullOrWhiteSpace(rigelKey) && TryResolveProfile(profileLookup, rigelKey, out var ri) && rigelNode is JsonObject rigel)
+            {
+                rigel["Rigel_H"] =  ri.H;
+                rigel["Rigel_B"] =  ri.B;
+                rigel["Rigel_s"] =  ri.t_w;
+                rigel["Rigel_t"] =  ri.t_f;
+                rigel["Rigel_A"] =  ri.A;
+                rigel["Rigel_P"] =  ri.P;
+                rigel["Rigel_Iz"] = ri.Iz;
+                rigel["Rigel_Iy"] = ri.Iy;
+                rigel["Rigel_Ix"] = ri.Ix;
+                rigel["Rigel_Wz"] = ri.Wz;
+                rigel["Rigel_Wy"] = ri.Wy;
+                rigel["Rigel_Wx"] = ri.Wx;
+                rigel["Rigel_Sz"] = ri.Sz;
+                rigel["Rigel_Sy"] = ri.Sy;
+                rigel["Rigel_iz"] = ri.iz;
+                rigel["Rigel_iy"] = ri.iy;
+                rigel["Rigel_xo"] = ri.xo;
+                rigel["Rigel_yo"] = ri.yo;
+                itemPatched = true;
+            }
+            // Patch RunThrough geometry
+            var runThroughNode = geometryNode["RunThrough"];
+            var runThroughKey = NormalizeProfileKey(runThroughNode?["ProfileRunThrough"]?.GetValue<string>());
+            if (!string.IsNullOrWhiteSpace(runThroughKey) && TryResolveProfile(profileLookup, runThroughKey, out var rt) && runThroughNode is JsonObject runThrough)
+            {
+                runThrough["RunThrough_H"] = rt.H;
+                runThrough["RunThrough_B"] = rt.B;
+                runThrough["RunThrough_s"] = rt.t_w;
+                runThrough["RunThrough_t"] = rt.t_f;
+                runThrough["RunThrough_A"] = rt.A;
+                runThrough["RunThrough_P"] = rt.P;
+                runThrough["RunThrough_Iz"] = rt.Iz;
+                runThrough["RunThrough_Iy"] = rt.Iy;
+                runThrough["RunThrough_Ix"] = rt.Ix;
+                runThrough["RunThrough_Wz"] = rt.Wz;
+                runThrough["RunThrough_Wy"] = rt.Wy;
+                runThrough["RunThrough_Wx"] = rt.Wx;
+                runThrough["RunThrough_Sz"] = rt.Sz;
+                runThrough["RunThrough_Sy"] = rt.Sy;
+                runThrough["RunThrough_iz"] = rt.iz;
+                runThrough["RunThrough_iy"] = rt.iy;
+                runThrough["RunThrough_xo"] = rt.xo;
+                runThrough["RunThrough_yo"] = rt.yo;
+                itemPatched = true;
+            }
+
             if (itemPatched) patched++;
         }
 

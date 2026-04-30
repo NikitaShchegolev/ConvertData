@@ -59,7 +59,29 @@ namespace ConvertData.Infrastructure
             int startCol = ws.Dimension.Start.Column;
             int endCol = ws.Dimension.End.Column;
 
-            int headerRow = FindHeaderRow(ws, startRow, Math.Min(endRow, startRow + 30), startCol, endCol);
+            int headerRow = startRow;
+            for (int r = startRow; r <= Math.Min(endRow, startRow + 30); r++)
+            {
+                var tokens = new List<string>();
+                for (int c = startCol; c <= endCol; c++)
+                    tokens.Add(HeaderUtils.NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
+
+                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, ["ProfileBeam", "Профиль"]) >= 0;
+                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_H", "Н"]) >= 0;
+                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_B", "В"]) >= 0;
+                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_s", "S"]) >= 0;
+                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_t", "T"]) >= 0;
+
+                bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, KeyColumnHeaders) >= 0
+                    && HeaderUtils.IndexOfHeader(tokens, "Name") >= 0
+                    && hasProfile;
+
+                if (hasMain || (hasProfile && hasH && hasB && hass && hast))
+                {
+                    headerRow = r;
+                    break;
+                }
+            }
 
             var header = new List<string>();
             for (int c = startCol; c <= endCol; c++)
@@ -69,7 +91,21 @@ namespace ConvertData.Infrastructure
 
             if (!map.IsMainTable && !map.IsProfileTable)
             {
-                ExcelHeaderResolver.ApplyProfileFallback(map, header);
+                if (map.IdxProfileBeam >= 0)
+                {
+                    if (map.IdxH_beam < 0) map.IdxH_beam = map.IdxProfileBeam + 1;
+                    if (map.IdxB_beam < 0) map.IdxB_beam = map.IdxProfileBeam + 2;
+                    if (map.Idxs_beam < 0) map.Idxs_beam = map.IdxProfileBeam + 3;
+                    if (map.Idxt_beam < 0) map.Idxt_beam = map.IdxProfileBeam + 4;
+                }
+                else
+                {
+                    map.IdxProfileBeam = 0;
+                    map.IdxH_beam = 1;
+                    map.IdxB_beam = 2;
+                    map.Idxs_beam = 3;
+                    map.Idxt_beam = 4;
+                }
 
                 if (!map.IsProfileTable)
                     throw new InvalidDataException("Cannot find required headers in worksheet");
@@ -86,7 +122,7 @@ namespace ConvertData.Infrastructure
                     if (string.IsNullOrWhiteSpace(code))
                         continue;
 
-                    list.Add(RowMapper.MapMainRow(
+                    var row = RowMapper.MapMainRowIdentity(
                         GetCell(ws, r, startCol + map.IdxName),
                         code,
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
@@ -100,11 +136,20 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxTableBrand >= 0 ? startCol + map.IdxTableBrand : null),
                         GetCell(ws, r, startCol + map.IdxProfileBeam),
                         GetCell(ws, r, map.IdxProfileColumn >= 0 ? startCol + map.IdxProfileColumn : null),
-                        GetCell(ws, r, map.IdxExplanations >= 0 ? startCol + map.IdxExplanations : null),
-                        GetCell(ws, r, map.IdxH >= 0 ? startCol + map.IdxH : null),
-                        GetCell(ws, r, map.IdxB >= 0 ? startCol + map.IdxB : null),
-                        GetCell(ws, r, map.Idxs >= 0 ? startCol + map.Idxs : null),
-                        GetCell(ws, r, map.Idxt >= 0 ? startCol + map.Idxt : null),
+                        GetCell(ws, r, map.IdxExplanations >= 0 ? startCol + map.IdxExplanations : null));
+
+                    row.ProfileBrace = GetCell(ws, r, map.IdxProfileBrace >= 0 ? startCol + map.IdxProfileBrace : null);
+                    row.ProfileRigel = GetCell(ws, r, map.IdxProfileRigel >= 0 ? startCol + map.IdxProfileRigel : null);
+                    row.ProfileRunThrough = GetCell(ws, r, map.IdxProfileRunThrough >= 0 ? startCol + map.IdxProfileRunThrough : null);
+
+                    RowMapper.MapMainRowStiffness(
+                        row,
+                        GetCell(ws, r, map.IdxVariable >= 0 ? startCol + map.IdxVariable : null),
+                        GetCell(ws, r, map.IdxSj >= 0 ? startCol + map.IdxSj : null),
+                        GetCell(ws, r, map.IdxSjo >= 0 ? startCol + map.IdxSjo : null));
+
+                    RowMapper.MapMainRowForces(
+                        row,
                         GetCell(ws, r, map.IdxNt >= 0 ? startCol + map.IdxNt : null),
                         GetCell(ws, r, map.IdxQy >= 0 ? startCol + map.IdxQy : null),
                         GetCell(ws, r, map.IdxQz >= 0 ? startCol + map.IdxQz : null),
@@ -114,33 +159,49 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdxMy >= 0 ? startCol + map.IdxMy : null),
                         GetCell(ws, r, map.IdxMy_compression >= 0 ? startCol + map.IdxMy_compression : null),
                         GetCell(ws, r, map.IdxMy_tension >= 0 ? startCol + map.IdxMy_tension : null),
-                        GetCell(ws, r, map.IdxVariable >= 0 ? startCol + map.IdxVariable : null),
-                        GetCell(ws, r, map.IdxSj >= 0 ? startCol + map.IdxSj : null),
-                        GetCell(ws, r, map.IdxSjo >= 0 ? startCol + map.IdxSjo : null),
                         GetCell(ws, r, map.IdxMneg >= 0 ? startCol + map.IdxMneg : null),
                         GetCell(ws, r, map.IdxMz >= 0 ? startCol + map.IdxMz : null),
                         GetCell(ws, r, map.IdxMz_compression >= 0 ? startCol + map.IdxMz_compression : null),
                         GetCell(ws, r, map.IdxMz_tension >= 0 ? startCol + map.IdxMz_tension : null),
                         GetCell(ws, r, map.IdxMx >= 0 ? startCol + map.IdxMx : null),
-                        GetCell(ws, r, map.IdxMw >= 0 ? startCol + map.IdxMw : null),
+                        GetCell(ws, r, map.IdxMw >= 0 ? startCol + map.IdxMw : null));
+
+                    RowMapper.MapMainRowCoefficients(
+                        row,
                         GetCell(ws, r, map.IdxAlpha >= 0 ? startCol + map.IdxAlpha : null),
                         GetCell(ws, r, map.IdxBeta >= 0 ? startCol + map.IdxBeta : null),
                         GetCell(ws, r, map.IdxGamma >= 0 ? startCol + map.IdxGamma : null),
                         GetCell(ws, r, map.IdxDelta >= 0 ? startCol + map.IdxDelta : null),
                         GetCell(ws, r, map.IdxEpsilon >= 0 ? startCol + map.IdxEpsilon : null),
-                        GetCell(ws, r, map.IdxLambda >= 0 ? startCol + map.IdxLambda : null),
+                        GetCell(ws, r, map.IdxLambda >= 0 ? startCol + map.IdxLambda : null));
+
+                    RowMapper.MapMainRowBeamGeometry(
+                        row,
+                        GetCell(ws, r, map.IdxH_beam >= 0 ? startCol + map.IdxH_beam : null),
+                        GetCell(ws, r, map.IdxB_beam >= 0 ? startCol + map.IdxB_beam : null),
+                        GetCell(ws, r, map.Idxs_beam >= 0 ? startCol + map.Idxs_beam : null),
+                        GetCell(ws, r, map.Idxt_beam >= 0 ? startCol + map.Idxt_beam     : null));
+
+                    RowMapper.MapMainRowPlateGeometry(
+                        row,
                         GetCell(ws, r, map.IdxB_plate >= 0 ? startCol + map.IdxB_plate : null),
                         GetCell(ws, r, map.IdxH_plate >= 0 ? startCol + map.IdxH_plate : null),
                         GetCell(ws, r, map.IdxLws_plate >= 0 ? startCol + map.IdxLws_plate : null),
                         GetCell(ws, r, map.IdxTp_plate >= 0 ? startCol + map.IdxTp_plate : null),
                         GetCell(ws, r, map.IdxTr1_plate >= 0 ? startCol + map.IdxTr1_plate : null),
-                        GetCell(ws, r, map.IdxTr2_plate >= 0 ? startCol + map.IdxTr2_plate : null),
+                        GetCell(ws, r, map.IdxTr2_plate >= 0 ? startCol + map.IdxTr2_plate : null));
+
+                    RowMapper.MapMainRowStiffGeometry(
+                        row,
                         GetCell(ws, r, map.IdxB_stiff >= 0 ? startCol + map.IdxB_stiff : null),
                         GetCell(ws, r, map.IdxH_stiff >= 0 ? startCol + map.IdxH_stiff : null),
                         GetCell(ws, r, map.IdxLws_stiff >= 0 ? startCol + map.IdxLws_stiff : null),
                         GetCell(ws, r, map.Idxtp_stiff >= 0 ? startCol + map.Idxtp_stiff : null),
                         GetCell(ws, r, map.Idxtr1_stiff >= 0 ? startCol + map.Idxtr1_stiff : null),
-                        GetCell(ws, r, map.Idxtr2_stiff >= 0 ? startCol + map.Idxtr2_stiff : null),
+                        GetCell(ws, r, map.Idxtr2_stiff >= 0 ? startCol + map.Idxtr2_stiff : null));
+
+                    RowMapper.MapMainRowBase(
+                        row,
                         GetCell(ws, r, map.IdF_base >= 0 ? startCol + map.IdF_base : null),
                         GetCell(ws, r, map.IdLws_base >= 0 ? startCol + map.IdLws_base : null),
                         GetCell(ws, r, map.IdLp_base >= 0 ? startCol + map.IdLp_base : null),
@@ -148,38 +209,73 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.IdTws_base >= 0 ? startCol + map.IdTws_base : null),
                         GetCell(ws, r, map.IdD_ws_base >= 0 ? startCol + map.IdD_ws_base : null),
                         GetCell(ws, r, map.IdD_p_base >= 0 ? startCol + map.IdD_p_base : null),
-                        GetCell(ws, r, map.IdXh_base >= 0 ? startCol + map.IdXh_base : null),
                         GetCell(ws, r, map.IdxH_base >= 0 ? startCol + map.IdxH_base : null),
-                        GetCell(ws, r, map.IdxB_base >= 0 ? startCol + map.IdxB_base : null),
                         GetCell(ws, r, map.IdxS_base >= 0 ? startCol + map.IdxS_base : null),
+                        GetCell(ws, r, map.IdxB_base >= 0 ? startCol + map.IdxB_base : null),
                         GetCell(ws, r, map.IdxT_base >= 0 ? startCol + map.IdxT_base : null),
+                        GetCell(ws, r, map.IdXh_base >= 0 ? startCol + map.IdXh_base : null),
                         GetCell(ws, r, map.IdNh_base_var1 >= 0 ? startCol + map.IdNh_base_var1 : null),
-                        GetCell(ws, r, map.IdNh_base_var2 >= 0 ? startCol + map.IdNh_base_var2 : null),
+                        GetCell(ws, r, map.IdNh_base_var2 >= 0 ? startCol + map.IdNh_base_var2 : null));
+
+                    RowMapper.MapMainRowAnchor(
+                        row,
                         GetCell(ws, r, map.IdAnchor_var_1 >= 0 ? startCol + map.IdAnchor_var_1 : null),
                         GetCell(ws, r, map.IdAnchor_var_2 >= 0 ? startCol + map.IdAnchor_var_2 : null),
                         GetCell(ws, r, map.IdAnchor_var_3 >= 0 ? startCol + map.IdAnchor_var_3 : null),
-                        GetCell(ws, r, map.IdAnchor_var_4 >= 0 ? startCol + map.IdAnchor_var_4 : null),
+                        GetCell(ws, r, map.IdAnchor_var_4 >= 0 ? startCol + map.IdAnchor_var_4 : null));
+
+                    RowMapper.MapMainRowShearKey(
+                        row,
                         GetCell(ws, r, map.IdxLp_shearKey >= 0 ? startCol + map.IdxLp_shearKey : null),
-                        GetCell(ws, r, map.IdxLs_shearKey >= 0 ? startCol + map.IdxLs_shearKey : null),
-                        GetCell(ws, r, map.Idx_e2_brace >= 0 ? startCol + map.Idx_e2_brace: null),
-                        GetCell(ws, r, map.Idx_e3_brace >= 0 ? startCol + map.Idx_e3_brace: null),
-                        GetCell(ws, r, map.Idx_n1_brace >= 0 ? startCol + map.Idx_n1_brace: null),
-                        GetCell(ws, r, map.Idx_n2_brace >= 0 ? startCol + map.Idx_n2_brace : null)
-                        ));
+                        GetCell(ws, r, map.IdxLs_shearKey >= 0 ? startCol + map.IdxLs_shearKey : null));
+
+                    RowMapper.MapMainRowBrace(
+                        row,
+                        GetCell(ws, r, map.Idx_e2_brace >= 0 ? startCol + map.Idx_e2_brace : null),
+                        GetCell(ws, r, map.Idx_e3_brace >= 0 ? startCol + map.Idx_e3_brace : null),
+                        GetCell(ws, r, map.Idx_n1_brace >= 0 ? startCol + map.Idx_n1_brace : null),
+                        GetCell(ws, r, map.Idx_n2_brace >= 0 ? startCol + map.Idx_n2_brace : null));
+
+                    list.Add(row);
                 }
                 else
                 {
-                    string profile = GetCell(ws, r, startCol + map.IdxProfileBeam);
-                    if (string.IsNullOrWhiteSpace(profile))
+                    string beamProfile = GetCell(ws, r, startCol + map.IdxProfileBeam);
+                    string columnProfile = GetCell(ws, r, map.IdxProfileColumn >= 0 ? startCol + map.IdxProfileColumn : null);
+                    string braceProfile = GetCell(ws, r, map.IdxProfileBrace >= 0 ? startCol + map.IdxProfileBrace : null);
+                    string rigelProfile = GetCell(ws, r, map.IdxProfileRigel >= 0 ? startCol + map.IdxProfileRigel : null);
+                    string runThroughProfile = GetCell(ws, r, map.IdxProfileRunThrough >= 0 ? startCol + map.IdxProfileRunThrough : null);
+
+                    if (string.IsNullOrWhiteSpace(beamProfile)
+                        && string.IsNullOrWhiteSpace(columnProfile)
+                        && string.IsNullOrWhiteSpace(braceProfile)
+                        && string.IsNullOrWhiteSpace(rigelProfile)
+                        && string.IsNullOrWhiteSpace(runThroughProfile))
                         continue;
 
-                    list.Add(RowMapper.MapProfileRow(
-                        profile,
-                        GetCell(ws, r, map.IdxGostProfile >= 0 ? startCol + map.IdxGostProfile : null),
-                        GetCell(ws, r, map.IdxH >= 0 ? startCol + map.IdxH : null),
-                        GetCell(ws, r, map.IdxB >= 0 ? startCol + map.IdxB : null),
-                        GetCell(ws, r, map.Idxs >= 0 ? startCol + map.Idxs : null),
-                        GetCell(ws, r, map.Idxt >= 0 ? startCol + map.Idxt : null)));
+                    var row = new Row();
+                    var gostProfile = GetCell(ws, r, map.IdxGostProfile >= 0 ? startCol + map.IdxGostProfile : null);
+                    var h = GetCell(ws, r, map.IdxH_beam >= 0 ? startCol + map.IdxH_beam : null);
+                    var b = GetCell(ws, r, map.IdxB_beam >= 0 ? startCol + map.IdxB_beam : null);
+                    var s = GetCell(ws, r, map.Idxs_beam >= 0 ? startCol + map.Idxs_beam : null);
+                    var t = GetCell(ws, r, map.Idxt_beam >= 0 ? startCol + map.Idxt_beam : null);
+
+                    if (!string.IsNullOrWhiteSpace(beamProfile))
+                        RowMapper.MapProfileBeam(row, beamProfile, gostProfile, h, b, s, t);
+
+                    if (!string.IsNullOrWhiteSpace(columnProfile))
+                        RowMapper.MapProfileColumn(row, gostProfile,columnProfile, h, b, s, t);
+
+                    if (!string.IsNullOrWhiteSpace(braceProfile))
+                        RowMapper.MapProfileBrace(row, gostProfile, braceProfile, h, b, s, t);
+
+                    if (!string.IsNullOrWhiteSpace(rigelProfile))
+                        RowMapper.MapProfileRigel(row, gostProfile, rigelProfile, h, b, s, t);
+
+                    if (!string.IsNullOrWhiteSpace(runThroughProfile))
+                        RowMapper.MapProfileRunThrough(row, gostProfile, runThroughProfile, h, b, s, t);
+
+                    list.Add(row);
                 }
             }
 
@@ -203,47 +299,13 @@ namespace ConvertData.Infrastructure
             return (ws.Cells[row, col.Value].Text ?? "").Trim();
         }
 
-        /// <summary>
-        /// Ищет строку с заголовками в указанном диапазоне листа Excel.
-        /// </summary>
-        /// <param name="ws">Лист Excel.</param>
-        /// <param name="fromRow">Начальная строка поиска.</param>
-        /// <param name="toRow">Конечная строка поиска.</param>
-        /// <param name="startCol">Начальная колонка.</param>
-        /// <param name="endCol">Конечная колонка.</param>
-        /// <returns>Номер строки с заголовками.</returns>
-        private static int FindHeaderRow(ExcelWorksheet ws, int fromRow, int toRow, int startCol, int endCol)
-        {
-            for (int r = fromRow; r <= toRow; r++)
-            {
-                var tokens = new List<string>();
-                for (int c = startCol; c <= endCol; c++)
-                    tokens.Add(HeaderUtils.NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
-
-                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, ["ProfileBeam", "Профиль"]) >= 0;
-                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_H", "Н"]) >= 0;
-                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_B", "В"]) >= 0;
-                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_s", "S"]) >= 0;
-                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_t", "T"]) >= 0;
-
-                bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, KeyColumnHeaders) >= 0
-                    && HeaderUtils.IndexOfHeader(tokens, "Name") >= 0
-                    && hasProfile;
-
-                if (hasMain || (hasProfile && hasH && hasB && hass && hast))
-                    return r;
-            }
-
-            return fromRow;
-        }
-
         #region Merge additional sheets (geometry, bolts, weld)
 
         /// <summary>
         /// Ключевые заголовки для колонки с кодом соединения.
         /// </summary>
         private static readonly string[] KeyColumnHeaders =
-            ["CONNECTION_CODE", "Connection_Code", "Code", "Код"];
+            ["CONNECTION_CODE"];
 
         /// <summary>
         /// Общая карта отображения колонок листа "geometry" на свойства Row.
@@ -269,7 +331,7 @@ namespace ConvertData.Infrastructure
                 ["kf9"] = (r, v) => r.kf9 = v,
                 ["kf10"] = (r, v) => r.kf10 = v,
                 ["kfws"] = (r, v) => r.K_fws_base = v,
-                ["Anchor_k_fws_base"] = (r, v) => r.K_fws_base = v
+                ["k_fws"] = (r, v) => r.K_fws_base = v
             };
 
         /// <summary>
@@ -292,42 +354,21 @@ namespace ConvertData.Infrastructure
             map["GostBeams"] = (r, v) => r.GostBeams = v;
             map["Марка опорного столика"] = (r, v) => r.TableBrand = v;
             map["Маркаопорногостолика"] = (r, v) => r.TableBrand = v;
-            //Фланец
-            map["H"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Flange_H = value;
-                if (r.H_Plate == 0)
-                    r.H_Plate = value;
-            };
+            //Фланец            
             map["H_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
                 r.Flange_H = value;
                 if (r.H_Plate == 0)
                     r.H_Plate = value;
-            };
-            map["B"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Flange_B = value;
-                if (r.B_Plate == 0)
-                    r.B_Plate = value;
-            };
+            };            
             map["B_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
                 r.Flange_B = value;
                 if (r.B_Plate == 0)
                     r.B_Plate = value;
-            };
-            map["tp"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Flange_t = value;
-                if (r.Tp_Plate == 0)
-                    r.Tp_Plate = value;
-            };
+            };            
             map["Tp_flange"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -335,7 +376,6 @@ namespace ConvertData.Infrastructure
                 if (r.Tp_Plate == 0)
                     r.Tp_Plate = value;
             };
-            map["Lb"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
             map["Lb_flange"] = (r, v) => r.Flange_Lb = NumericParser.ParseDouble(v);
             //Пластина
             map["B_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v);
@@ -344,42 +384,14 @@ namespace ConvertData.Infrastructure
             map["Tp_plate"] = (r, v) => r.Tp_Plate = NumericParser.ParseDouble(v);
             map["Tr1_plate"] = (r, v) => r.Tr1_Plate = NumericParser.ParseDouble(v);
             map["Tr2_plate"] = (r, v) => r.Tr2_Plate = NumericParser.ParseDouble(v);
-            //Ребра жесткости
+            //Ребра жесткости           
+            
+            map["H_stiff"] = (r, v) =>
+            {
+                if (r.H_Stiff == 0)
+                    r.H_Stiff = NumericParser.ParseDouble(v);
+            };
             map["B_stiff"] = (r, v) => r.B_Stiff = NumericParser.ParseDouble(v);
-            map["H_stiff"] = (r, v) => r.H_Stiff = NumericParser.ParseDouble(v);
-            map["Hh"] = (r, v) => r.Hh_Stiff = NumericParser.ParseDouble(v);
-            map["Tg_stiff"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Tg_Stiff = value;
-                if (r.Tg_Stiff == 0)
-                    r.Tg_Stiff = value;
-            };
-            map["tg"] = (r, v) => r.Tg_Stiff = NumericParser.ParseDouble(v);
-            map["Lg_stiff"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Lg_Stiff = value;
-                if (r.Lg_Stiff == 0)
-                    r.Lg_Stiff = value;
-            };
-            map["Lg"] = (r, v) => r.Lg_Stiff = NumericParser.ParseDouble(v);
-            map["Tf_stiff"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Tf_Stiff = value;
-                if (r.Tf_Stiff == 0)
-                    r.Tf_Stiff = value;
-            };
-            map["tf"] = (r, v) => r.Tf_Stiff = NumericParser.ParseDouble(v);
-            map["Lh_stiff"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Lh_Stiff = value;
-                if (r.Lh_Stiff == 0)
-                    r.Lh_Stiff = value;
-            };
-            map["Lh"] = (r, v) => r.Lh_Stiff = NumericParser.ParseDouble(v);
             map["Hh_stiff"] = (r, v) =>
             {
                 var value = NumericParser.ParseDouble(v);
@@ -387,72 +399,54 @@ namespace ConvertData.Infrastructure
                 if (r.Hh_Stiff == 0)
                     r.Hh_Stiff = value;
             };
+            map["Tf_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Tf_Stiff = value;
+                if (r.Tf_Stiff == 0)
+                    r.Tf_Stiff = value;
+            };            
+            map["Lh_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Lh_Stiff = value;
+                if (r.Lh_Stiff == 0)
+                    r.Lh_Stiff = value;
+            };            
+            map["Lg_stiff"] = (r, v) =>
+            {
+                var value = NumericParser.ParseDouble(v);
+                r.Lg_Stiff = value;
+                if (r.Lg_Stiff == 0)
+                    r.Lg_Stiff = value;
+            };
             map["Lws_stiff"] = (r, v) => r.Lws_Stiff = NumericParser.ParseDouble(v);
             map["Tp_stiff"] = (r, v) => r.Tp_Stiff = NumericParser.ParseDouble(v);
             map["Tr1_stiff"] = (r, v) => r.Tr1_Stiff = NumericParser.ParseDouble(v);
             map["Tr2_stiff"] = (r, v) => r.Tr2_Stiff = NumericParser.ParseDouble(v);
-            map["tr1"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Tr1_Stiff = value;
-                if (r.Tr1_Plate == 0)
-                    r.Tr1_Plate = value;
-            };
-            map["tr2"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Tr2_Stiff = value;
-                if (r.Tr2_Plate == 0)
-                    r.Tr2_Plate = value;
-            };
-            map["Lst"] = (r, v) =>
-            {
-                if (r.H_Stiff == 0)
-                    r.H_Stiff = NumericParser.ParseDouble(v);
-            };
-            map["tbp"] = (r, v) =>
-            {
-                var value = NumericParser.ParseDouble(v);
-                r.Tp_Stiff = value;
-            };
-            map["F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
-            map["Anchor_F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);
-            map["Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
-            map["Anchor_Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);
+            map["Tg_stiff"] = (r, v) => r.Tg_Stiff = NumericParser.ParseDouble(v);
+            
+            //Пластины баз            
+            map["F_base"] = (r, v) => r.F_base = NumericParser.ParseDouble(v);            
+            map["H_base"] = (r, v) => r.H_base = NumericParser.ParseDouble(v);            
+            map["B_base"] = (r, v) => r.B_base = NumericParser.ParseDouble(v);            
+            map["S_base"] = (r, v) => r.S_base = NumericParser.ParseDouble(v);            
+            map["Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v);            
             map["Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v);
-            map["Anchor_Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v);
-            map["Lws"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
+            map["Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v);
             map["Lws_base"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
-            map["Anchor_Lws"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
-            map["tws"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
+            map["Lws_base"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v);
+            map["T_base"] = (r, v) => r.T_base = NumericParser.ParseDouble(v);
             map["Tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
-            map["Anchor_tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v);
-            map["Dws"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
-            map["D_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
-            map["Anchor_d_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
-            map["Dp"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
-            map["D_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
-            map["Anchor_d_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
-            map["xh"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
-            map["Xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
-            map["Anchor_xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
-            map["Nh_1_2"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
-            map["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
-            map["Nh1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
-            map["Anchor_nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
-            map["Nh_3_4"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
+            map["Dws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
+            map["Dp_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
+            map["xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
+            map["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);            
             map["Nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
-            map["Nh2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
-            map["Anchor_nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v);
             map["Anchor_var_1"] = (r, v) => r.Anchor_var_1 = v;
             map["Anchor_var_2"] = (r, v) => r.Anchor_var_2 = v;
             map["Anchor_var_3"] = (r, v) => r.Anchor_var_3 = v;
             map["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v;
-            map["Anchor_anchor_var_1"] = (r, v) => r.Anchor_var_1 = v;
-            map["Anchor_anchor_var_2"] = (r, v) => r.Anchor_var_2 = v;
-            map["Anchor_anchor_var_3"] = (r, v) => r.Anchor_var_3 = v;
-            map["Anchor_anchor_var_4"] = (r, v) => r.Anchor_var_4 = v;
-
             return map;
         }
 
@@ -466,15 +460,10 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["Option"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
-                ["GOST_anchor"] = (r, v) => r.GostAnchore = v,
-                ["GOST_anchors"] = (r, v) => r.GostAnchore = v,
                 ["GOST_bolts"] = (r, v) => r.GostBolts = v,
-                ["GostAnchore"] = (r, v) => r.GostAnchore = v,
-                ["GostBolts"] = (r, v) => r.GostBolts = v,
                 ["TypeNode"] = (r, v) => r.TypeNode = v,
-                ["Тип узла"] = (r, v) => r.TypeNode = v,
-                ["Вид узла"] = (r, v) => r.TypeNode = v,
-                ["F"] = (r, v) => { r.F = NumericParser.ParseInt(v); r.N_Rows = 1; },
+                ["F"] = (r, v) => r.F = NumericParser.ParseInt(v),
+                ["N_rows"] = (r, v) => r.N_Rows = NumericParser.ParseInt(v),
                 ["Nb"] = (r, v) => r.Bolts_Nb = NumericParser.ParseInt(v),
                 ["d1"] = (r, v) =>
                 {
@@ -499,65 +488,12 @@ namespace ConvertData.Infrastructure
                 ["p9"] = (r, v) => r.p9 = NumericParser.ParseInt(v),
                 ["p10"] = (r, v) => r.p10 = NumericParser.ParseInt(v),
                 ["Марка опорного столика"] = (r, v) => r.TableBrand = v,
-                ["Маркаопорногостолика"] = (r, v) => r.TableBrand = v,
-                ["марка"] = (r, v) => r.TableBrand = v,
-                ["Марка"] = (r, v) => r.TableBrand = v,
-                ["Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v),
-                ["Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v),
-                ["Анкер1"] = (r, v) => r.Anchor_var_1 = v,
-                ["Anchor1"] = (r, v) => r.Anchor_var_1 = v,
-                ["Анкер2"] = (r, v) => r.Anchor_var_2 = v,
-                ["Anchor2"] = (r, v) => r.Anchor_var_2 = v,
-                ["Анкер3"] = (r, v) => r.Anchor_var_3 = v,
-                ["Anchor3"] = (r, v) => r.Anchor_var_3 = v,
-                ["Анкер4"] = (r, v) => r.Anchor_var_4 = v,
-                ["Anchor4"] = (r, v) => r.Anchor_var_4 = v,
-                ["Anchor_Lp_base"] = (r, v) => r.Lp_base = NumericParser.ParseDouble(v),
-                ["Anchor_Ls_base"] = (r, v) => r.Ls_base = NumericParser.ParseDouble(v),
-                ["Anchor_tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v),
-                ["Anchor_d_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v),
-                ["Anchor_Lws"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
-                ["Anchor_d_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v),
-                ["Anchor_xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v),
-                ["Anchor_xh_holes"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
-                ["Anchor_nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
-                ["Anchor_nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-                ["Anchor_anchor_var_1"] = (r, v) => r.Anchor_var_1 = v,
-                ["Anchor_anchor_var_2"] = (r, v) => r.Anchor_var_2 = v,
-                ["Anchor_anchor_var_3"] = (r, v) => r.Anchor_var_3 = v,
-                ["Anchor_anchor_var_4"] = (r, v) => r.Anchor_var_4 = v,
+                ["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
+                ["Nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
                 ["Anchor_var_1"] = (r, v) => r.Anchor_var_1 = v,
                 ["Anchor_var_2"] = (r, v) => r.Anchor_var_2 = v,
                 ["Anchor_var_3"] = (r, v) => r.Anchor_var_3 = v,
-                ["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v,
-                ["Lws"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
-                ["Lws_base"] = (r, v) => r.Lws_base = NumericParser.ParseDouble(v),
-                ["tws"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v),
-                ["Tws_base"] = (r, v) => r.Tws_base = NumericParser.ParseDouble(v),
-                ["Dws"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v),
-                ["D_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v),
-                ["Dp"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v),
-                ["D_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v),
-                ["xh"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v),
-                ["Xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v),
-                ["Nh_1_2"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
-                ["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
-                ["Nh1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
-                ["Nh_3_4"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-                ["Nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-                ["Nh2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-                ["B_plate"] = (r, v) => r.B_Plate = NumericParser.ParseDouble(v),
-                ["H_plate"] = (r, v) => r.H_Plate = NumericParser.ParseDouble(v),
-                ["Lws_plate"] = (r, v) => r.Lws_Plate = NumericParser.ParseDouble(v),
-                ["Tp_plate"] = (r, v) => r.Tp_Plate = NumericParser.ParseDouble(v),
-                ["Tr1_plate"] = (r, v) => r.Tr1_Plate = NumericParser.ParseDouble(v),
-                ["Tr2_plate"] = (r, v) => r.Tr2_Plate = NumericParser.ParseDouble(v),
-                ["B_stiff"] = (r, v) => r.B_Stiff = NumericParser.ParseDouble(v),
-                ["H_stiff"] = (r, v) => r.H_Stiff = NumericParser.ParseDouble(v),
-                ["Lws_stiff"] = (r, v) => r.Lws_Stiff = NumericParser.ParseDouble(v),
-                ["Tp_stiff"] = (r, v) => r.Tp_Stiff = NumericParser.ParseDouble(v),
-                ["Tr1_stiff"] = (r, v) => r.Tr1_Stiff = NumericParser.ParseDouble(v),
-                ["Tr2_stiff"] = (r, v) => r.Tr2_Stiff = NumericParser.ParseDouble(v)
+                ["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v
             };
             return map;
         }
@@ -572,19 +508,8 @@ namespace ConvertData.Infrastructure
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["Option"] = (r, v) => r.OptionHoles = NumericParser.ParseInt(v),
-                ["GOST"] = (r, v) => r.GostHoles = v,
-                ["GostHoles"] = (r, v) => r.GostHoles = v,
                 //Радиус отверстия
-                ["F"] = (r, v) => { r.F_holes = NumericParser.ParseInt(v); r.N_Rows = 1; },
                 ["F_holes"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),
-                ["DiameterHolesForBolts"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),
-                //Марка опорного столика
-                ["Марка опорного столика"] = (r, v) => r.TableBrandHoles = v,
-                ["Маркаопорногостолика"] = (r, v) => r.TableBrandHoles = v,
-                ["марка"] = (r, v) => r.TableBrandHoles = v,
-                ["Марка"] = (r, v) => r.TableBrandHoles = v,
-                //Гост для анкеров
-                ["GOST_holes"] = (r, v) => r.GostHoles = v,
                 //Радиус отверстия под анкер
                 ["Dws_holes"] = (r, v) => r.Dws_holes = NumericParser.ParseDouble(v),
                 //Радиус отверстия под анкер
@@ -593,11 +518,7 @@ namespace ConvertData.Infrastructure
                 ["Nh_holes_1_4"] = (r, v) => r.Nh_Holes_1_4 = NumericParser.ParseInt(v),
                 //Количество отверстий от 1 до 8
                 ["Nh_holes_5_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v),
-                ["Nh_holes_1_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v),
-                //Расстояние между отверстиями
-                ["Anchor_xh_holes"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
-                ["xh"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
-
+                ["Марка опорного столика"] = (r, v) => r.TableBrandHoles = v
             };
             return map;
         }

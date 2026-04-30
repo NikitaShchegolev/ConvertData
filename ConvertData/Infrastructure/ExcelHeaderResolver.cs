@@ -52,27 +52,37 @@ internal sealed class ExcelColumnMap
     public int IdxTableBrand { get; set; } = -1;
 
     /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
-    public bool IsProfileTable => IdxProfileBeam >= 0 && IdxH >= 0 && IdxB >= 0 && Idxs >= 0 && Idxt >= 0;
+    public bool IsProfileTable => IdxProfileBeam >= 0 && IdxH_beam >= 0 && IdxB_beam >= 0 && Idxs_beam >= 0 && Idxt_beam >= 0;
     #endregion
     #region Балка
     /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
     public int IdxProfileBeam { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_H" (высота балки).</summary>
-    public int IdxH { get; set; } = -1;
+    public int IdxH_beam { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_B" (ширина полки балки).</summary>
-    public int IdxB { get; set; } = -1;
+    public int IdxB_beam { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_s" (толщина стенки балки).</summary>
-    public int Idxs { get; set; } = -1;
+    public int Idxs_beam { get; set; } = -1;
     /// <summary>Индекс колонки "Beam_t" (толщина полки балки).</summary>
-    public int Idxt { get; set; } = -1;
+    public int Idxt_beam { get; set; } = -1;
     #endregion
     #region Колонна
 
     /// <summary>Индекс колонки "ProfileColumn" (профиль колонны).</summary>
     public int IdxProfileColumn { get; set; } = -1;
+    /// <summary>Индекс колонки "Column_H" (высота колонны).</summary>
+    public int IdxH_column { get; set; } = -1;
+    /// <summary>Индекс колонки "Column_B" (ширина полки колонны).</summary>
+    public int IdxB_column { get; set; } = -1;
+    /// <summary>Индекс колонки "Column_s" (толщина стенки колонны).</summary>
+    public int Idxs_column { get; set; } = -1;
+    /// <summary>Индекс колонки "Column_t" (толщина полки колонны).</summary>
+    public int Idxt_column { get; set; } = -1;
     #endregion
 
     #region Связи
+    /// <summary>Индекс колонки "ProfileBrace" (профиль связи).</summary>
+    public int IdxProfileBrace { get; set; } = -1;
     /// <summary>Растояние болта до края фасонки</summary>
     public int Idx_e2_brace { get; set; } = -1;
     /// <summary>Растояние от ребра до ряда болтов</summary>
@@ -81,9 +91,15 @@ internal sealed class ExcelColumnMap
     public int Idx_n1_brace { get; set; } = -1;
     /// <summary>Колличество болтов в 2 ряду</summary>
     public int Idx_n2_brace { get; set; } = -1;
+    #endregion
 
-
-
+    #region Ригель
+    /// <summary>Индекс колонки "ProfileRigel" (профиль ригеля).</summary>
+    public int IdxProfileRigel { get; set; } = -1;
+    #endregion
+    #region Прогон    
+    /// <summary>Индекс колонки "ProfileRunThrough" (профиль прогона).</summary>
+    public int IdxProfileRunThrough { get; set; } = -1;
     #endregion
 
     #region Пластины
@@ -332,10 +348,19 @@ internal static class ExcelHeaderResolver
 
             IdxProfileBeam = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "ProfileBeams", "Профиль"]),
             IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "ProfileColumnn", "Profile_Column", "ПрофильКолонны"]),
-            IdxH = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),
-            IdxB = HeaderUtils.IndexOfHeaderAny(header, ["Beam_B"]),
-            Idxs = HeaderUtils.IndexOfHeaderAny(header, ["Beam_s"]),
-            Idxt = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
+            IdxProfileBrace = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBrace", "Profile_Brace", "ПрофильСвязи"]),
+            IdxProfileRigel = HeaderUtils.IndexOfHeaderAny(header, ["ProfileRigel", "Profile_Rigel", "ПрофильРигеля"]),
+            IdxProfileRunThrough = HeaderUtils.IndexOfHeaderAny(header, ["ProfileRunThrough", "ProfileRunTrought", "Profile_RunThrough", "ПрофильПрогона"]),
+            IdxH_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),
+            IdxB_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_B"]),
+            Idxs_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_s"]),
+            Idxt_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
+
+
+            IdxH_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_H"]),
+            IdxB_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_B"]),
+            Idxs_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_s"]),
+            Idxt_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_t"]),
 
             IdAnchor_var_1 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_1"]),
             IdAnchor_var_2 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_2"]),
@@ -409,32 +434,4 @@ internal static class ExcelHeaderResolver
         }
     }
 
-    /// <summary>
-    /// Применяет логику определения колонок профиля по позициям,
-    /// если таблица не распознана как основная или профильная.
-    /// Предполагает, что H, B, s, t идут сразу после колонки Profile.
-    /// </summary>
-    /// <param name="map">Карта индексов колонок.</param>
-    /// <param name="header">Список заголовков.</param>
-    public static void ApplyProfileFallback(ExcelColumnMap map, List<string> header)
-    {
-        if (map.IsMainTable || map.IsProfileTable)
-            return;
-
-        if (map.IdxProfileBeam >= 0)
-        {
-            if (map.IdxH < 0) map.IdxH = map.IdxProfileBeam + 1;
-            if (map.IdxB < 0) map.IdxB = map.IdxProfileBeam + 2;
-            if (map.Idxs < 0) map.Idxs = map.IdxProfileBeam + 3;
-            if (map.Idxt < 0) map.Idxt = map.IdxProfileBeam + 4;
-        }
-        else
-        {
-            map.IdxProfileBeam = 0;
-            map.IdxH = 1;
-            map.IdxB = 2;
-            map.Idxs = 3;
-            map.Idxt = 4;
-        }
-    }
 }
