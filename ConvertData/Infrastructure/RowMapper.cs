@@ -13,9 +13,7 @@ internal static class RowMapper
         string name,
         string code,
         string typeNode,
-        string gost,
         string gostColumnAndBeams,
-        string gostHoles,
         string gostBolts,
         string gostAnchore,
         string gostWeld,
@@ -30,9 +28,7 @@ internal static class RowMapper
             Name = name,
             CONNECTION_CODE = code,
             TypeNode = typeNode ?? "",
-            Gost = gost ?? "",
             GostBeams = gostColumnAndBeams ?? "",
-            GostHoles = gostHoles ?? "",
             GostBolts = gostBolts ?? "",
             GostAnchore = gostAnchore ?? "",
             GostWeld = gostWeld ?? "",
@@ -200,21 +196,13 @@ internal static class RowMapper
         row.Anchor_var_4 = anchor_var_4;
     }
 
-    internal static void MapMainRowShearKey(
-        Row row,
-        string lp_shearKey,
-        string ls_shearKey)
+    internal static void MapMainRowShearKey(Row row, string lp_shearKey, string ls_shearKey)
     {
         row.Lp_ShearKey = NumericParser.ParseDouble(lp_shearKey);
         row.Ls_ShearKey = NumericParser.ParseDouble(ls_shearKey);
     }
 
-    internal static void MapMainRowBrace(
-        Row row,
-        string e2_mode_brace,
-        string e3_mode_brace,
-        string n1_mode_brace,
-        string n2_mode_brace)
+    internal static void MapMainRowBrace(Row row, string e2_mode_brace, string e3_mode_brace, string n1_mode_brace, string n2_mode_brace)
     {
         row.E2_Brace = NumericParser.ParseDouble(e2_mode_brace);
         row.E3_Brace = NumericParser.ParseDouble(e3_mode_brace);
@@ -222,14 +210,7 @@ internal static class RowMapper
         row.N2_Brace = NumericParser.ParseDouble(n2_mode_brace);
     }
 
-    internal static void MapProfileBeam(
-        Row row,
-        string profile,
-        string gostProfile,
-        string h,
-        string b,
-        string s,
-        string t)
+    internal static void MapProfileBeam(Row row, string profile, string gostProfile, string h, string b, string s, string t)
     {
         row.ProfileBeam = profile ?? "";
         row.GostBeams = gostProfile ?? "";
@@ -241,13 +222,7 @@ internal static class RowMapper
 
 
     internal static void MapProfileBrace(
-        Row row,
-        string profile,
-        string gostProfile,
-        string h,
-        string b,
-        string s,
-        string t)
+        Row row, string profile, string gostProfile, string h, string b, string s, string t)
     {
         row.ProfileBrace = profile ?? "";
         row.GostBrace = gostProfile ?? "";
@@ -267,8 +242,7 @@ internal static class RowMapper
         string t)
     {
         row.ProfileRigel = profile ?? "";
-
-        row.GostRunThrough = gostProfile ?? "";
+        row.GostRigel = gostProfile ?? "";
         row.Rigel_H = NumericParser.ParseDouble(h);
         row.Rigel_B = NumericParser.ParseDouble(b);
         row.Rigel_s = NumericParser.ParseDouble(s);
@@ -277,7 +251,7 @@ internal static class RowMapper
 
     internal static void MapProfileRunThrough(
         Row row,
-        string profile, 
+        string profile,
         string gostProfile,
         string h,
         string b,

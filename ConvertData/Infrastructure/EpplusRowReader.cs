@@ -66,11 +66,11 @@ namespace ConvertData.Infrastructure
                 for (int c = startCol; c <= endCol; c++)
                     tokens.Add(HeaderUtils.NormalizeHeader((ws.Cells[r, c].Text ?? "").Trim()));
 
-                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, ["ProfileBeam", "Профиль"]) >= 0;
-                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_H", "Н"]) >= 0;
-                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_B", "В"]) >= 0;
-                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_s", "S"]) >= 0;
-                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_t", "T"]) >= 0;
+                bool hasProfile = HeaderUtils.IndexOfHeaderAny(tokens, ["ProfileBeam", "Профиль", "ProfileColumn", "ProfileBrace", "ProfileRigel", "ProfileRunThrough", "ProfileRunTrought"]) >= 0;
+                bool hasH = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_H", "Column_H", "Brace_H", "Rigel_H", "RunThrough_H", "RunTrought_H", "Н"]) >= 0;
+                bool hasB = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_B", "Column_B", "Brace_B", "Rigel_B", "RunThrough_B", "RunTrought_B", "В"]) >= 0;
+                bool hass = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_s", "Column_s", "Brace_s", "Rigel_s", "RunThrough_s", "RunTrought_s", "S"]) >= 0;
+                bool hast = HeaderUtils.IndexOfHeaderAny(tokens, ["Beam_t", "Column_t", "Brace_t", "Rigel_t", "RunThrough_t", "RunTrought_t", "T"]) >= 0;
 
                 bool hasMain = HeaderUtils.IndexOfHeaderAny(tokens, KeyColumnHeaders) >= 0
                     && HeaderUtils.IndexOfHeader(tokens, "Name") >= 0
@@ -89,16 +89,17 @@ namespace ConvertData.Infrastructure
 
             var map = ExcelHeaderResolver.Resolve(header);
 
-            if (!map.IsMainTable && !map.IsProfileTable)
+            if (!map.IsMainTable)
             {
-                if (map.IdxProfileBeam >= 0)
+                if (map.IdxProfileBeam >= 0
+                    && (map.IdxH_beam < 0 || map.IdxB_beam < 0 || map.Idxs_beam < 0 || map.Idxt_beam < 0))
                 {
                     if (map.IdxH_beam < 0) map.IdxH_beam = map.IdxProfileBeam + 1;
                     if (map.IdxB_beam < 0) map.IdxB_beam = map.IdxProfileBeam + 2;
                     if (map.Idxs_beam < 0) map.Idxs_beam = map.IdxProfileBeam + 3;
                     if (map.Idxt_beam < 0) map.Idxt_beam = map.IdxProfileBeam + 4;
                 }
-                else
+                else if (!HasAnyProfileColumns(map))
                 {
                     map.IdxProfileBeam = 0;
                     map.IdxH_beam = 1;
@@ -107,7 +108,7 @@ namespace ConvertData.Infrastructure
                     map.Idxt_beam = 4;
                 }
 
-                if (!map.IsProfileTable)
+                if (!HasAnyProfileColumns(map))
                     throw new InvalidDataException("Cannot find required headers in worksheet");
             }
 
@@ -126,9 +127,7 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, startCol + map.IdxName),
                         code,
                         GetCell(ws, r, map.IdxTypeNode >= 0 ? startCol + map.IdxTypeNode : null),
-                        GetCell(ws, r, map.IdxGost >= 0 ? startCol + map.IdxGost : null),
-                        GetCell(ws, r, map.IdxGostColumnAndBeams >= 0 ? startCol + map.IdxGostColumnAndBeams : null),
-                        GetCell(ws, r, map.IdxGostHoles >= 0 ? startCol + map.IdxGostHoles : null),
+                        GetCell(ws, r, map.IdxGostColumnAndBeams >= 0 ? startCol + map.IdxGostColumnAndBeams : null),                        
                         GetCell(ws, r, map.IdxGostBolts >= 0 ? startCol + map.IdxGostBolts : null),
                         GetCell(ws, r, map.IdxGostAnchore >= 0 ? startCol + map.IdxGostAnchore : null),
                         GetCell(ws, r, map.IdxGostWeld >= 0 ? startCol + map.IdxGostWeld : null),
@@ -236,6 +235,8 @@ namespace ConvertData.Infrastructure
                         GetCell(ws, r, map.Idx_n1_brace >= 0 ? startCol + map.Idx_n1_brace : null),
                         GetCell(ws, r, map.Idx_n2_brace >= 0 ? startCol + map.Idx_n2_brace : null));
 
+                    ApplyMappedColumns(row, ws, r, startCol, header, GeometryColumnMap);
+
                     list.Add(row);
                 }
                 else
@@ -264,16 +265,18 @@ namespace ConvertData.Infrastructure
                         RowMapper.MapProfileBeam(row, beamProfile, gostProfile, h, b, s, t);
 
                     if (!string.IsNullOrWhiteSpace(columnProfile))
-                        RowMapper.MapProfileColumn(row, gostProfile,columnProfile, h, b, s, t);
+                        RowMapper.MapProfileColumn(row, columnProfile, gostProfile, h, b, s, t);
 
                     if (!string.IsNullOrWhiteSpace(braceProfile))
-                        RowMapper.MapProfileBrace(row, gostProfile, braceProfile, h, b, s, t);
+                        RowMapper.MapProfileBrace(row, braceProfile, gostProfile, h, b, s, t);
 
                     if (!string.IsNullOrWhiteSpace(rigelProfile))
-                        RowMapper.MapProfileRigel(row, gostProfile, rigelProfile, h, b, s, t);
+                        RowMapper.MapProfileRigel(row, rigelProfile, gostProfile, h, b, s, t);
 
                     if (!string.IsNullOrWhiteSpace(runThroughProfile))
-                        RowMapper.MapProfileRunThrough(row, gostProfile, runThroughProfile, h, b, s, t);
+                        RowMapper.MapProfileRunThrough(row, runThroughProfile, gostProfile, h, b, s, t);
+
+                    ApplyMappedColumns(row, ws, r, startCol, header, GeometryColumnMap);
 
                     list.Add(row);
                 }
@@ -297,6 +300,35 @@ namespace ConvertData.Infrastructure
             if (col == null)
                 return "";
             return (ws.Cells[row, col.Value].Text ?? "").Trim();
+        }
+
+        private static bool HasAnyProfileColumns(ExcelColumnMap map)
+        {
+            return map.IdxProfileBeam >= 0
+                || map.IdxProfileColumn >= 0
+                || map.IdxProfileBrace >= 0
+                || map.IdxProfileRigel >= 0
+                || map.IdxProfileRunThrough >= 0;
+        }
+
+        private static void ApplyMappedColumns(
+            Row row,
+            ExcelWorksheet ws,
+            int rowIndex,
+            int startCol,
+            IReadOnlyList<string> headers,
+            IReadOnlyDictionary<string, Action<Row, string>> propertyMap)
+        {
+            for (int i = 0; i < headers.Count; i++)
+            {
+                var headerName = headers[i];
+                if (string.IsNullOrWhiteSpace(headerName) || !propertyMap.TryGetValue(headerName, out var setter))
+                    continue;
+
+                var value = GetCell(ws, rowIndex, startCol + i);
+                if (!string.IsNullOrWhiteSpace(value))
+                    setter(row, value);
+            }
         }
 
         #region Merge additional sheets (geometry, bolts, weld)
@@ -348,10 +380,11 @@ namespace ConvertData.Infrastructure
         private static Dictionary<string, Action<Row, string>> BuildGeometryColumnMap()
         {
             var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);
-            map["GOST"] = (r, v) => r.Gost = v;
-            map["Gost"] = (r, v) => r.Gost = v;
             map["GostColumn"] = (r, v) => r.GostColumn = v;
             map["GostBeams"] = (r, v) => r.GostBeams = v;
+            AddBraceGeometryColumns(map);
+            AddRigelGeometryColumns(map);
+            AddRunThroughGeometryColumns(map);
             map["Марка опорного столика"] = (r, v) => r.TableBrand = v;
             map["Маркаопорногостолика"] = (r, v) => r.TableBrand = v;
             //Фланец            
@@ -448,6 +481,96 @@ namespace ConvertData.Infrastructure
             map["Anchor_var_3"] = (r, v) => r.Anchor_var_3 = v;
             map["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v;
             return map;
+        }
+
+        private static void AddBraceGeometryColumns(Dictionary<string, Action<Row, string>> map)
+        {
+            AddTextColumn(map, (r, v) => r.ProfileBrace = v, "ProfileBrace");
+            AddTextColumn(map, (r, v) => r.GostBrace = v, "GostBrace");
+            AddNumericColumn(map, (r, v) => r.Brace_H = v, "Brace_H");
+            AddNumericColumn(map, (r, v) => r.Brace_B = v, "Brace_B");
+            AddNumericColumn(map, (r, v) => r.Brace_s = v, "Brace_s");
+            AddNumericColumn(map, (r, v) => r.Brace_t = v, "Brace_t");
+            AddNumericColumn(map, (r, v) => r.Brace_A = v, "Brace_A");
+            AddNumericColumn(map, (r, v) => r.Brace_P = v, "Brace_P");
+            AddNumericColumn(map, (r, v) => r.Brace_Iz = v, "Brace_Iz");
+            AddNumericColumn(map, (r, v) => r.Brace_Iy = v, "Brace_Iy");
+            AddNumericColumn(map, (r, v) => r.Brace_Ix = v, "Brace_Ix");
+            AddNumericColumn(map, (r, v) => r.Brace_Wz = v, "Brace_Wz");
+            AddNumericColumn(map, (r, v) => r.Brace_Wy = v, "Brace_Wy");
+            AddNumericColumn(map, (r, v) => r.Brace_Wx = v, "Brace_Wx");
+            AddNumericColumn(map, (r, v) => r.Brace_Sz = v, "Brace_Sz");
+            AddNumericColumn(map, (r, v) => r.Brace_Sy = v, "Brace_Sy");
+            AddNumericColumn(map, (r, v) => r.Brace_iz = v, "Brace_i_z", "Brace_iz");
+            AddNumericColumn(map, (r, v) => r.Brace_iy = v, "Brace_i_y", "Brace_iy");
+            AddNumericColumn(map, (r, v) => r.Brace_xo = v, "Brace_xo");
+            AddNumericColumn(map, (r, v) => r.Brace_yo = v, "Brace_yo");
+        }
+
+        private static void AddRigelGeometryColumns(Dictionary<string, Action<Row, string>> map)
+        {
+            AddTextColumn(map, (r, v) => r.ProfileRigel = v, "ProfileRigel");
+            AddTextColumn(map, (r, v) => r.GostRigel = v, "GostRigel");
+            AddNumericColumn(map, (r, v) => r.Rigel_H = v, "Rigel_H");
+            AddNumericColumn(map, (r, v) => r.Rigel_B = v, "Rigel_B");
+            AddNumericColumn(map, (r, v) => r.Rigel_s = v, "Rigel_s");
+            AddNumericColumn(map, (r, v) => r.Rigel_t = v, "Rigel_t");
+            AddNumericColumn(map, (r, v) => r.Rigel_A = v, "Rigel_A");
+            AddNumericColumn(map, (r, v) => r.Rigel_P = v, "Rigel_P");
+            AddNumericColumn(map, (r, v) => r.Rigel_Iz = v, "Rigel_Iz");
+            AddNumericColumn(map, (r, v) => r.Rigel_Iy = v, "Rigel_Iy");
+            AddNumericColumn(map, (r, v) => r.Rigel_Ix = v, "Rigel_Ix");
+            AddNumericColumn(map, (r, v) => r.Rigel_Wz = v, "Rigel_Wz");
+            AddNumericColumn(map, (r, v) => r.Rigel_Wy = v, "Rigel_Wy");
+            AddNumericColumn(map, (r, v) => r.Rigel_Wx = v, "Rigel_Wx");
+            AddNumericColumn(map, (r, v) => r.Rigel_Sz = v, "Rigel_Sz");
+            AddNumericColumn(map, (r, v) => r.Rigel_Sy = v, "Rigel_Sy");
+            AddNumericColumn(map, (r, v) => r.Rigel_iz = v, "Rigel_i_z", "Rigel_iz");
+            AddNumericColumn(map, (r, v) => r.Rigel_iy = v, "Rigel_i_y", "Rigel_iy");
+            AddNumericColumn(map, (r, v) => r.Rigel_xo = v, "Rigel_xo");
+            AddNumericColumn(map, (r, v) => r.Rigel_yo = v, "Rigel_yo");
+        }
+
+        private static void AddRunThroughGeometryColumns(Dictionary<string, Action<Row, string>> map)
+        {
+            AddTextColumn(map, (r, v) => r.ProfileRunThrough = v, "ProfileRunThrough", "ProfileRunTrought");
+            AddTextColumn(map, (r, v) => r.GostRunThrough = v, "GostRunThrough", "GostRunTrought");
+            AddNumericColumn(map, (r, v) => r.RunThrough_H = v, "RunThrough_H", "RunTrought_H");
+            AddNumericColumn(map, (r, v) => r.RunThrough_B = v, "RunThrough_B", "RunTrought_B");
+            AddNumericColumn(map, (r, v) => r.RunThrough_s = v, "RunThrough_s", "RunTrought_s");
+            AddNumericColumn(map, (r, v) => r.RunThrough_t = v, "RunThrough_t", "RunTrought_t");
+            AddNumericColumn(map, (r, v) => r.RunThrough_A = v, "RunThrough_A", "RunTrought_A");
+            AddNumericColumn(map, (r, v) => r.RunThrough_P = v, "RunThrough_P", "RunTrought_P");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Iz = v, "RunThrough_Iz", "RunTrought_Iz");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Iy = v, "RunThrough_Iy", "RunTrought_Iy");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Ix = v, "RunThrough_Ix", "RunTrought_Ix");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Wz = v, "RunThrough_Wz", "RunTrought_Wz");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Wy = v, "RunThrough_Wy", "RunTrought_Wy");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Wx = v, "RunThrough_Wx", "RunTrought_Wx");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Sz = v, "RunThrough_Sz", "RunTrought_Sz");
+            AddNumericColumn(map, (r, v) => r.RunThrough_Sy = v, "RunThrough_Sy", "RunTrought_Sy");
+            AddNumericColumn(map, (r, v) => r.RunThrough_iz = v, "RunThrough_i_z", "RunThrough_iz", "RunTrought_i_z", "RunTrought_iz");
+            AddNumericColumn(map, (r, v) => r.RunThrough_iy = v, "RunThrough_i_y", "RunThrough_iy", "RunTrought_i_y", "RunTrought_iy");
+            AddNumericColumn(map, (r, v) => r.RunThrough_xo = v, "RunThrough_xo", "RunTrought_xo");
+            AddNumericColumn(map, (r, v) => r.RunThrough_yo = v, "RunThrough_yo", "RunTrought_yo");
+        }
+
+        private static void AddTextColumn(
+            Dictionary<string, Action<Row, string>> map,
+            Action<Row, string> setter,
+            params string[] headers)
+        {
+            foreach (var header in headers)
+                map[header] = setter;
+        }
+
+        private static void AddNumericColumn(
+            Dictionary<string, Action<Row, string>> map,
+            Action<Row, double> setter,
+            params string[] headers)
+        {
+            foreach (var header in headers)
+                map[header] = (r, v) => setter(r, NumericParser.ParseDouble(v));
         }
 
         /// <summary>

@@ -8,10 +8,8 @@ internal sealed class Row
     /// </summary>
     public string Name { get; set; } = "";
     public string TypeNode { get; set; } = "";
-    public string Gost { get; set; } = "";
     public string GostColumn { get; set; } = "";
     public string GostBeams { get; set; } = "";
-    public string GostHoles { get; set; } = "";
     public string GostBolts { get; set; } = "";
     public string GostAnchore { get; set; } = "";
     public string GostWeld { get; set; } = "";
