@@ -6,11 +6,30 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using ConvertData.Domain;
+using ConvertData.Enums;
 
 namespace ConvertData.Application;
 
 internal sealed class JsonProfilePatcher
 {
+    private static readonly ProfileSectionType[] ProfileSections =
+    [
+        ProfileSectionType.Beam,
+        ProfileSectionType.Column,
+        ProfileSectionType.Brace,
+        ProfileSectionType.Rigel,
+        ProfileSectionType.RunThrougth
+    ];
+
+    private static readonly Dictionary<ProfileSectionType, ProfileSectionDefinition> SectionDefinitions = new()
+    {
+        [ProfileSectionType.Beam] = new("Beam", "ProfileBeam", "Beam"),
+        [ProfileSectionType.Column] = new("Column", "ProfileColumn", "Column"),
+        [ProfileSectionType.Brace] = new("Brace", "ProfileBrace", "Brace"),
+        [ProfileSectionType.Rigel] = new("Rigel", "ProfileRigel", "Rigel"),
+        [ProfileSectionType.RunThrougth] = new("RunThrougth", "ProfileRunThrough", "RunThrougth")
+    };
+
     public void ApplyProfilesToJson(string jsonOutDir, Dictionary<string, ProfileGeometry> profileLookup)
     {
         foreach (var jsonPath in Directory.EnumerateFiles(jsonOutDir, "*.json", SearchOption.TopDirectoryOnly)
@@ -61,24 +80,45 @@ internal sealed class JsonProfilePatcher
         if (profileLookup.TryGetValue(normalizedProfile, out geometry))
             return true;
 
-        var digits = new string(normalizedProfile.Where(char.IsDigit).ToArray());
-        if (!string.IsNullOrWhiteSpace(digits) && profileLookup.TryGetValue(digits, out geometry))
-            return true;
-
-        if (!string.IsNullOrWhiteSpace(digits))
-        {
-            foreach (var kv in profileLookup)
-            {
-                if (kv.Key.StartsWith(digits, StringComparison.OrdinalIgnoreCase))
-                {
-                    geometry = kv.Value;
-                    return true;
-                }
-            }
-        }
-
         geometry = default!;
         return false;
+    }
+
+    private static void SetNumber(JsonObject target, string propertyName, double value)
+    {
+        target[propertyName] = value;
+    }
+
+    private static ProfileSectionDefinition? GetSectionDefinition(ProfileSectionType sectionType)
+    {
+        return SectionDefinitions.TryGetValue(sectionType, out var definition)
+            ? definition
+            : null;
+    }
+
+    private static void ApplySectionGeometry(
+        JsonObject target,
+        string prefix,
+        ProfileGeometry geometry)
+    {
+        SetNumber(target, $"{prefix}_H", geometry.H);
+        SetNumber(target, $"{prefix}_B", geometry.B);
+        SetNumber(target, $"{prefix}_s", geometry.t_w);
+        SetNumber(target, $"{prefix}_t", geometry.t_f);
+        SetNumber(target, $"{prefix}_A", geometry.A);
+        SetNumber(target, $"{prefix}_P", geometry.P);
+        SetNumber(target, $"{prefix}_Iz", geometry.Iz);
+        SetNumber(target, $"{prefix}_Iy", geometry.Iy);
+        SetNumber(target, $"{prefix}_Ix", geometry.Ix);
+        SetNumber(target, $"{prefix}_Wz", geometry.Wz);
+        SetNumber(target, $"{prefix}_Wy", geometry.Wy);
+        SetNumber(target, $"{prefix}_Wx", geometry.Wx);
+        SetNumber(target, $"{prefix}_Sz", geometry.Sz);
+        SetNumber(target, $"{prefix}_Sy", geometry.Sy);
+        SetNumber(target, $"{prefix}_iz", geometry.iz);
+        SetNumber(target, $"{prefix}_iy", geometry.iy);
+        SetNumber(target, $"{prefix}_xo", geometry.xo);
+        SetNumber(target, $"{prefix}_yo", geometry.yo);
     }
 
     private void PatchJsonFile(string jsonPath, Dictionary<string, ProfileGeometry> profileLookup)
@@ -99,131 +139,20 @@ internal sealed class JsonProfilePatcher
 
             bool itemPatched = false;
 
-            // Patch Beam geometry
-            var beamNode = geometryNode["Beam"];
-            var beamKey = NormalizeProfileKey(beamNode?["ProfileBeam"]?.GetValue<string>());
-            if (!string.IsNullOrWhiteSpace(beamKey) && TryResolveProfile(profileLookup, beamKey, out var bg) && beamNode is JsonObject beam)
+            foreach (var sectionType in ProfileSections)
             {
-                beam["Beam_H"]  = bg.H;
-                beam["Beam_B"]  = bg.B;
-                beam["Beam_s"]  = bg.t_w;
-                beam["Beam_t"]  = bg.t_f;
-                beam["Beam_A"]  = bg.A;
-                beam["Beam_P"]  = bg.P;
-                beam["Beam_Iz"] = bg.Iz;
-                beam["Beam_Iy"] = bg.Iy;
-                beam["Beam_Ix"] = bg.Ix;
-                beam["Beam_Wz"] = bg.Wz;
-                beam["Beam_Wy"] = bg.Wy;
-                beam["Beam_Wx"] = bg.Wx;
-                beam["Beam_Sz"] = bg.Sz;
-                beam["Beam_Sy"] = bg.Sy;
-                beam["Beam_iz"] = bg.iz;
-                beam["Beam_iy"] = bg.iy;
-                beam["Beam_xo"] = bg.xo;
-                beam["Beam_yo"] = bg.yo;
-                itemPatched = true;
-            }
+                var sectionDefinition = GetSectionDefinition(sectionType);
+                if (sectionDefinition is null)
+                    continue;
 
-            // Patch Column geometry
-            var columnNode = geometryNode["Column"];
-            var columnKey = NormalizeProfileKey(columnNode?["ProfileColumn"]?.GetValue<string>());
-            if (!string.IsNullOrWhiteSpace(columnKey) && TryResolveProfile(profileLookup, columnKey, out var cg) && columnNode is JsonObject column)
-            {
-                column["Column_H"]  = cg.H;
-                column["Column_B"]  = cg.B;
-                column["Column_s"]  = cg.t_w;
-                column["Column_t"]  = cg.t_f;
-                column["Column_A"]  = cg.A;
-                column["Column_P"]  = cg.P;
-                column["Column_Iz"] = cg.Iz;
-                column["Column_Iy"] = cg.Iy;
-                column["Column_Ix"] = cg.Ix;
-                column["Column_Wz"] = cg.Wz;
-                column["Column_Wy"] = cg.Wy;
-                column["Column_Wx"] = cg.Wx;
-                column["Column_Sz"] = cg.Sz;
-                column["Column_Sy"] = cg.Sy;
-                column["Column_iz"] = cg.iz;
-                column["Column_iy"] = cg.iy;
-                column["Column_xo"] = cg.xo;
-                column["Column_yo"] = cg.yo;
-                itemPatched = true;
-            }
+                if (geometryNode[sectionDefinition.SectionName] is not JsonObject sectionNode)
+                    continue;
 
-            // Patch Brace geometry
-            var braceNode = geometryNode["Brace"];
-            var braceKey = NormalizeProfileKey(braceNode?["ProfileBrace"]?.GetValue<string>());
-            if (!string.IsNullOrWhiteSpace(braceKey) && TryResolveProfile(profileLookup, braceKey, out var rg) && braceNode is JsonObject brace)
-            {
-                brace["Brace_H"] = rg.H;
-                brace["Brace_B"] = rg.B;
-                brace["Brace_s"] = rg.t_w;
-                brace["Brace_t"] = rg.t_f;
-                brace["Brace_A"] = rg.A;
-                brace["Brace_P"] = rg.P;
-                brace["Brace_Iz"] = rg.Iz;
-                brace["Brace_Iy"] = rg.Iy;
-                brace["Brace_Ix"] = rg.Ix;
-                brace["Brace_Wz"] = rg.Wz;
-                brace["Brace_Wy"] = rg.Wy;
-                brace["Brace_Wx"] = rg.Wx;
-                brace["Brace_Sz"] = rg.Sz;
-                brace["Brace_Sy"] = rg.Sy;
-                brace["Brace_iz"] = rg.iz;
-                brace["Brace_iy"] = rg.iy;
-                brace["Brace_xo"] = rg.xo;
-                brace["Brace_yo"] = rg.yo;
-                itemPatched = true;
-            }
-            // Patch Rigel geometry
-            var rigelNode = geometryNode["Rigel"];
-            var rigelKey = NormalizeProfileKey(rigelNode?["ProfileRigel"]?.GetValue<string>());
-            if (!string.IsNullOrWhiteSpace(rigelKey) && TryResolveProfile(profileLookup, rigelKey, out var ri) && rigelNode is JsonObject rigel)
-            {
-                rigel["Rigel_H"] =  ri.H;
-                rigel["Rigel_B"] =  ri.B;
-                rigel["Rigel_s"] =  ri.t_w;
-                rigel["Rigel_t"] =  ri.t_f;
-                rigel["Rigel_A"] =  ri.A;
-                rigel["Rigel_P"] =  ri.P;
-                rigel["Rigel_Iz"] = ri.Iz;
-                rigel["Rigel_Iy"] = ri.Iy;
-                rigel["Rigel_Ix"] = ri.Ix;
-                rigel["Rigel_Wz"] = ri.Wz;
-                rigel["Rigel_Wy"] = ri.Wy;
-                rigel["Rigel_Wx"] = ri.Wx;
-                rigel["Rigel_Sz"] = ri.Sz;
-                rigel["Rigel_Sy"] = ri.Sy;
-                rigel["Rigel_iz"] = ri.iz;
-                rigel["Rigel_iy"] = ri.iy;
-                rigel["Rigel_xo"] = ri.xo;
-                rigel["Rigel_yo"] = ri.yo;
-                itemPatched = true;
-            }
-            // Patch RunThrough geometry
-            var runThroughNode = geometryNode["RunThrough"];
-            var runThroughKey = NormalizeProfileKey(runThroughNode?["ProfileRunThrough"]?.GetValue<string>());
-            if (!string.IsNullOrWhiteSpace(runThroughKey) && TryResolveProfile(profileLookup, runThroughKey, out var rt) && runThroughNode is JsonObject runThrough)
-            {
-                runThrough["RunThrough_H"] = rt.H;
-                runThrough["RunThrough_B"] = rt.B;
-                runThrough["RunThrough_s"] = rt.t_w;
-                runThrough["RunThrough_t"] = rt.t_f;
-                runThrough["RunThrough_A"] = rt.A;
-                runThrough["RunThrough_P"] = rt.P;
-                runThrough["RunThrough_Iz"] = rt.Iz;
-                runThrough["RunThrough_Iy"] = rt.Iy;
-                runThrough["RunThrough_Ix"] = rt.Ix;
-                runThrough["RunThrough_Wz"] = rt.Wz;
-                runThrough["RunThrough_Wy"] = rt.Wy;
-                runThrough["RunThrough_Wx"] = rt.Wx;
-                runThrough["RunThrough_Sz"] = rt.Sz;
-                runThrough["RunThrough_Sy"] = rt.Sy;
-                runThrough["RunThrough_iz"] = rt.iz;
-                runThrough["RunThrough_iy"] = rt.iy;
-                runThrough["RunThrough_xo"] = rt.xo;
-                runThrough["RunThrough_yo"] = rt.yo;
+                var profileKey = NormalizeProfileKey(sectionNode[sectionDefinition.ProfilePropertyName]?.GetValue<string>());
+                if (string.IsNullOrWhiteSpace(profileKey) || !TryResolveProfile(profileLookup, profileKey, out var geometry))
+                    continue;
+
+                ApplySectionGeometry(sectionNode, sectionDefinition.SectionPrefix, geometry);
                 itemPatched = true;
             }
 
@@ -262,4 +191,6 @@ internal sealed class JsonProfilePatcher
         arr = a;
         return true;
     }
+
+    private sealed record ProfileSectionDefinition(string SectionName, string ProfilePropertyName, string SectionPrefix);
 }

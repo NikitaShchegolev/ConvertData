@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using ConvertData.Enums;
 
-using ConvertData.Infrastructure.Parsing;
-
-namespace ConvertData.Infrastructure;
+namespace ConvertData.Infrastructure.Interop;
 
 /// <summary>
 /// Карта индексов колонок Excel для отображения заголовков на свойства Row.
@@ -53,6 +50,49 @@ internal sealed class ExcelColumnMap
 
     /// <summary>Проверяет, является ли таблица таблицей профилей (содержит Profile, H, B, s, t).</summary>
     public bool IsProfileTable => IdxProfileBeam >= 0 && IdxH_beam >= 0 && IdxB_beam >= 0 && Idxs_beam >= 0 && Idxt_beam >= 0;
+
+    public void SetProfileSectionIndices( ProfileSectionType sectionType, int profileIndex,
+        int heightIndex, int widthIndex, int wallIndex, int flangeIndex)
+    {
+        switch (sectionType)
+        {
+            case ProfileSectionType.Beam:
+                IdxProfileBeam = profileIndex;
+                IdxH_beam = heightIndex;
+                IdxB_beam = widthIndex;
+                Idxs_beam = wallIndex;
+                Idxt_beam = flangeIndex;
+                break;
+            case ProfileSectionType.Column:
+                IdxProfileColumn = profileIndex;
+                IdxH_column = heightIndex;
+                IdxB_column = widthIndex;
+                Idxs_column = wallIndex;
+                Idxt_column = flangeIndex;
+                break;
+            case ProfileSectionType.Brace:
+                IdxProfileBrace = profileIndex;
+                IdxH_brace = heightIndex;
+                IdxB_brace = widthIndex;
+                Idxs_brace = wallIndex;
+                Idxt_brace = flangeIndex;
+                break;
+            case ProfileSectionType.Rigel:
+                IdxProfileRigel = profileIndex;
+                IdxH_rigel = heightIndex;
+                IdxB_rigel = widthIndex;
+                Idxs_rigel = wallIndex;
+                Idxt_rigel = flangeIndex;
+                break;
+            case ProfileSectionType.RunThrougth:
+                IdxProfileRunThrough = profileIndex;
+                IdxH_runThrough = heightIndex;
+                IdxB_runThrough = widthIndex;
+                Idxs_runThrough = wallIndex;
+                Idxt_runThrough = flangeIndex;
+                break;
+        }
+    }
     #endregion
     #region Балка
     /// <summary>Индекс колонки "ProfileBeam" или "Профиль" (профиль балки).</summary>
@@ -79,10 +119,15 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "Column_t" (толщина полки колонны).</summary>
     public int Idxt_column { get; set; } = -1;
     #endregion
-
     #region Связи
     /// <summary>Индекс колонки "ProfileBrace" (профиль связи).</summary>
     public int IdxProfileBrace { get; set; } = -1;
+    public int IdxH_brace { get; set; } = -1;
+    public int IdxB_brace { get; set; } = -1;
+    public int Idxs_brace { get; set; } = -1;
+    public int Idxt_brace { get; set; } = -1;
+    /// <summary>Растояние болта до края фасонки</summary>
+    public int Idx_a_brace { get; set; } = -1;
     /// <summary>Растояние болта до края фасонки</summary>
     public int Idx_e2_brace { get; set; } = -1;
     /// <summary>Растояние от ребра до ряда болтов</summary>
@@ -91,18 +136,26 @@ internal sealed class ExcelColumnMap
     public int Idx_n1_brace { get; set; } = -1;
     /// <summary>Колличество болтов в 2 ряду</summary>
     public int Idx_n2_brace { get; set; } = -1;
+    public int Idx_Lb_brace { get; set; } = -1;
     #endregion
-
     #region Ригель
     /// <summary>Индекс колонки "ProfileRigel" (профиль ригеля).</summary>
     public int IdxProfileRigel { get; set; } = -1;
+    public int IdxH_rigel { get; set; } = -1;
+    public int IdxB_rigel { get; set; } = -1;
+    public int Idxs_rigel { get; set; } = -1;
+    public int Idxt_rigel { get; set; } = -1;
     #endregion
     #region Прогон    
     /// <summary>Индекс колонки "ProfileRunThrough" (профиль прогона).</summary>
     public int IdxProfileRunThrough { get; set; } = -1;
+    public int IdxH_runThrough { get; set; } = -1;
+    public int IdxB_runThrough { get; set; } = -1;
+    public int Idxs_runThrough { get; set; } = -1;
+    public int Idxt_runThrough { get; set; } = -1;
     #endregion
-
     #region Пластины
+    public int IdxLb_plate { get; set; } = -1;
     public int IdxB_plate { get; set; } = -1;
     public int IdxH_plate { get; set; } = -1;
     public int IdxTp_plate { get; set; } = -1;
@@ -171,7 +224,6 @@ internal sealed class ExcelColumnMap
     /// <summary>Индекс колонки "Mw" (крутящий момент Mw).</summary>
     public int IdxMw { get; set; } = -1;
     #endregion
-
     #region Жесткость
     /// <summary>Индекс колонки "Sj" (жесткость Sj).</summary>
     public int IdxSj { get; set; } = -1;
@@ -218,7 +270,6 @@ internal sealed class ExcelColumnMap
     /// <summary> Количество отверстий для базы под анкера варианта 2</summary>
     public int IdNh_base_var2 { get; set; } = -1;
     #endregion
-
     #region Тип принимаемого анкера
     /// <summary> Наименование соединения вариант 1</summary>
     public int IdAnchor_var_1 { get; set; } = -1;
@@ -229,207 +280,8 @@ internal sealed class ExcelColumnMap
     /// <summary> Наименование соединения вариант 4</summary>
     public int IdAnchor_var_4 { get; set; } = -1;
     #endregion
-
     #region Противосдвиговой упор/ShearKey
     public int IdxLp_shearKey { get; set; } = -1;
     public int IdxLs_shearKey { get; set; } = -1;
     #endregion
-
-
-}
-
-/// <summary>
-/// Разрешает заголовки колонок Excel в карту индексов для отображения на свойства Row.
-/// </summary>
-internal static class ExcelHeaderResolver
-{
-    /// <summary>
-    /// Переопределение имени колонки профиля из аргументов командной строки (--profile-column).
-    /// </summary>
-    public static string? ProfileColumnOverride { get; set; }
-
-    /// <summary>
-    /// Разрешает список заголовков в карту индексов колонок.
-    /// </summary>
-    /// <param name="header">Список нормализованных заголовков из Excel.</param>
-    /// <returns>Карта индексов колонок.</returns>
-    public static ExcelColumnMap Resolve(List<string> header)
-    {
-        int idxProfile;
-        if (!string.IsNullOrWhiteSpace(ProfileColumnOverride))
-        {
-            idxProfile = HeaderUtils.IndexOfHeader(header, ProfileColumnOverride);
-            if (idxProfile < 0)
-                idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
-        }
-        else
-        {
-            idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
-        }
-        //IdxProfileBeam = idxProfile, - не знаю для чего!
-        var map = new ExcelColumnMap
-        {
-            //Общие данные об узле
-            IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
-            IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
-            IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),
-            IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GostBeams", "GostColumnAndBeams", "GOST_Column_Beams", "Gost_Column_Beams", "GOST Column Beams"]),
-            IdxGostBolts = HeaderUtils.IndexOfHeaderAny(header, ["GostBolts", "GOST_bolts"]),
-            IdxGostAnchore = HeaderUtils.IndexOfHeaderAny(header, ["GostAnchore", "GOST_anchor", "GOST_anchors"]),
-            IdxGostWeld = HeaderUtils.IndexOfHeaderAny(header, ["GostWeld", "GOST_weld"]),
-            IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostColumn", "GOST_Profile", "Gost_Profile", "GOST Profile"]),
-            IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, ["Explanations", "Explanation"]),
-            IdxTableBrand = HeaderUtils.IndexOfHeaderAny(header, ["Марка опорного столика", "Маркаопорногостолика", "Марка"]),
-
-
-            //Внутренние усилия
-            IdF_base = HeaderUtils.IndexOfHeaderAny(header, ["F_base", "Fbase", "F_base_anchor"]),
-            IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
-            IdxQy = HeaderUtils.IndexOfHeaderAny(header, ["Qy"]),
-            IdxQz = HeaderUtils.IndexOfHeaderAny(header, ["Qz"]),
-            IdxT = HeaderUtils.IndexOfHeader(header, "T"),
-            IdxNc = HeaderUtils.IndexOfHeader(header, "Nc"),
-            IdxN = HeaderUtils.IndexOfHeader(header, "N"),
-            IdxMy = HeaderUtils.IndexOfHeaderAny(header, ["My"]),
-            IdxMy_compression = HeaderUtils.IndexOfHeaderAny(header, ["My_compression", "My_compresion", "My_ compresion", "My compression"]),
-            IdxMy_tension = HeaderUtils.IndexOfHeaderAny(header, ["My_tension", "My_ tension", "My tension"]),
-            IdxMz = HeaderUtils.IndexOfHeaderAny(header, ["Mz"]),
-            IdxMz_compression = HeaderUtils.IndexOfHeaderAny(header, ["Mz_compression", "Mz_compresion", "Mz_ compresion", "Mz compression"]),
-            IdxMz_tension = HeaderUtils.IndexOfHeaderAny(header, ["Mz_tension", "Mz_ tension", "Mz tension"]),
-            IdxMneg = HeaderUtils.IndexOfHeader(header, "Mneg"),
-            IdxMx = HeaderUtils.IndexOfHeader(header, "Mx"),
-            IdxMw = HeaderUtils.IndexOfHeader(header, "Mw"),
-            IdxVariable = HeaderUtils.IndexOfHeaderAny(header, ["variable", "Variable"]),
-            //Жесткость
-            IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
-            IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
-
-
-            IdLws_base = HeaderUtils.IndexOfHeaderAny(header, ["Lws_base", "Lws", "L_ws"]),
-            IdLp_base = HeaderUtils.IndexOfHeaderAny(header, ["Lp_base", "Lp", "Lpbase"]),
-            IdLs_base = HeaderUtils.IndexOfHeaderAny(header, ["Ls_base", "Ls", "Lsbase"]),
-            IdTws_base = HeaderUtils.IndexOfHeaderAny(header, ["Tws_base", "tws", "Tws", "tws_base"]),
-            IdD_ws_base = HeaderUtils.IndexOfHeaderAny(header, ["D_ws_base", "Dws", "D_ws", "d_ws_base"]),
-            IdD_p_base = HeaderUtils.IndexOfHeaderAny(header, ["D_p_base", "Dp", "D_p", "d_p_base"]),
-            IdXh_base = HeaderUtils.IndexOfHeaderAny(header, ["Xh_base", "xh", "Xh", "xh_base"]),
-            IdK_fws_base = HeaderUtils.IndexOfHeaderAny(header, ["K_fws_base"]),
-            IdNh_base_var2 = HeaderUtils.IndexOfHeaderAny(header, ["Nh_base_var2"]),
-            IdxH_base = HeaderUtils.IndexOfHeaderAny(header, ["H_base"]),
-            IdxB_base = HeaderUtils.IndexOfHeaderAny(header, ["B_base"]),
-            IdxS_base = HeaderUtils.IndexOfHeaderAny(header, ["S_base"]),
-            IdxT_base = HeaderUtils.IndexOfHeaderAny(header, ["T_base"]),
-
-            IdxB_plate = HeaderUtils.IndexOfHeaderAny(header, ["B_plate", "Plate_B"]),
-            IdxH_plate = HeaderUtils.IndexOfHeaderAny(header, ["H_plate", "Plate_H"]),
-            IdxLws_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lws_plate", "Plate_Lws"]),
-            IdxTp_plate = HeaderUtils.IndexOfHeaderAny(header, ["tp_plate", "Tp_plate", "Plate_t", "Plate_tp"]),
-            IdxTr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr1_plate", "Tr1_plate", "Plate_tr1"]),
-            IdxTr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr2_plate", "Tr2_plate", "Plate_tr2"]),
-
-            IdxB_stiff = HeaderUtils.IndexOfHeaderAny(header, ["B_stiff", "Stiff_B"]),
-            IdxH_stiff = HeaderUtils.IndexOfHeaderAny(header, ["H_stiff", "Stiff_H"]),
-            IdxLws_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lws_stiff", "Stiff_Lws"]),
-            Idxtp_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tp_stiff", "Tp_stiff", "Stiff_tp"]),
-            Idxtr1_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tr1_stiff", "Tr1_stiff", "Stiff_tr1"]),
-            Idxtr2_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tr2_stiff", "Tr2_stiff", "Stiff_tr2"]),
-            IdxTg_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tg_stiff"]),
-            IdxLg_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lg_stiff"]),
-            IdxTf_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tf_stiff"]),
-            IdxLh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lh_stiff"]),
-            IdxHh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Hh_stiff"]),
-
-            IdxTp_Flange = HeaderUtils.IndexOfHeaderAny(header, ["Tp_flange"]),
-            IdxB_Flange = HeaderUtils.IndexOfHeaderAny(header, ["B_flange"]),
-            IdxH_Flange = HeaderUtils.IndexOfHeaderAny(header, ["H_flange"]),
-            IdxLb_Flange = HeaderUtils.IndexOfHeaderAny(header, ["Lb_flange"]),
-
-
-            IdxProfileBeam = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "ProfileBeams", "Профиль"]),
-            IdxProfileColumn = HeaderUtils.IndexOfHeaderAny(header, ["ProfileColumn", "ProfileColumnn", "Profile_Column", "ПрофильКолонны"]),
-            IdxProfileBrace = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBrace", "Profile_Brace", "ПрофильСвязи"]),
-            IdxProfileRigel = HeaderUtils.IndexOfHeaderAny(header, ["ProfileRigel", "Profile_Rigel", "ПрофильРигеля"]),
-            IdxProfileRunThrough = HeaderUtils.IndexOfHeaderAny(header, ["ProfileRunThrough", "ProfileRunTrought", "Profile_RunThrough", "ПрофильПрогона"]),
-            IdxH_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_H"]),
-            IdxB_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_B"]),
-            Idxs_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_s"]),
-            Idxt_beam = HeaderUtils.IndexOfHeaderAny(header, ["Beam_t"]),
-
-
-            IdxH_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_H"]),
-            IdxB_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_B"]),
-            Idxs_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_s"]),
-            Idxt_column = HeaderUtils.IndexOfHeaderAny(header, ["Column_t"]),
-
-            IdAnchor_var_1 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_1"]),
-            IdAnchor_var_2 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_2"]),
-            IdAnchor_var_3 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_3"]),
-            IdAnchor_var_4 = HeaderUtils.IndexOfHeaderAny(header, ["Anchor_var_4"]),
-
-            IdxLp_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Lp_shearKey"]),
-            IdxLs_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Ls_shearKey"]),
-            Idx_e2_brace = HeaderUtils.IndexOfHeaderAny(header, ["e2"]),
-            Idx_e3_brace = HeaderUtils.IndexOfHeaderAny(header, ["e3"]),
-            Idx_n1_brace = HeaderUtils.IndexOfHeaderAny(header, ["n1"]),
-            Idx_n2_brace = HeaderUtils.IndexOfHeaderAny(header, ["n2"])
-        };
-
-        map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");
-        if (map.IdxAlpha < 0) map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "Alpha");
-        map.IdxBeta = HeaderUtils.IndexOfHeader(header, "β");
-        if (map.IdxBeta < 0) map.IdxBeta = HeaderUtils.IndexOfHeader(header, "Beta");
-        map.IdxGamma = HeaderUtils.IndexOfHeader(header, "γ");
-        if (map.IdxGamma < 0) map.IdxGamma = HeaderUtils.IndexOfHeader(header, "Gamma");
-        map.IdxDelta = HeaderUtils.IndexOfHeader(header, "δ");
-        if (map.IdxDelta < 0) map.IdxDelta = HeaderUtils.IndexOfHeader(header, "Delta");
-        map.IdxEpsilon = HeaderUtils.IndexOfHeader(header, "ε");
-        if (map.IdxEpsilon < 0) map.IdxEpsilon = HeaderUtils.IndexOfHeader(header, "Epsilon");
-        map.IdxLambda = HeaderUtils.IndexOfHeader(header, "λ");
-        if (map.IdxLambda < 0) map.IdxLambda = HeaderUtils.IndexOfHeader(header, "Lambda");
-
-        ResolveGreekFallback(header, map);
-
-        return map;
-    }
-
-    /// <summary>
-    /// Пытается определить индексы греческих коэффициентов (α, β, γ, δ, ε, λ),
-    /// если они не были найдены по заголовкам. Использует позиционную логику или "?" заголовки.
-    /// </summary>
-    /// <param name="header">Список заголовков.</param>
-    /// <param name="map">Карта индексов колонок.</param>
-    private static void ResolveGreekFallback(List<string> header, ExcelColumnMap map)
-    {
-        if (map.IdxMz < 0)
-            return;
-        if (map.IdxAlpha >= 0 && map.IdxBeta >= 0 && map.IdxGamma >= 0
-            && map.IdxDelta >= 0 && map.IdxEpsilon >= 0 && map.IdxLambda >= 0)
-            return;
-
-        var qMarks = header
-            .Select((h, i) => new { h, i })
-            .Where(x => x.h == "?")
-            .Select(x => x.i)
-            .ToList();
-
-        int baseIdx = map.IdxMz + 1;
-        if (baseIdx < header.Count && header.Count - baseIdx >= 6)
-        {
-            if (map.IdxAlpha < 0) map.IdxAlpha = baseIdx + 0;
-            if (map.IdxBeta < 0) map.IdxBeta = baseIdx + 1;
-            if (map.IdxGamma < 0) map.IdxGamma = baseIdx + 2;
-            if (map.IdxDelta < 0) map.IdxDelta = baseIdx + 3;
-            if (map.IdxEpsilon < 0) map.IdxEpsilon = baseIdx + 4;
-            if (map.IdxLambda < 0) map.IdxLambda = baseIdx + 5;
-        }
-        else if (qMarks.Count >= 6)
-        {
-            if (map.IdxAlpha < 0) map.IdxAlpha = qMarks[0];
-            if (map.IdxBeta < 0) map.IdxBeta = qMarks[1];
-            if (map.IdxGamma < 0) map.IdxGamma = qMarks[2];
-            if (map.IdxDelta < 0) map.IdxDelta = qMarks[3];
-            if (map.IdxEpsilon < 0) map.IdxEpsilon = qMarks[4];
-            if (map.IdxLambda < 0) map.IdxLambda = qMarks[5];
-        }
-    }
-
 }

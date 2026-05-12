@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ConvertData.Domain;
 using ConvertData.Infrastructure;
+using ConvertData.Infrastructure.Interop;
 
 namespace ConvertData.Application
 {

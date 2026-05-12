@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace ConvertData.Infrastructure.Interop;
 
@@ -60,9 +61,9 @@ internal static class ExcelXlsConverter
             }
             catch { }
 
-            if (workbook != null) System.Runtime.InteropServices.Marshal.FinalReleaseComObject(workbook);
-            if (workbooks != null) System.Runtime.InteropServices.Marshal.FinalReleaseComObject(workbooks);
-            if (excel != null) System.Runtime.InteropServices.Marshal.FinalReleaseComObject(excel);
+            if (workbook != null) Marshal.FinalReleaseComObject(workbook);
+            if (workbooks != null) Marshal.FinalReleaseComObject(workbooks);
+            if (excel != null) Marshal.FinalReleaseComObject(excel);
         }
     }
 }

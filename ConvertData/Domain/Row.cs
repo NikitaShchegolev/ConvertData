@@ -291,29 +291,30 @@ internal sealed class Row
     #endregion
     #region Прогон
     public string ProfileRunThrough { get; set; } = "";
-    public string GostRunThrough { get; set; } = "";
-    public double RunThrough_H { get; set; }
-    public double RunThrough_B { get; set; }
-    public double RunThrough_s { get; set; }
-    public double RunThrough_t { get; set; }
-    public double RunThrough_A { get; set; }
-    public double RunThrough_P { get; set; }
-    public double RunThrough_Iz { get; set; }
-    public double RunThrough_Iy { get; set; }
-    public double RunThrough_Ix { get; set; }
-    public double RunThrough_Wz { get; set; }
-    public double RunThrough_Wy { get; set; }
-    public double RunThrough_Wx { get; set; }
-    public double RunThrough_Sz { get; set; }
-    public double RunThrough_Sy { get; set; }
-    public double RunThrough_iz { get; set; }
-    public double RunThrough_iy { get; set; }
-    public double RunThrough_xo { get; set; }
-    public double RunThrough_yo { get; set; }
+    public string GostRunThrougth { get; set; } = "";
+    public double RunThrougth_H { get; set; }
+    public double RunThrougth_B { get; set; }
+    public double RunThrougth_s { get; set; }
+    public double RunThrougth_t { get; set; }
+    public double RunThrougth_A { get; set; }
+    public double RunThrougth_P { get; set; }
+    public double RunThrougth_Iz { get; set; }
+    public double RunThrougth_Iy { get; set; }
+    public double RunThrougth_Ix { get; set; }
+    public double RunThrougth_Wz { get; set; }
+    public double RunThrougth_Wy { get; set; }
+    public double RunThrougth_Wx { get; set; }
+    public double RunThrougth_Sz { get; set; }
+    public double RunThrougth_Sy { get; set; }
+    public double RunThrougth_iz { get; set; }
+    public double RunThrougth_iy { get; set; }
+    public double RunThrougth_xo { get; set; }
+    public double RunThrougth_yo { get; set; }
 #endregion
     #region Пластины
 public double B_Plate { get; set; }
     public double H_Plate { get; set; }
+    public double Lb_Plate { get; set; }
     public double Lws_Plate { get; set; }
     public double Tp_Plate { get; set; }
     public double Tr1_Plate { get; set; }
@@ -456,10 +457,6 @@ public double B_Plate { get; set; }
     /// "Holes": Версия использования болтов
     /// </summary>
     public double OptionHoles { get; set; } = 0;
-
-    /// <summary>
-    /// "Holes": Марка опорного столика
-    /// </summary>
     public string TableBrandHoles { get; set; } = "";
     /// <summary>
     /// "Holes": Диаметр болта
@@ -674,13 +671,12 @@ public double B_Plate { get; set; }
     #endregion
 
     #region Связи
-
+    public double A_Brace { get; set; }
     public double E2_Brace { get; set; }
     public double E3_Brace { get; set; }
     public double N1_Brace { get; set; }
     public double N2_Brace { get; set; }
-
-
+    public double Lb_Brace { get; set; }
     #endregion
 
 }
