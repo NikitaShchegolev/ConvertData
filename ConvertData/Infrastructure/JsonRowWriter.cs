@@ -347,7 +347,6 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("      \"Holes\": {");
             sb.AppendLine("        \"OptionHoles\": " + Dbl(r.OptionHoles) + ",");
-            sb.AppendLine("        \"TableBrandHoles\": \"" + JsonEscape(r.TableBrandHoles) + "\",");
             sb.AppendLine("        \"DiameterHolesForBolts\": " + r.F_holes + ",");
             sb.AppendLine("        \"Dws_holes\": " + Dbl(r.Dws_holes) + ",");
             sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");

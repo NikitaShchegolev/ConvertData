@@ -62,20 +62,19 @@ internal static partial class EpplusRowPropertyMaps
             ["kf10"] = (r, v) => r.kf10 = v,
             ["k_fws"] = (r, v) => r.K_fws_base = v
         };
-    internal static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = BoltsMap();
+    internal static readonly Dictionary<string, Action<Row, string>> ShearKeyColumnMap = ShearKeyMap();
+    internal static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = MergeMaps(BoltsMap(), ShearKeyColumnMap);
     internal static readonly Dictionary<string, Action<Row, string>> HolesColumnMap = HolesMap();
     private static Dictionary<string, Action<Row, string>> BuildGeometryColumnMap()
     {
         var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);
 
-        AddCommonGeometryColumns(map);
         foreach (var sectionType in GeometryProfileSections) { AddGeometryProfileSection(map, sectionType); }
             
         AddGeometryBraceBolt(map);
         AddGeometryPlate(map);
         AddGeometryFlange(map);
         AddGeometryBase(map);
-        AddGeometryAnchor(map);
         AddGeometryStiff(map);
         return map;
     }
@@ -99,18 +98,7 @@ internal static partial class EpplusRowPropertyMaps
                 AddGeometryRunThrough(map);
                 break;
         }
-    }
-    private static void AddCommonGeometryColumns(Dictionary<string, Action<Row, string>> map)
-    {
-        AddTextColumn(map, (r, v) => r.TableBrand = v, "Марка опорного столика");
-    }
-    private static void AddGeometryAnchor(Dictionary<string, Action<Row, string>> map)
-    {
-        AddTextColumn(map, (r, v) => r.Anchor_var_1 = v, "Anchor_var_1");
-        AddTextColumn(map, (r, v) => r.Anchor_var_2 = v, "Anchor_var_2");
-        AddTextColumn(map, (r, v) => r.Anchor_var_3 = v, "Anchor_var_3");
-        AddTextColumn(map, (r, v) => r.Anchor_var_4 = v, "Anchor_var_4");
-    }
+    }    
     private static void AddGeometryBraceBolt(Dictionary<string, Action<Row, string>> map)
     {
         AddNumericColumn(map, (r, v) => r.Lb_Brace = v, "Lb_brace");
@@ -251,7 +239,7 @@ internal static partial class EpplusRowPropertyMaps
                 ProfileSetter = (r, v) => r.ProfileBeam = v,
                 ProfileHeaders = ["ProfileBeam", "ProfileBeams"],
                 GostSetter = (r, v) => r.GostBeams = v,
-                GostHeaders = ["GostBeams", "GostBeam", "GOST_Column_Beams", "GostColumnAndBeams"],
+                GostHeaders = ["GostBeams"],
                 HSetter = (r, v) => r.Beam_H = v,
                 BSetter = (r, v) => r.Beam_B = v,
                 SSetter = (r, v) => r.Beam_s = v,
@@ -269,12 +257,7 @@ internal static partial class EpplusRowPropertyMaps
                 izSetter = (r, v) => r.Beam_iz = v,
                 iySetter = (r, v) => r.Beam_iy = v,
                 xoSetter = (r, v) => r.Beam_xo = v,
-                yoSetter = (r, v) => r.Beam_yo = v,
-                HeaderAliases = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["iz"] = ["Beam_iz"],
-                    ["iy"] = ["Beam_iy"]
-                }
+                yoSetter = (r, v) => r.Beam_yo = v                
             },
             ProfileSectionType.Column => new GeometrySectionDefinition
             {
@@ -352,12 +335,8 @@ internal static partial class EpplusRowPropertyMaps
                 izSetter = (r, v) => r.Rigel_iz = v,
                 iySetter = (r, v) => r.Rigel_iy = v,
                 xoSetter = (r, v) => r.Rigel_xo = v,
-                yoSetter = (r, v) => r.Rigel_yo = v,
-                HeaderAliases = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["iz"] = ["Rigel_iz"],
-                    ["iy"] = ["Rigel_iy"]
-                }
+                yoSetter = (r, v) => r.Rigel_yo = v
+                
             },
             ProfileSectionType.RunThrougth => new GeometrySectionDefinition
             {
@@ -388,33 +367,58 @@ internal static partial class EpplusRowPropertyMaps
             _ => throw new ArgumentOutOfRangeException(nameof(sectionType), sectionType, null)
         };
     }
+   /// <summary>
+   /// Заполнение геометрических характеристик для балки
+   /// </summary>
+   /// <param name="map"></param>
     private static void AddGeometryBeam(Dictionary<string, Action<Row, string>> map)
     {
         AddGeometrySection(map, GetGeometrySectionDefinition(ProfileSectionType.Beam));
     }
+    /// <summary>
+    /// Заполнение геометрических характеристик для колонны
+    /// </summary>
+    /// <param name="map"></param>
     private static void AddGeometryColumns(Dictionary<string, Action<Row, string>> map)
     {
         AddGeometrySection(map, GetGeometrySectionDefinition(ProfileSectionType.Column));
     }
+    /// <summary>
+    /// Заполнение геометрических характеристик для связи
+    /// </summary>
+    /// <param name="map"></param>
     private static void AddGeometryBrace(Dictionary<string, Action<Row, string>> map)
     {
         AddGeometrySection(map, GetGeometrySectionDefinition(ProfileSectionType.Brace));
     }
+    /// <summary>
+    /// Заполнение геометрических характеристик для ригеля
+    /// </summary>
+    /// <param name="map"></param>
     private static void AddGeometryRigel(Dictionary<string, Action<Row, string>> map)
     {
         AddGeometrySection(map, GetGeometrySectionDefinition(ProfileSectionType.Rigel));
     }
+    /// <summary>
+    /// Заполнение геометрических характеристик для прогона
+    /// </summary>
+    /// <param name="map"></param>
     private static void AddGeometryRunThrough(Dictionary<string, Action<Row, string>> map)
     {
         AddGeometrySection(map, GetGeometrySectionDefinition(ProfileSectionType.RunThrougth));
     }
+       
+    /// <summary>
+    /// Заполнение болтов
+    /// </summary>
+    /// <returns></returns>
     private static Dictionary<string, Action<Row, string>> BoltsMap()
     {
         return new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
         {
             ["Option"] = (r, v) => r.OptionBolts = NumericParser.ParseInt(v),
-            ["GOST_bolts"] = (r, v) => r.GostBolts = v,
             ["TypeNode"] = (r, v) => r.TypeNode = v,
+            ["GostBolts"] = (r, v) => r.GostBolts = v,
             ["F"] = (r, v) => r.F = NumericParser.ParseInt(v),
             ["N_rows"] = (r, v) => r.N_Rows = NumericParser.ParseInt(v),
             ["Nb"] = (r, v) => r.Bolts_Nb = NumericParser.ParseInt(v),
@@ -454,6 +458,28 @@ internal static partial class EpplusRowPropertyMaps
             ["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v
         };
     }
+
+    private static Dictionary<string, Action<Row, string>> ShearKeyMap()
+    {
+        return new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Lp_shearKey"] = (r, v) => r.Lp_ShearKey = NumericParser.ParseDouble(v),
+            ["Ls_shearKey"] = (r, v) => r.Ls_ShearKey = NumericParser.ParseDouble(v)
+        };
+    }
+
+    private static Dictionary<string, Action<Row, string>> MergeMaps(
+        Dictionary<string, Action<Row, string>> left,
+        Dictionary<string, Action<Row, string>> right)
+    {
+        var map = new Dictionary<string, Action<Row, string>>(left, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var pair in right)
+            map[pair.Key] = pair.Value;
+
+        return map;
+    }
+
     private static Dictionary<string, Action<Row, string>> HolesMap()
     {
         return new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
@@ -463,11 +489,9 @@ internal static partial class EpplusRowPropertyMaps
             ["Dws_holes"] = (r, v) => r.Dws_holes = NumericParser.ParseDouble(v),
             ["Dp_holes"] = (r, v) => r.Dp_holes = NumericParser.ParseDouble(v),
             ["xh"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
-            ["Xh"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
             ["xh_holes"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
             ["Nh_holes_1_4"] = (r, v) => r.Nh_Holes_1_4 = NumericParser.ParseInt(v),
-            ["Nh_holes_5_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v),
-            ["Марка опорного столика"] = (r, v) => r.TableBrandHoles = v
+            ["Nh_holes_5_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v)
         };
     }
     private static void AddTextColumn(Dictionary<string, Action<Row, string>> map, Action<Row, string> setter,params string[] headers)

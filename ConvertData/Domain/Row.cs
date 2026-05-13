@@ -457,7 +457,6 @@ public double B_Plate { get; set; }
     /// "Holes": Версия использования болтов
     /// </summary>
     public double OptionHoles { get; set; } = 0;
-    public string TableBrandHoles { get; set; } = "";
     /// <summary>
     /// "Holes": Диаметр болта
     /// </summary>
