@@ -7,12 +7,15 @@ internal sealed class Row
     /// Имя группы узлового соединения
     /// </summary>
     public string Name { get; set; } = "";
+    public string StructuralElement { get; set; } = "";
     public string TypeNode { get; set; } = "";
     public string GostColumn { get; set; } = "";
     public string GostBeams { get; set; } = "";
     public string GostBolts { get; set; } = "";
     public string GostAnchore { get; set; } = "";
     public string GostWeld { get; set; } = "";
+
+
     /// <summary>
     /// Пояснения к узловому соединению, которые могут включать в себя описание типа соединения,
     /// </summary>
@@ -477,7 +480,7 @@ public double B_Plate { get; set; }
     /// "Holes": Координата X второго ряда болтов
     /// </summary>
     public double Dp_holes { get; set; }
-    public double Anchor_xh_holes { get; set; }
+    public double xh_holes { get; set; }
 
     #endregion
 
@@ -647,8 +650,6 @@ public double B_Plate { get; set; }
     public double D_ws_base { get; set; }
     /// <summary> Диаметр отверстия под анкер </summary>
     public double D_p_base { get; set; }
-    /// <summary> Расстояние между монтажными отверстиями </summary>
-    public double Xh_base { get; set; }
     /// <summary> Катет сварного шва крепления базы </summary>
     /// <summary> Количество отверстий для базы варианта 1</summary>
     public double Nh_base_var1 { get; set; }
@@ -676,6 +677,7 @@ public double B_Plate { get; set; }
     public double N1_Brace { get; set; }
     public double N2_Brace { get; set; }
     public double Lb_Brace { get; set; }
+    public double Tp_Brace { get; set; }
     #endregion
 
 }

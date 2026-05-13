@@ -13,6 +13,7 @@ internal static class RowMapper
 
     internal static Row MapMainRowIdentity(
         string name,
+        string structuralElement,
         string code,
         string typeNode,
         string gostColumnAndBeams,
@@ -28,6 +29,7 @@ internal static class RowMapper
         return new Row
         {
             Name = name,
+            StructuralElement = structuralElement,
             CONNECTION_CODE = code,
             TypeNode = typeNode ?? "",
             GostBeams = gostColumnAndBeams ?? "",
@@ -147,7 +149,6 @@ internal static class RowMapper
         string b_base,
         string t_base,
         string k_fws_base,
-        string xh_base,
         string nh_base_var1,
         string nh_base_var2)
     {
@@ -163,7 +164,6 @@ internal static class RowMapper
         row.B_base = NumericParser.ParseDouble(b_base);
         row.T_base = NumericParser.ParseDouble(t_base);
         row.K_fws_base = k_fws_base ?? "";
-        row.Xh_base = NumericParser.ParseDouble(xh_base);
         row.Nh_base_var1 = NumericParser.ParseDouble(nh_base_var1);
         row.Nh_base_var2 = NumericParser.ParseDouble(nh_base_var2);
     }

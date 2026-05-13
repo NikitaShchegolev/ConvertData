@@ -61,6 +61,7 @@ namespace ConvertData.Infrastructure
                 var r = rows[i];
                 sb.AppendLine("  {");
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
+                sb.AppendLine("    \"StructuralElement\": \"" + JsonEscape(r.StructuralElement) + "\",");
                 sb.AppendLine("    \"GUID_NODE\": \"" + Guid.NewGuid().ToString() + "\",");
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(processedCodes[i]) + "\",");
                 sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");
@@ -251,6 +252,7 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Tr2_Plate\": " + Dbl(r.Tr2_Plate) + ",");
             sb.AppendLine("        \"PlateBrace\": {");
             sb.AppendLine("          \"Lb\": " + Dbl(r.Lb_Brace) + ",");
+            sb.AppendLine("          \"Tp_brace\": " + Dbl(r.Tp_Brace) + ",");
             sb.AppendLine("          \"a\": " + Dbl(r.A_Brace));
             sb.AppendLine("        }");
             sb.AppendLine("      },");
@@ -352,8 +354,7 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Dp_holes\": " + Dbl(r.Dp_holes) + ",");
             sb.AppendLine("        \"CountHoles\": {");
             sb.AppendLine("          \"Nh_holes_1_4\": " + r.Nh_Holes_1_4 + ",");
-            sb.AppendLine("          \"Nh_holes_1_8\": " + r.Nh_Holes_5_8 + ",");
-            sb.AppendLine("          \"xh\": " + Dbl(r.Anchor_xh_holes));
+            sb.AppendLine("          \"Nh_holes_1_8\": " + r.Nh_Holes_5_8 );            
             sb.AppendLine("        }");
             sb.AppendLine("      },");
         }
@@ -361,20 +362,20 @@ namespace ConvertData.Infrastructure
         {
             sb.AppendLine("      \"Anchor\": {");
             sb.AppendLine("        \"GostAnchore\": \"" + JsonEscape(r.GostAnchore) + "\",");
-            sb.AppendLine("        \"Anchor_Lws\": " + Dbl(r.Lws_base) + ",");
-            sb.AppendLine("        \"Anchor_Lp_base\": " + Dbl(r.Lp_base) + ",");
-            sb.AppendLine("        \"Anchor_Ls_base\": " + Dbl(r.Ls_base) + ",");
-            sb.AppendLine("        \"Anchor_tws_base\": " + Dbl(r.Tws_base) + ",");
-            sb.AppendLine("        \"Anchor_d_ws_base\": " + Dbl(r.D_ws_base) + ",");
-            sb.AppendLine("        \"Anchor_d_p_base\": " + Dbl(r.D_p_base) + ",");
-            sb.AppendLine("        \"Anchor_xh_base\": " + Dbl(r.Xh_base) + ",");
-            sb.AppendLine("        \"Anchor_nh_base_var1\": " + Dbl(r.Nh_base_var1) + ",");
-            sb.AppendLine("        \"Anchor_nh_base_var2\": " + Dbl(r.Nh_base_var2) + ",");
-            sb.AppendLine("        \"Anchor_k_fws_base\": " + WeldValue(r.K_fws_base) + ",");
-            sb.AppendLine("        \"Anchor_anchor_var_1\": \"" + JsonEscape(r.Anchor_var_1) + "\",");
-            sb.AppendLine("        \"Anchor_anchor_var_2\": \"" + JsonEscape(r.Anchor_var_2) + "\",");
-            sb.AppendLine("        \"Anchor_anchor_var_3\": \"" + JsonEscape(r.Anchor_var_3) + "\",");
-            sb.AppendLine("        \"Anchor_anchor_var_4\": \"" + JsonEscape(r.Anchor_var_4) + "\"");
+            sb.AppendLine("        \"Lws_base\": " + Dbl(r.Lws_base) + ",");
+            sb.AppendLine("        \"Lp_base\": " + Dbl(r.Lp_base) + ",");
+            sb.AppendLine("        \"Ls_base\": " + Dbl(r.Ls_base) + ",");
+            sb.AppendLine("        \"Tws_base\": " + Dbl(r.Tws_base) + ",");
+            sb.AppendLine("        \"D_ws_base\": " + Dbl(r.D_ws_base) + ",");
+            sb.AppendLine("        \"D_p_base\": " + Dbl(r.D_p_base) + ",");
+            sb.AppendLine("        \"xh\": " + Dbl(r.xh_holes) + ",");
+            sb.AppendLine("        \"Nh_base_var1\": " + Dbl(r.Nh_base_var1) + ",");
+            sb.AppendLine("        \"Nh_base_var2\": " + Dbl(r.Nh_base_var2) + ",");
+            sb.AppendLine("        \"K_fws_base\": " + WeldValue(r.K_fws_base) + ",");
+            sb.AppendLine("        \"Anchor_var_1\": \"" + JsonEscape(r.Anchor_var_1) + "\",");
+            sb.AppendLine("        \"Anchor_var_2\": \"" + JsonEscape(r.Anchor_var_2) + "\",");
+            sb.AppendLine("        \"Anchor_var_3\": \"" + JsonEscape(r.Anchor_var_3) + "\",");
+            sb.AppendLine("        \"Anchor_var_4\": \"" + JsonEscape(r.Anchor_var_4) + "\"");
             sb.AppendLine("      },");
         }
         private void WriteShearKey(StringBuilder sb, Row r)
@@ -525,6 +526,7 @@ namespace ConvertData.Infrastructure
                 var r = rows[i];
                 sb.AppendLine("  {");
                 sb.AppendLine("    \"Name\": \"" + JsonEscape(r.Name) + "\",");
+                sb.AppendLine("    \"StructuralElement\": \"" + JsonEscape(r.StructuralElement) + "\",");
                 sb.AppendLine("    \"GUID_NODE\": \"" + Guid.NewGuid().ToString() + "\",");
                 sb.AppendLine("    \"CONNECTION_CODE\": \"" + JsonEscape(processedCodes[i]) + "\",");
                 sb.AppendLine("    \"TypeNode\": \"" + JsonEscape(r.TypeNode) + "\",");

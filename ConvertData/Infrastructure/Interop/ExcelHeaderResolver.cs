@@ -79,15 +79,16 @@ internal static class ExcelHeaderResolver
         {
             //Общие данные об узле
             IdxName = HeaderUtils.IndexOfHeader(header, "Name"),
-            IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE", "Connection_Code", "Code", "Код"]),
-            IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode", "Тип узла", "ТипУзла", "Вид узла"]),
-            IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GostBeams", "GostColumnAndBeams", "GOST_Column_Beams", "Gost_Column_Beams", "GOST Column Beams"]),
-            IdxGostBolts = HeaderUtils.IndexOfHeaderAny(header, ["GostBolts", "GOST_bolts"]),
-            IdxGostAnchore = HeaderUtils.IndexOfHeaderAny(header, ["GostAnchore", "GOST_anchor", "GOST_anchors"]),
-            IdxGostWeld = HeaderUtils.IndexOfHeaderAny(header, ["GostWeld", "GOST_weld"]),
-            IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostColumn", "GOST_Profile", "Gost_Profile", "GOST Profile"]),
+            IdxStructuralElement = HeaderUtils.IndexOfHeader(header, "StructuralElement"),
+            IdxCode = HeaderUtils.IndexOfHeaderAny(header, ["CONNECTION_CODE"]),
+            IdxTypeNode = HeaderUtils.IndexOfHeaderAny(header, ["TypeNode"]),
+            IdxGostColumnAndBeams = HeaderUtils.IndexOfHeaderAny(header, ["GostBeams"]),
+            IdxGostBolts = HeaderUtils.IndexOfHeaderAny(header, ["GostBolts"]),
+            IdxGostAnchore = HeaderUtils.IndexOfHeaderAny(header, ["GostAnchore"]),
+            IdxGostWeld = HeaderUtils.IndexOfHeaderAny(header, ["GostWeld"]),
+            IdxGostProfile = HeaderUtils.IndexOfHeaderAny(header, ["GostColumn"]),
             IdxExplanations = HeaderUtils.IndexOfHeaderAny(header, ["Explanations", "Explanation"]),
-            IdxTableBrand = HeaderUtils.IndexOfHeaderAny(header, ["Марка опорного столика", "Маркаопорногостолика", "Марка"]),
+            IdxTableBrand = HeaderUtils.IndexOfHeaderAny(header, ["Марка опорного столика"]),
 
 
             //Внутренние усилия

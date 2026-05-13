@@ -316,6 +316,7 @@ internal sealed class EpplusWorksheetReader
     {
         var row = RowMapper.MapMainRowIdentity(
             EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, bounds.StartCol + map.IdxName),
+            EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxStructuralElement >= 0 ? bounds.StartCol + map.IdxStructuralElement : null),
             code,
             EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxTypeNode >= 0 ? bounds.StartCol + map.IdxTypeNode : null),
             EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxGostColumnAndBeams >= 0 ? bounds.StartCol + map.IdxGostColumnAndBeams : null),
@@ -417,7 +418,6 @@ internal sealed class EpplusWorksheetReader
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxB_base >= 0 ? bounds.StartCol + map.IdxB_base : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxT_base >= 0 ? bounds.StartCol + map.IdxT_base : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdK_fws_base >= 0 ? bounds.StartCol + map.IdK_fws_base : null),
-                    EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdXh_base >= 0 ? bounds.StartCol + map.IdXh_base : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdNh_base_var1 >= 0 ? bounds.StartCol + map.IdNh_base_var1 : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdNh_base_var2 >= 0 ? bounds.StartCol + map.IdNh_base_var2 : null));
                 break;

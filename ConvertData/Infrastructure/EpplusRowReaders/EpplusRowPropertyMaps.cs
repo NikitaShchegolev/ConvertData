@@ -45,26 +45,28 @@ internal static partial class EpplusRowPropertyMaps
         return false;
     }    
     internal static readonly string[] KeyColumnHeaders =  ["CONNECTION_CODE"];
+    #region Работа с листами в excel
     internal static readonly Dictionary<string, Action<Row, string>> GeometryColumnMap = BuildGeometryColumnMap();
     internal static readonly Dictionary<string, Action<Row, string>> WeldColumnMap = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["GOST_weld"] = (r, v) => r.GostWeld = v,
-            ["GostWeld"] = (r, v) => r.GostWeld = v,
-            ["kf1"] = (r, v) => r.kf1 = v,
-            ["kf2"] = (r, v) => r.kf2 = v,
-            ["kf3"] = (r, v) => r.kf3 = v,
-            ["kf4"] = (r, v) => r.kf4 = v,
-            ["kf5"] = (r, v) => r.kf5 = v,
-            ["kf6"] = (r, v) => r.kf6 = v,
-            ["kf7"] = (r, v) => r.kf7 = v,
-            ["kf8"] = (r, v) => r.kf8 = v,
-            ["kf9"] = (r, v) => r.kf9 = v,
-            ["kf10"] = (r, v) => r.kf10 = v,
-            ["k_fws"] = (r, v) => r.K_fws_base = v
-        };
+    {
+        ["GostWeld"] = (r, v) => r.GostWeld = v,
+        ["kf1"] = (r, v) => r.kf1 = v,
+        ["kf2"] = (r, v) => r.kf2 = v,
+        ["kf3"] = (r, v) => r.kf3 = v,
+        ["kf4"] = (r, v) => r.kf4 = v,
+        ["kf5"] = (r, v) => r.kf5 = v,
+        ["kf6"] = (r, v) => r.kf6 = v,
+        ["kf7"] = (r, v) => r.kf7 = v,
+        ["kf8"] = (r, v) => r.kf8 = v,
+        ["kf9"] = (r, v) => r.kf9 = v,
+        ["kf10"] = (r, v) => r.kf10 = v,
+        ["k_fws"] = (r, v) => r.K_fws_base = v
+    };
     internal static readonly Dictionary<string, Action<Row, string>> ShearKeyColumnMap = ShearKeyMap();
-    internal static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = MergeMaps(BoltsMap(), ShearKeyColumnMap);
-    internal static readonly Dictionary<string, Action<Row, string>> HolesColumnMap = HolesMap();
+    internal static readonly Dictionary<string, Action<Row, string>> AnchorColumnMap = AnchorMap();
+    internal static readonly Dictionary<string, Action<Row, string>> BoltsColumnMap = MergeMaps(MergeMaps(BoltsMap(), ShearKeyColumnMap), AnchorColumnMap);
+    internal static readonly Dictionary<string, Action<Row, string>> HolesColumnMap = MergeMaps(HolesMap(), AnchorColumnMap); 
+    #endregion
     private static Dictionary<string, Action<Row, string>> BuildGeometryColumnMap()
     {
         var map = new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase);
@@ -102,6 +104,7 @@ internal static partial class EpplusRowPropertyMaps
     private static void AddGeometryBraceBolt(Dictionary<string, Action<Row, string>> map)
     {
         AddNumericColumn(map, (r, v) => r.Lb_Brace = v, "Lb_brace");
+        AddNumericColumn(map, (r, v) => r.Tp_Brace = v, "Tp_brace");
         AddNumericColumn(map, (r, v) => r.A_Brace = v, "a_brace");
         AddNumericColumn(map, (r, v) => r.E2_Brace = v, "e2_brace");
         AddNumericColumn(map, (r, v) => r.E3_Brace = v, "e3_brace");
@@ -123,7 +126,6 @@ internal static partial class EpplusRowPropertyMaps
         map["D_ws_base"] = (r, v) => r.D_ws_base = NumericParser.ParseDouble(v);
         map["Dp_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
         map["D_p_base"] = (r, v) => r.D_p_base = NumericParser.ParseDouble(v);
-        map["xh_base"] = (r, v) => r.Xh_base = NumericParser.ParseDouble(v);
         map["K_fws_base"] = (r, v) => r.K_fws_base = v;
         map["k_fws_base"] = (r, v) => r.K_fws_base = v;
         map["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v);
@@ -206,6 +208,11 @@ internal static partial class EpplusRowPropertyMaps
                 r.Tf_Stiff = value;
         };
     }
+    /// <summary>
+    /// Метод отвечает за добавление в карту свойств геометрических характеристик для заданного типа профиля (балка, колонна, связь, ригель, прогон).
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="section"></param>
     private static void AddGeometrySection(Dictionary<string, Action<Row, string>> map, GeometrySectionDefinition section)
     {
         AddTextColumn(map, section.ProfileSetter, section.ProfileHeaders);
@@ -229,6 +236,15 @@ internal static partial class EpplusRowPropertyMaps
         AddNumericColumn(map, section.xoSetter, section.GetHeaders("xo"));
         AddNumericColumn(map, section.yoSetter, section.GetHeaders("yo"));
     }
+    /// <summary>
+    /// Метод возвращает определение геометрической секции
+    /// (балка, колонна, связь, ригель, прогон) с соответствующими сеттерами и
+    /// заголовками для заполнения свойств Row. Это позволяет избежать 
+    /// дублирования кода при добавлении различных типов профилей в карту свойств.
+    /// </summary>
+    /// <param name="sectionType"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     private static GeometrySectionDefinition GetGeometrySectionDefinition(ProfileSectionType sectionType)
     {
         return sectionType switch
@@ -239,7 +255,7 @@ internal static partial class EpplusRowPropertyMaps
                 ProfileSetter = (r, v) => r.ProfileBeam = v,
                 ProfileHeaders = ["ProfileBeam", "ProfileBeams"],
                 GostSetter = (r, v) => r.GostBeams = v,
-                GostHeaders = ["GostBeams"],
+                GostHeaders = ["GostBeam"],
                 HSetter = (r, v) => r.Beam_H = v,
                 BSetter = (r, v) => r.Beam_B = v,
                 SSetter = (r, v) => r.Beam_s = v,
@@ -449,13 +465,7 @@ internal static partial class EpplusRowPropertyMaps
             ["e2_brace"] = (r, v) => r.E2_Brace = NumericParser.ParseDouble(v),
             ["e3_brace"] = (r, v) => r.E3_Brace = NumericParser.ParseDouble(v),
             ["n1_brace"] = (r, v) => r.N1_Brace = NumericParser.ParseDouble(v),
-            ["n2_brace"] = (r, v) => r.N2_Brace = NumericParser.ParseDouble(v),
-            ["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
-            ["Nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
-            ["Anchor_var_1"] = (r, v) => r.Anchor_var_1 = v,
-            ["Anchor_var_2"] = (r, v) => r.Anchor_var_2 = v,
-            ["Anchor_var_3"] = (r, v) => r.Anchor_var_3 = v,
-            ["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v
+            ["n2_brace"] = (r, v) => r.N2_Brace = NumericParser.ParseDouble(v)
         };
     }
 
@@ -465,6 +475,20 @@ internal static partial class EpplusRowPropertyMaps
         {
             ["Lp_shearKey"] = (r, v) => r.Lp_ShearKey = NumericParser.ParseDouble(v),
             ["Ls_shearKey"] = (r, v) => r.Ls_ShearKey = NumericParser.ParseDouble(v)
+        };
+    }
+
+    private static Dictionary<string, Action<Row, string>> AnchorMap()
+    {
+        return new Dictionary<string, Action<Row, string>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["GostAnchore"] = (r, v) => r.GostAnchore = v,
+            ["Nh_base_var1"] = (r, v) => r.Nh_base_var1 = NumericParser.ParseDouble(v),
+            ["Nh_base_var2"] = (r, v) => r.Nh_base_var2 = NumericParser.ParseDouble(v),
+            ["Anchor_var_1"] = (r, v) => r.Anchor_var_1 = v,
+            ["Anchor_var_2"] = (r, v) => r.Anchor_var_2 = v,
+            ["Anchor_var_3"] = (r, v) => r.Anchor_var_3 = v,
+            ["Anchor_var_4"] = (r, v) => r.Anchor_var_4 = v
         };
     }
 
@@ -488,8 +512,7 @@ internal static partial class EpplusRowPropertyMaps
             ["F_holes"] = (r, v) => r.F_holes = NumericParser.ParseInt(v),
             ["Dws_holes"] = (r, v) => r.Dws_holes = NumericParser.ParseDouble(v),
             ["Dp_holes"] = (r, v) => r.Dp_holes = NumericParser.ParseDouble(v),
-            ["xh"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
-            ["xh_holes"] = (r, v) => r.Anchor_xh_holes = NumericParser.ParseDouble(v),
+            ["xh"] = (r, v) => r.xh_holes = NumericParser.ParseDouble(v),
             ["Nh_holes_1_4"] = (r, v) => r.Nh_Holes_1_4 = NumericParser.ParseInt(v),
             ["Nh_holes_5_8"] = (r, v) => r.Nh_Holes_5_8 = NumericParser.ParseInt(v)
         };

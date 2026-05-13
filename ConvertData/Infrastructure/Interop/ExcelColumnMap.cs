@@ -11,6 +11,8 @@ internal sealed class ExcelColumnMap
     #region Основное
     /// <summary>Индекс колонки "Name" (имя соединения).</summary>
     public int IdxName { get; set; } = -1;
+    /// <summary>Индекс колонки "StructuralElement" (тип конструктивного элемента).</summary>
+    public int IdxStructuralElement { get; set; } = -1;
     /// <summary>Проверяет, является ли таблица основной (содержит Name, Code, Profile).</summary>
     public bool IsMainTable => IdxName >= 0 && IdxCode >= 0 && IdxProfileBeam >= 0;
 
@@ -283,5 +285,6 @@ internal sealed class ExcelColumnMap
     #region Противосдвиговой упор/ShearKey
     public int IdxLp_shearKey { get; set; } = -1;
     public int IdxLs_shearKey { get; set; } = -1;
+    
     #endregion
 }
