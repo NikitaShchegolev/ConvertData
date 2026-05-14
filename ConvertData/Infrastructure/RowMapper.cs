@@ -119,20 +119,24 @@ internal static class RowMapper
         string tg_stiff,
         string lg_stiff,
         string tf_stiff,
+        string twp_stiff,
+        string tbp_stiff,
         string lh_stiff,
         string hh_stiff)
     {
-        row.B_Stiff = NumericParser.ParseDouble(b_stiff);
         row.H_Stiff = NumericParser.ParseDouble(h_stiff);
+        row.Hh_Stiff = NumericParser.ParseDouble(hh_stiff);
+        row.B_Stiff = NumericParser.ParseDouble(b_stiff);
         row.Lws_Stiff = NumericParser.ParseDouble(lws_stiff);
+        row.Lh_Stiff = NumericParser.ParseDouble(lh_stiff);
         row.Tp_Stiff = NumericParser.ParseDouble(tp_stiff_map);
         row.Tr1_Stiff = NumericParser.ParseDouble(tr1_stiff_map);
         row.Tr2_Stiff = NumericParser.ParseDouble(tr2_stiff_map);
         row.Tg_Stiff = NumericParser.ParseDouble(tg_stiff);
         row.Lg_Stiff = NumericParser.ParseDouble(lg_stiff);
         row.Tf_Stiff = NumericParser.ParseDouble(tf_stiff);
-        row.Lh_Stiff = NumericParser.ParseDouble(lh_stiff);
-        row.Hh_Stiff = NumericParser.ParseDouble(hh_stiff);
+        row.Twp_Stiff = NumericParser.ParseDouble(twp_stiff);
+        row.Tbp_Stiff = NumericParser.ParseDouble(tbp_stiff);
     }
 
     internal static void MapMainRowBase(

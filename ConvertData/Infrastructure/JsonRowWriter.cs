@@ -267,11 +267,16 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"t_Flange\": " + Dbl(r.Flange_t));
             sb.AppendLine("      },");
         }
-
+        /// <summary>
+        /// Ребро жесткости
+        /// </summary>
+        /// <param name="sb">Построение строки</param>
+        /// <param name="r">Параметры ребра</param>
         private static void WriteStiff(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Stiff\": {");
             sb.AppendLine("        \"H_Stiff\": " + Dbl(r.H_Stiff) + ",");
+            sb.AppendLine("        \"Hh_Stiff\": " + Dbl(r.Hh_Stiff) + ",");
             sb.AppendLine("        \"B_Stiff\": " + Dbl(r.B_Stiff) + ",");
             sb.AppendLine("        \"Lg_Stiff\": " + Dbl(r.Lg_Stiff) + ",");
             sb.AppendLine("        \"Lh_Stiff\": " + Dbl(r.Lh_Stiff) + ",");
@@ -279,12 +284,17 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"tp_Stiff\": " + Dbl(r.Tp_Stiff) + ",");
             sb.AppendLine("        \"tr1_Stiff\": " + Dbl(r.Tr1_Stiff) + ",");
             sb.AppendLine("        \"tr2_Stiff\": " + Dbl(r.Tr2_Stiff) + ",");
-            sb.AppendLine("        \"Tg_Stiff\": " + Dbl(r.Tg_Stiff) + ",");
-            sb.AppendLine("        \"Tf_Stiff\": " + Dbl(r.Tf_Stiff) + ",");
-            sb.AppendLine("        \"Hh_Stiff\": " + Dbl(r.Hh_Stiff));
+            sb.AppendLine("        \"tg_Stiff\": " + Dbl(r.Tg_Stiff) + ",");
+            sb.AppendLine("        \"tf_Stiff\": " + Dbl(r.Tf_Stiff) + ",");
+            sb.AppendLine("        \"tbp_Stiff\": " + Dbl(r.Tbp_Stiff) + ",");
+            sb.AppendLine("        \"twp_Stiff\": " + Dbl(r.Twp_Stiff));
             sb.AppendLine("      },");
         }
-
+        /// <summary>
+        /// Базы
+        /// </summary>
+        /// <param name="sb">Построение строки</param>
+        /// <param name="r">Параметры базы</param>
         private static void WriteBase(StringBuilder sb, Row r)
         {
             sb.AppendLine("      \"Base\": {");
@@ -298,7 +308,11 @@ namespace ConvertData.Infrastructure
             sb.AppendLine("        \"Tws_base\": " + Dbl(r.Tws_base));
             sb.AppendLine("      }");
         }
-
+        /// <summary>
+        /// Болты
+        /// </summary>
+        /// <param name="sb">Построение строки</param>
+        /// <param name="r">Параметры болтов</param>
         private static void WriteBolts(StringBuilder sb, Row r)
         {
             sb.AppendLine("    \"Bolts\": {");

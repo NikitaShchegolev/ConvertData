@@ -176,15 +176,17 @@ internal sealed class ExcelColumnMap
     #region Ребра жесткости
     public int IdxB_stiff { get; set; } = -1;
     public int IdxH_stiff { get; set; } = -1;
+    public int IdxHh_Stiff { get; set; } = -1;
     public int Idxtp_stiff { get; set; } = -1;
+    public int IdxLh_Stiff { get; set; } = -1;
     public int IdxLws_stiff { get; set; } = -1;
     public int Idxtr1_stiff { get; set; } = -1;
     public int Idxtr2_stiff { get; set; } = -1;
     public int IdxTg_Stiff { get; set; } = -1;
     public int IdxLg_Stiff { get; set; } = -1;
     public int IdxTf_Stiff { get; set; } = -1;
-    public int IdxLh_Stiff { get; set; } = -1;
-    public int IdxHh_Stiff { get; set; } = -1;
+    public int IdxTwp_Stiff { get; set; } = -1;
+    public int IdxTbp_Stiff { get; set; } = -1;
     #endregion
     #region Фланец
     public int IdxTp_Flange { get; set; } = -1;

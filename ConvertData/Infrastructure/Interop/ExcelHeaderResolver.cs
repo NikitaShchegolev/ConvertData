@@ -68,11 +68,11 @@ internal static class ExcelHeaderResolver
         {
             idxProfile = HeaderUtils.IndexOfHeader(header, ProfileColumnOverride);
             if (idxProfile < 0)
-                idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
+                idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam"]);
         }
         else
         {
-            idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam", "Профиль"]);
+            idxProfile = HeaderUtils.IndexOfHeaderAny(header, ["ProfileBeam"]);
         }
         //IdxProfileBeam = idxProfile, - не знаю для чего!
         var map = new ExcelColumnMap
@@ -92,7 +92,7 @@ internal static class ExcelHeaderResolver
 
 
             //Внутренние усилия
-            IdF_base = HeaderUtils.IndexOfHeaderAny(header, ["F_base", "Fbase", "F_base_anchor"]),
+            IdF_base = HeaderUtils.IndexOfHeaderAny(header, ["F_base"]),
             IdxNt = HeaderUtils.IndexOfHeader(header, "Nt"),
             IdxQy = HeaderUtils.IndexOfHeaderAny(header, ["Qy"]),
             IdxQz = HeaderUtils.IndexOfHeaderAny(header, ["Qz"]),
@@ -113,11 +113,11 @@ internal static class ExcelHeaderResolver
             IdxSj = HeaderUtils.IndexOfHeader(header, "Sj"),
             IdxSjo = HeaderUtils.IndexOfHeader(header, "Sjo"),
 
-
-            IdLws_base = HeaderUtils.IndexOfHeaderAny(header, ["Lws_base", "Lws", "L_ws"]),
+            //Параметры баз (размеры, геометрические характеристики)
+            IdLws_base = HeaderUtils.IndexOfHeaderAny(header, ["Lws_base"]),
             IdLp_base = HeaderUtils.IndexOfHeaderAny(header, ["Lp_base"]),
             IdLs_base = HeaderUtils.IndexOfHeaderAny(header, ["Ls_base"]),
-            IdTws_base = HeaderUtils.IndexOfHeaderAny(header, ["Tws_base", "tws", "Tws", "tws_base"]),
+            IdTws_base = HeaderUtils.IndexOfHeaderAny(header, ["Tws_base"]),
             IdD_ws_base = HeaderUtils.IndexOfHeaderAny(header, ["D_ws_base", "Dws", "D_ws", "d_ws_base"]),
             IdD_p_base = HeaderUtils.IndexOfHeaderAny(header, ["D_p_base", "Dp", "D_p", "d_p_base"]),
             IdXh_base = HeaderUtils.IndexOfHeaderAny(header, ["Xh_base", "xh", "Xh", "xh_base"]),
@@ -128,26 +128,28 @@ internal static class ExcelHeaderResolver
             IdxB_base = HeaderUtils.IndexOfHeaderAny(header, ["B_base"]),
             IdxS_base = HeaderUtils.IndexOfHeaderAny(header, ["S_base"]),
             IdxT_base = HeaderUtils.IndexOfHeaderAny(header, ["T_base"]),
-
+            //Параметры пластин
             IdxLb_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lb_plate"]),
-            IdxB_plate = HeaderUtils.IndexOfHeaderAny(header, ["B_plate", "Plate_B"]),
-            IdxH_plate = HeaderUtils.IndexOfHeaderAny(header, ["H_plate", "Plate_H"]),
-            IdxLws_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lws_plate", "Plate_Lws"]),
-            IdxTp_plate = HeaderUtils.IndexOfHeaderAny(header, ["tp_plate", "Tp_plate", "Plate_t", "Plate_tp"]),
-            IdxTr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr1_plate", "Tr1_plate", "Plate_tr1"]),
-            IdxTr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["tr2_plate", "Tr2_plate", "Plate_tr2"]),
+            IdxB_plate = HeaderUtils.IndexOfHeaderAny(header, ["B_plate"]),
+            IdxH_plate = HeaderUtils.IndexOfHeaderAny(header, ["H_plate"]),
+            IdxLws_plate = HeaderUtils.IndexOfHeaderAny(header, ["Lws_plate"]),
+            IdxTp_plate = HeaderUtils.IndexOfHeaderAny(header, ["Tp_plate"]),
+            IdxTr1_plate = HeaderUtils.IndexOfHeaderAny(header, ["Tr1_plate"]),
+            IdxTr2_plate = HeaderUtils.IndexOfHeaderAny(header, ["Tr2_plate"]),
 
-            IdxB_stiff = HeaderUtils.IndexOfHeaderAny(header, ["B_stiff", "Stiff_B"]),
-            IdxH_stiff = HeaderUtils.IndexOfHeaderAny(header, ["H_stiff", "Stiff_H"]),
-            IdxLws_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lws_stiff", "Stiff_Lws"]),
-            Idxtp_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tp_stiff", "Tp_stiff", "Stiff_tp"]),
-            Idxtr1_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tr1_stiff", "Tr1_stiff", "Stiff_tr1"]),
-            Idxtr2_stiff = HeaderUtils.IndexOfHeaderAny(header, ["tr2_stiff", "Tr2_stiff", "Stiff_tr2"]),
+            IdxH_stiff = HeaderUtils.IndexOfHeaderAny(header, ["H_stiff"]),
+            IdxHh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Hh_stiff"]),
+            IdxB_stiff = HeaderUtils.IndexOfHeaderAny(header, ["B_stiff"]),
+            IdxLws_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lws_stiff"]),
+            IdxLh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lh_stiff"]),
+            Idxtp_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tp_stiff"]),
+            Idxtr1_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tr1_stiff"]),
+            Idxtr2_stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tr2_stiff"]),
             IdxTg_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tg_stiff"]),
             IdxLg_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lg_stiff"]),
             IdxTf_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tf_stiff"]),
-            IdxLh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Lh_stiff"]),
-            IdxHh_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Hh_stiff"]),
+            IdxTwp_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Twp_stiff"]),
+            IdxTbp_Stiff = HeaderUtils.IndexOfHeaderAny(header, ["Tbp_stiff"]),
 
             IdxTp_Flange = HeaderUtils.IndexOfHeaderAny(header, ["Tp_flange"]),
             IdxB_Flange = HeaderUtils.IndexOfHeaderAny(header, ["B_flange"]),
@@ -163,7 +165,7 @@ internal static class ExcelHeaderResolver
             IdxLp_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Lp_shearKey"]),
             IdxLs_shearKey = HeaderUtils.IndexOfHeaderAny(header, ["Ls_shearKey"]),
 
-            Idx_a_brace = HeaderUtils.IndexOfHeaderAny(header, ["a_brace"]),
+            Idx_a_brace = HeaderUtils.IndexOfHeaderAny(header,  ["a_brace"]),
             Idx_e2_brace = HeaderUtils.IndexOfHeaderAny(header, ["e2_brace"]),
             Idx_e3_brace = HeaderUtils.IndexOfHeaderAny(header, ["e3_brace"]),
             Idx_n1_brace = HeaderUtils.IndexOfHeaderAny(header, ["n1_brace"]),
@@ -173,7 +175,7 @@ internal static class ExcelHeaderResolver
 
         foreach (var sectionType in ProfileSections)
             ResolveProfileSectionHeaders(header, map, sectionType);
-
+        //
         map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "α");
         if (map.IdxAlpha < 0) map.IdxAlpha = HeaderUtils.IndexOfHeader(header, "Alpha");
         map.IdxBeta = HeaderUtils.IndexOfHeader(header, "β");
@@ -192,6 +194,12 @@ internal static class ExcelHeaderResolver
         return map;
     }
 
+    /// <summary>
+    /// Метод для разрешения заголовков колонок, относящихся к профилям (балки, колонны, связи и т.д.).
+    /// </summary>
+    /// <param name="header">Список заголовков.</param>
+    /// <param name="map">Карта индексов колонок.</param>
+    /// <param name="sectionType">Тип секции профиля.</param>
     private static void ResolveProfileSectionHeaders(List<string> header, ExcelColumnMap map, ProfileSectionType sectionType)
     {
         if (!ProfileSectionHeaders.TryGetValue(sectionType, out var headerInfo))

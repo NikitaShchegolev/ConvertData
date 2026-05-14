@@ -207,6 +207,20 @@ internal static partial class EpplusRowPropertyMaps
             if (r.Tf_Stiff == 0)
                 r.Tf_Stiff = value;
         };
+        map["Twp_stiff"] = (r, v) =>
+        {
+            var value = NumericParser.ParseDouble(v);
+            r.Twp_Stiff = value;
+            if (r.Twp_Stiff == 0)
+                r.Twp_Stiff = value;
+        };
+        map["Tbp_stiff"] = (r, v) =>
+        {
+            var value = NumericParser.ParseDouble(v);
+            r.Tbp_Stiff = value;
+            if (r.Tbp_Stiff == 0)
+                r.Tbp_Stiff = value;
+        };
     }
     /// <summary>
     /// Метод отвечает за добавление в карту свойств геометрических характеристик для заданного типа профиля (балка, колонна, связь, ригель, прогон).

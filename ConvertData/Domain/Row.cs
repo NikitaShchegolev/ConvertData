@@ -324,17 +324,19 @@ public double B_Plate { get; set; }
     public double Tr2_Plate { get; set; }
     #endregion
     #region Ребра жесткости
-    public double B_Stiff { get; set; }
     public double H_Stiff { get; set; }
+    public double Hh_Stiff { get; set; }
+    public double B_Stiff { get; set; }
     public double Lws_Stiff { get; set; }
+    public double Lh_Stiff { get; set; }
     public double Tp_Stiff { get; set; }
     public double Tr1_Stiff { get; set; }
     public double Tr2_Stiff { get; set; }
     public double Tg_Stiff { get; set; }
     public double Lg_Stiff { get; set; }
     public double Tf_Stiff { get; set; }
-    public double Lh_Stiff { get; set; }
-    public double Hh_Stiff { get; set; }
+    public double Twp_Stiff { get; set; }
+    public double Tbp_Stiff { get; set; }
     #endregion
     #region Flange
     /// <summary>

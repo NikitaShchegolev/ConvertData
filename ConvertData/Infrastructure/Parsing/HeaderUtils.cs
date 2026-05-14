@@ -2,7 +2,12 @@ using System;
 using System.Collections.Generic;
 
 namespace ConvertData.Infrastructure.Parsing;
-
+/// <summary>
+/// нужен для нормализации и поиска заголовков Excel
+/// •	приводит заголовки к единому виду
+/// •	убирает мусорные/невидимые символы
+/// •	обрезает отличия, из-за которых одинаковые заголовки могут не совпасть строка в строку
+/// </summary>
 internal static class HeaderUtils
 {
     public static string NormalizeHeader(string h)

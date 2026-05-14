@@ -67,6 +67,7 @@ internal sealed class EpplusWorksheetReader
         "Tg_stiff",
         "Lg_stiff",
         "Tf_stiff",
+        "Twp_stiff",
         "Lh_stiff",
         "Hh_stiff",
         "F_base",
@@ -400,6 +401,8 @@ internal sealed class EpplusWorksheetReader
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxTg_Stiff >= 0 ? bounds.StartCol + map.IdxTg_Stiff : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxLg_Stiff >= 0 ? bounds.StartCol + map.IdxLg_Stiff : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxTf_Stiff >= 0 ? bounds.StartCol + map.IdxTf_Stiff : null),
+                    EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxTwp_Stiff >= 0 ? bounds.StartCol + map.IdxTwp_Stiff : null),
+                    EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxTbp_Stiff >= 0 ? bounds.StartCol + map.IdxTbp_Stiff : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxLh_Stiff >= 0 ? bounds.StartCol + map.IdxLh_Stiff : null),
                     EpplusWorksheetHelpers.GetCell(worksheet, rowIndex, map.IdxHh_Stiff >= 0 ? bounds.StartCol + map.IdxHh_Stiff : null));
                 break;
